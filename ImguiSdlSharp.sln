@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImguiSdlSharp.Native", "src\ImguiSdlSharp.Native\ImguiSdlSharp.Native.vcxproj", "{22AC315C-F1E2-4014-9905-3BED66F72A35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImguiSdlSharp", "src\ImguiSdlSharp\ImguiSdlSharp.csproj", "{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x64.Build.0 = Release|x64
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x86.ActiveCfg = Release|Win32
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x86.Build.0 = Release|Win32
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|x64.Build.0 = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Debug|x86.Build.0 = Debug|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|x64.ActiveCfg = Release|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|x64.Build.0 = Release|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|x86.ActiveCfg = Release|Any CPU
+		{FD0FA913-2784-47D9-BA76-4D38BEBC2D6B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
