@@ -72,7 +72,7 @@ extern "C"
 // CIMGUI_API is used for core imgui functions, IMGUI_IMPL_API is used for the default backends files (imgui_impl_xxx.h)
 // Using dear imgui via a shared library is not recommended, because we don't guarantee backward nor forward ABI compatibility (also function call overhead, as dear imgui is a call-heavy API)
 #ifndef CIMGUI_API
-#define CIMGUI_API __declspec(dllexport)
+#define CIMGUI_API
 #endif // #ifndef CIMGUI_API
 #ifndef IMGUI_IMPL_API
 #define IMGUI_IMPL_API              CIMGUI_API

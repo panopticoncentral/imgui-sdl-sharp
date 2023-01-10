@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using static SdlSharp.Imgui.Native;
+
+// Interop structures have unused private members for padding
+#pragma warning disable IDE0051 // Private member ... is unused
+
+// Some interop structures have unused fields
+#pragma warning disable CS0169 // The field ... is never used
 
 namespace SdlSharp.Imgui
 {
@@ -11,39 +16,17 @@ namespace SdlSharp.Imgui
         public const string IMGUI_VERSION = "1.89.2";
         public const int IMGUI_VERSION_NUM = 18920;
 
-        #region FORWARDS TODO
-        public struct ImGuiContext { }
-        public struct ImFontAtlas { }
-        public struct ImDrawData { }
-        public struct ImDrawList { }
-        public struct ImGuiSizeCallback { }
-
-        public struct ImFont { }
-
-        public struct ImGuiTableSortSpecs { }
-
-        public struct ImGuiInputTextCallback { }
-
-        public struct ImGuiPayload { }
-
-        public struct ImGuiViewport { }
-
-        public struct ImDrawListSharedData { }
-
-        public struct ImGuiStorage { }
-
-        public struct ImGuiMemAllocFunc { }
-
-        public struct ImGuiMemFreeFunc { }
-        #endregion
-
         public readonly record struct ImTextureID(nuint Value);
 
         public readonly record struct ImGuiID(uint Value);
 
+        public readonly record struct ImDrawIdx(ushort Value);
+
         public readonly record struct ImVec2(float x, float y) { }
 
         public readonly record struct ImVec4(float x, float y, float z, float w) { }
+
+        public readonly struct ImGuiContext { }
 
         #region Context creation and access
 
@@ -196,7 +179,7 @@ namespace SdlSharp.Imgui
         public static extern void ImGui_SetNextWindowSize(ImVec2 size, ImGuiCond cond = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_SetNextWindowSizeConstraints(ImVec2 size_min, ImVec2 size_max, ImGuiSizeCallback custom_callback = default, void* custom_callback_data = default);
+        public static extern void ImGui_SetNextWindowSizeConstraints(ImVec2 size_min, ImVec2 size_max, delegate* unmanaged[Cdecl]<ImGuiSizeCallbackData*, void> custom_callback = default, void* custom_callback_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_SetNextWindowContentSize(ImVec2 size);
@@ -799,19 +782,19 @@ namespace SdlSharp.Imgui
         public static extern bool ImGui_InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, ImGuiInputTextCallback callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputTextMultiline(byte* label, char* buf, nuint buf_size);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, ImGuiInputTextCallback callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputTextWithHint(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, ImGuiInputTextCallback callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputFloat(byte* label, float* v);
@@ -1423,8 +1406,9 @@ namespace SdlSharp.Imgui
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern int ImGui_GetFrameCount();
 
-        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern ImDrawListSharedData* ImGui_GetDrawListSharedData();
+        // ImDrawListSharedData is internal
+        // [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        // public static extern ImDrawListSharedData* ImGui_GetDrawListSharedData();
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern byte* ImGui_GetStyleColorName(ImGuiCol idx);
@@ -1593,10 +1577,10 @@ namespace SdlSharp.Imgui
         #region Memory Allocators
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_SetAllocatorFunctions(ImGuiMemAllocFunc alloc_func, ImGuiMemFreeFunc free_func, void* user_data = default);
+        public static extern void ImGui_SetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*> alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void> free_func, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_GetAllocatorFunctions(ImGuiMemAllocFunc* p_alloc_func, ImGuiMemFreeFunc* p_free_func, void** p_user_data);
+        public static extern void ImGui_GetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*>* p_alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void>* p_free_func, void** p_user_data);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void* ImGui_MemAlloc(nuint size);
@@ -1935,7 +1919,7 @@ namespace SdlSharp.Imgui
             ImGuiDir_COUNT,
         }
 
-        public enum ImGuiSortDirection
+        public enum ImGuiSortDirection : byte
         {
             ImGuiSortDirection_None = 0,
             ImGuiSortDirection_Ascending = 1,
@@ -2353,6 +2337,7 @@ namespace SdlSharp.Imgui
             public bool AntiAliasedFill;
             public float CurveTessellationTol;
             public float CircleTessellationMaxError;
+            // TODO
             public fixed float /* ImVec4 */ Colors[(int)ImGuiCol.ImGuiCol_COUNT * 4];
         }
 
@@ -2373,115 +2358,883 @@ namespace SdlSharp.Imgui
 
         public struct ImGuiIO
         {
-            ImGuiConfigFlags ConfigFlags;
-            ImGuiBackendFlags BackendFlags;
-            ImVec2 DisplaySize;
-            float DeltaTime;
-            float IniSavingRate;
-            byte* IniFilename;
-            byte* LogFilename;
-            float MouseDoubleClickTime;
-            float MouseDoubleClickMaxDist;
-            float MouseDragThreshold;
-            float KeyRepeatDelay;
-            float KeyRepeatRate;
-            float HoverDelayNormal;
-            float HoverDelayShort;
-            void* UserData;
+            // Configuration
+            public ImGuiConfigFlags ConfigFlags;
+            public ImGuiBackendFlags BackendFlags;
+            public ImVec2 DisplaySize;
+            public float DeltaTime;
+            public float IniSavingRate;
+            public byte* IniFilename;
+            public byte* LogFilename;
+            public float MouseDoubleClickTime;
+            public float MouseDoubleClickMaxDist;
+            public float MouseDragThreshold;
+            public float KeyRepeatDelay;
+            public float KeyRepeatRate;
+            public float HoverDelayNormal;
+            public float HoverDelayShort;
+            public void* UserData;
 
-            ImFontAtlas* Fonts;
-            float FontGlobalScale;
-            bool FontAllowUserScaling;
-            ImFont* FontDefault;
-            ImVec2 DisplayFramebufferScale;
+            public ImFontAtlas* Fonts;
+            public float FontGlobalScale;
+            public bool FontAllowUserScaling;
+            public ImFont* FontDefault;
+            public ImVec2 DisplayFramebufferScale;
 
-            bool MouseDrawCursor;
-            bool ConfigMacOSXBehaviors;
-            bool ConfigInputTrickleEventQueue;
-            bool ConfigInputTextCursorBlink;
-            bool ConfigInputTextEnterKeepActive;
-            bool ConfigDragClickToInputText;
-            bool ConfigWindowsResizeFromEdges;
-            bool ConfigWindowsMoveFromTitleBarOnly;
-            float ConfigMemoryCompactTimer;
+            public bool MouseDrawCursor;
+            public bool ConfigMacOSXBehaviors;
+            public bool ConfigInputTrickleEventQueue;
+            public bool ConfigInputTextCursorBlink;
+            public bool ConfigInputTextEnterKeepActive;
+            public bool ConfigDragClickToInputText;
+            public bool ConfigWindowsResizeFromEdges;
+            public bool ConfigWindowsMoveFromTitleBarOnly;
+            public float ConfigMemoryCompactTimer;
 
-            byte* BackendPlatformName;
-            byte* BackendRendererName;
-            void* BackendPlatformUserData;
-            void* BackendRendererUserData;
-            void* BackendLanguageUserData;
+            // Platform functions
+            public byte* BackendPlatformName; 
+            public byte* BackendRendererName;
+            public void* BackendPlatformUserData;
+            public void* BackendRendererUserData;
+            public void* BackendLanguageUserData;
 
-            byte* (*GetClipboardTextFn)(void* user_data);
-            void (* SetClipboardTextFn) (void* user_data, byte* text);
-            void* ClipboardUserData;
+            public delegate* unmanaged[Cdecl]<void*, byte*> GetClipboardTextFn;
+            public delegate* unmanaged[Cdecl]<void*, byte*, void> SetClipboardTextFn;
+            public void* ClipboardUserData;
 
-            void (* SetPlatformImeDataFn) (ImGuiViewport* viewport, ImGuiPlatformImeData* data);
-            void* _UnusedPadding;
+            public delegate* unmanaged[Cdecl]<ImGuiViewport*, ImGuiPlatformImeData*, void> SetPlatformImeDataFn;
+            private readonly nuint UnusedPadding;
 
-            bool WantCaptureMouse;
-            bool WantCaptureKeyboard;
-            bool WantTextInput;
-            bool WantSetMousePos;
-            bool WantSaveIniSettings;
-            bool NavActive;
-            bool NavVisible;
-            float Framerate;
-            int MetricsRenderVertices;
-            int MetricsRenderIndices;
-            int MetricsRenderWindows;
-            int MetricsActiveWindows;
-            int MetricsActiveAllocations;
-            ImVec2 MouseDelta;
+            // Output
+            public bool WantCaptureMouse;
+            public bool WantCaptureKeyboard;
+            public bool WantTextInput;
+            public bool WantSetMousePos;
+            public bool WantSaveIniSettings;
+            public bool NavActive;
+            public bool NavVisible;
+            public float Framerate;
+            public int MetricsRenderVertices;
+            public int MetricsRenderIndices;
+            public int MetricsRenderWindows;
+            public int MetricsActiveWindows;
+            public int MetricsActiveAllocations;
+            public ImVec2 MouseDelta;
 
-            ImVec2 MousePos;
-            fixed bool MouseDown[5];
-            float MouseWheel;
-            float MouseWheelH;
-            bool KeyCtrl;
-            bool KeyShift;
-            bool KeyAlt;
-            bool KeySuper;
-
-            ImGuiKeyChord KeyMods;
-            ImGuiKeyData KeysData[ImGuiKey_KeysData_SIZE];
-            bool WantCaptureMouseUnlessPopupClose;
-            ImVec2 MousePosPrev;
-            fixed ImVec2 MouseClickedPos[5];
-            fixed double MouseClickedTime[5];
-            fixed bool MouseClicked[5];
-            fixed bool MouseDoubleClicked[5];
-            fixed ushort MouseClickedCount[5];
-            fixed ushort MouseClickedLastCount[5];
-            fixed bool MouseReleased[5];
-            fixed bool MouseDownOwned[5];
-            fixed bool MouseDownOwnedUnlessPopupClose[5];
-            fixed float MouseDownDuration[5];
-            fixed float MouseDownDurationPrev[5];
-            fixed float MouseDragMaxDistanceSqr[5];
-            fixed float PenPressure;
-            bool AppFocusLost;
-            bool AppAcceptingEvents;
-            sbyte BackendUsingLegacyKeyArrays;
-            bool BackendUsingLegacyNavInputArray;
-            char InputQueueSurrogate;
-            ImVector_ImWchar InputQueueCharacters;
+            // Internal fields follow but are omitted...
         }
 
-        CIMGUI_API void ImGuiIO_AddKeyEvent(ImGuiIO* self, ImGuiKey key, bool down);
-        CIMGUI_API void ImGuiIO_AddKeyAnalogEvent(ImGuiIO* self, ImGuiKey key, bool down, float v);
-        CIMGUI_API void ImGuiIO_AddMousePosEvent(ImGuiIO* self, float x, float y);
-        CIMGUI_API void ImGuiIO_AddMouseButtonEvent(ImGuiIO* self, int button, bool down);
-        CIMGUI_API void ImGuiIO_AddMouseWheelEvent(ImGuiIO* self, float wh_x, float wh_y);
-        CIMGUI_API void ImGuiIO_AddFocusEvent(ImGuiIO* self, bool focused);
-        CIMGUI_API void ImGuiIO_AddInputCharacter(ImGuiIO* self, uint c);
-        CIMGUI_API void ImGuiIO_AddInputCharacterUTF16(ImGuiIO* self, char c);
-        CIMGUI_API void ImGuiIO_AddInputCharactersUTF8(ImGuiIO* self, byte* str);
-        CIMGUI_API void ImGuiIO_SetKeyEventNativeData(ImGuiIO* self, ImGuiKey key, int native_keycode, int native_scancode);
-        CIMGUI_API void ImGuiIO_SetKeyEventNativeDataEx(ImGuiIO* self, ImGuiKey key, int native_keycode, int native_scancode, int native_legacy_index = -1);
-        CIMGUI_API void ImGuiIO_SetAppAcceptingEvents(ImGuiIO* self, bool accepting_events);
-        CIMGUI_API void ImGuiIO_ClearInputCharacters(ImGuiIO* self);
-        CIMGUI_API void ImGuiIO_ClearInputKeys(ImGuiIO* self);
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddKeyEvent(ImGuiIO* self, ImGuiKey key, bool down);
 
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddKeyAnalogEvent(ImGuiIO* self, ImGuiKey key, bool down, float v);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddMousePosEvent(ImGuiIO* self, float x, float y);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddMouseButtonEvent(ImGuiIO* self, int button, bool down);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddMouseWheelEvent(ImGuiIO* self, float wh_x, float wh_y);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddFocusEvent(ImGuiIO* self, bool focused);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddInputCharacter(ImGuiIO* self, uint c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddInputCharacterUTF16(ImGuiIO* self, char c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_AddInputCharactersUTF8(ImGuiIO* self, byte* str);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_SetKeyEventNativeData(ImGuiIO* self, ImGuiKey key, int native_keycode, int native_scancode);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_SetKeyEventNativeDataEx(ImGuiIO* self, ImGuiKey key, int native_keycode, int native_scancode, int native_legacy_index = -1);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_SetAppAcceptingEvents(ImGuiIO* self, bool accepting_events);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_ClearInputCharacters(ImGuiIO* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiIO_ClearInputKeys(ImGuiIO* self);
+
+        #endregion
+
+        #region Misc data structures
+
+        public struct ImGuiInputTextCallbackData
+        {
+            public ImGuiInputTextFlags EventFlag;
+            public ImGuiInputTextFlags Flags;
+            public void* UserData;
+
+            public char EventChar;
+            public ImGuiKey EventKey;
+            public char* Buf;
+            public int BufTextLen;
+            public int BufSize;
+            public bool BufDirty;
+            public int CursorPos;
+            public int SelectionStart;
+            public int SelectionEnd;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiInputTextCallbackData_DeleteChars(ImGuiInputTextCallbackData* self, int pos, int bytes_count);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiInputTextCallbackData_InsertChars(ImGuiInputTextCallbackData* self, int pos, byte* text, byte* text_end = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiInputTextCallbackData_SelectAll(ImGuiInputTextCallbackData* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiInputTextCallbackData_ClearSelection(ImGuiInputTextCallbackData* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiInputTextCallbackData_HasSelection(ImGuiInputTextCallbackData* self);
+
+        public struct ImGuiSizeCallbackData
+        {
+            public void* UserData;
+            public ImVec2 Pos;
+            public ImVec2 CurrentSize;
+            public ImVec2 DesiredSize;
+        }
+
+        public struct ImGuiPayload
+        {
+            public void* Data;
+            public int DataSize;
+
+            // Internal fields omitted...
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiPayload_Clear(ImGuiPayload* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiPayload_IsDataType(ImGuiPayload* self, byte* type);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiPayload_IsPreview(ImGuiPayload* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiPayload_IsDelivery(ImGuiPayload* self);
+
+        public struct ImGuiTableColumnSortSpecs
+        {
+            public ImGuiID ColumnUserID;
+            public short ColumnIndex;
+            public short SortOrder;
+            public ImGuiSortDirection SortDirection;
+        }
+
+        public struct ImGuiTableSortSpecs
+        {
+            public ImGuiTableColumnSortSpecs* Specs;
+            int SpecsCount;
+            bool SpecsDirty;
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public const char IM_UNICODE_CODEPOINT_INVALID = (char)0xFFFD;
+        public const char IM_UNICODE_CODEPOINT_MAX = (char)0xFFFF;
+
+        // ImGuiTextFilter is internal
+
+        // StringBuilder should be used instead of ImGuiTextBuffer
+
+        public struct ImGuiStorage
+        {
+            private int _size;
+            private int _capacity;
+            private nuint _data;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_Clear(ImGuiStorage* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ImGuiStorage_GetInt(ImGuiStorage* self, ImGuiID key, int default_val = 0);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_SetInt(ImGuiStorage* self, ImGuiID key, int val);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiStorage_GetBool(ImGuiStorage* self, ImGuiID key, bool default_val = false);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_SetBool(ImGuiStorage* self, ImGuiID key, bool val);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern float ImGuiStorage_GetFloat(ImGuiStorage* self, ImGuiID key, float default_val = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_SetFloat(ImGuiStorage* self, ImGuiID key, float val);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void* ImGuiStorage_GetVoidPtr(ImGuiStorage* self, ImGuiID key);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_SetVoidPtr(ImGuiStorage* self, ImGuiID key, void* val);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int* ImGuiStorage_GetIntRef(ImGuiStorage* self, ImGuiID key, int default_val = 0);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool* ImGuiStorage_GetBoolRef(ImGuiStorage* self, ImGuiID key, bool default_val = false);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern float* ImGuiStorage_GetFloatRef(ImGuiStorage* self, ImGuiID key, float default_val = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void** ImGuiStorage_GetVoidPtrRef(ImGuiStorage* self, ImGuiID key, void* default_val = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_SetAllInt(ImGuiStorage* self, int val);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiStorage_BuildSortByKey(ImGuiStorage* self);
+
+        public struct ImGuiListClipper
+        {
+            public int DisplayStart;
+            public int DisplayEnd;
+            private int ItemsCount;
+            private float ItemsHeight;
+            private float StartPosY;
+            private void* TempData;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiListClipper_Begin(ImGuiListClipper* self, int items_count, float items_height = -1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiListClipper_End(ImGuiListClipper* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiListClipper_Step(ImGuiListClipper* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiListClipper_ForceDisplayRangeByIndices(ImGuiListClipper* self, int item_min, int item_max);
+
+        public const int IM_COL32_R_SHIFT = 0;
+        public const int IM_COL32_G_SHIFT = 8;
+        public const int IM_COL32_B_SHIFT = 16;
+        public const int IM_COL32_A_SHIFT = 24;
+        public const uint IM_COL32_A_MASK = 0xFF000000;
+
+        public static uint IM_COL32(byte R, byte G, byte B, byte A) => ((uint)A << IM_COL32_A_SHIFT) | ((uint)B << IM_COL32_B_SHIFT) | ((uint)G << IM_COL32_G_SHIFT) | ((uint)R << IM_COL32_R_SHIFT);
+        public static uint IM_COL32_WHITE = IM_COL32(255, 255, 255, 255);
+        public static uint IM_COL32_BLACK = IM_COL32(0, 0, 0, 255);
+        public static uint IM_COL32_BLACK_TRANS = IM_COL32(0, 0, 0, 0);
+
+        #endregion
+
+        #region Drawing API
+
+        public const int IM_DRAWLIST_TEX_LINES_WIDTH_MAX = 63;
+
+        public static readonly delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void> ImDrawCallback_ResetRenderState = (delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void>)(-1);
+
+        public struct ImDrawCmd
+        {
+            public ImVec4 ClipRect;
+            public ImTextureID TextureId;
+            public uint VtxOffset;
+            public uint IdxOffset;
+            public uint ElemCount;
+            public delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void> UserCallback;
+            public void* UserCallbackData;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImTextureID ImDrawCmd_GetTexID(ImDrawCmd* self);
+
+        public struct ImDrawVert
+        {
+            ImVec2 pos;
+            ImVec2 uv;
+            uint col;
+        }
+
+        public enum ImDrawFlags
+        {
+            ImDrawFlags_None = 0,
+            ImDrawFlags_Closed = 1 << 0,
+            ImDrawFlags_RoundCornersTopLeft = 1 << 4,
+            ImDrawFlags_RoundCornersTopRight = 1 << 5,
+            ImDrawFlags_RoundCornersBottomLeft = 1 << 6,
+            ImDrawFlags_RoundCornersBottomRight = 1 << 7,
+            ImDrawFlags_RoundCornersNone = 1 << 8,
+            ImDrawFlags_RoundCornersTop = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight,
+            ImDrawFlags_RoundCornersBottom = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
+            ImDrawFlags_RoundCornersLeft = ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopLeft,
+            ImDrawFlags_RoundCornersRight = ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopRight,
+            ImDrawFlags_RoundCornersAll = ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight,
+            ImDrawFlags_RoundCornersDefault_ = ImDrawFlags_RoundCornersAll,
+            ImDrawFlags_RoundCornersMask_ = ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone,
+        }
+
+        public enum ImDrawListFlags
+        {
+            ImDrawListFlags_None = 0,
+            ImDrawListFlags_AntiAliasedLines = 1 << 0,
+            ImDrawListFlags_AntiAliasedLinesUseTex = 1 << 1,
+            ImDrawListFlags_AntiAliasedFill = 1 << 2,
+            ImDrawListFlags_AllowVtxOffset = 1 << 3,
+        }
+
+        public struct ImVector_ImDrawCmd
+        {
+            public int Size;
+            public int Capacity;
+            public ImDrawCmd* Data;
+        }
+
+        public struct ImVector_ImDrawIdx
+        {
+            public int Size;
+            public int Capacity;
+            public ImDrawIdx* Data;
+        }
+
+        public struct ImVector_ImDrawVert
+        {
+            public int Size;
+            public int Capacity;
+            public ImDrawVert* Data;
+        }
+
+        public struct ImDrawList
+        {
+            public ImVector_ImDrawCmd CmdBuffer;
+            public ImVector_ImDrawIdx IdxBuffer;
+            public ImVector_ImDrawVert VtxBuffer;
+            public ImDrawListFlags Flags;
+
+            // Internal fields omitted...
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PushClipRect(ImDrawList* self, ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect = false);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PushClipRectFullScreen(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PopClipRect(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PushTextureID(ImDrawList* self, ImTextureID texture_id);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PopTextureID(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImDrawList_GetClipRectMin(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImDrawList_GetClipRectMax(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddLine(ImDrawList* self, ImVec2 p1, ImVec2 p2, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddLineEx(ImDrawList* self, ImVec2 p1, ImVec2 p2, uint col, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddRect(ImDrawList* self, ImVec2 p_min, ImVec2 p_max, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddRectEx(ImDrawList* self, ImVec2 p_min, ImVec2 p_max, uint col, float rounding = default, ImDrawFlags flags = default, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddRectFilled(ImDrawList* self, ImVec2 p_min, ImVec2 p_max, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddRectFilledEx(ImDrawList* self, ImVec2 p_min, ImVec2 p_max, uint col, float rounding = default, ImDrawFlags flags = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddRectFilledMultiColor(ImDrawList* self, ImVec2 p_min, ImVec2 p_max, uint col_upr_left, uint col_upr_right, uint col_bot_right, uint col_bot_left);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddQuad(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddQuadEx(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, uint col, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddQuadFilled(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTriangle(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTriangleEx(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, uint col, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTriangleFilled(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddCircle(ImDrawList* self, ImVec2 center, float radius, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddCircleEx(ImDrawList* self, ImVec2 center, float radius, uint col, int num_segments = default, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddCircleFilled(ImDrawList* self, ImVec2 center, float radius, uint col, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddNgon(ImDrawList* self, ImVec2 center, float radius, uint col, int num_segments);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddNgonEx(ImDrawList* self, ImVec2 center, float radius, uint col, int num_segments, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddNgonFilled(ImDrawList* self, ImVec2 center, float radius, uint col, int num_segments);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddText(ImDrawList* self, ImVec2 pos, uint col, byte* text_begin);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTextEx(ImDrawList* self, ImVec2 pos, uint col, byte* text_begin, byte* text_end = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTextImFontPtr(ImDrawList* self, ImFont* font, float font_size, ImVec2 pos, uint col, byte* text_begin);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddTextImFontPtrEx(ImDrawList* self, ImFont* font, float font_size, ImVec2 pos, uint col, byte* text_begin, byte* text_end = default, float wrap_width = default, ImVec4* cpu_fine_clip_rect = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddPolyline(ImDrawList* self, ImVec2* points, int num_points, uint col, ImDrawFlags flags, float thickness);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddConvexPolyFilled(ImDrawList* self, ImVec2* points, int num_points, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddBezierCubic(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, uint col, float thickness, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddBezierQuadratic(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImVec2 p3, uint col, float thickness, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddImage(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p_min, ImVec2 p_max);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddImageEx(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min /* = default */, ImVec2 uv_max /* = ImVec2(1, 1) */, uint col /* = IM_COL32_WHITE */);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddImageQuad(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddImageQuadEx(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, ImVec2 uv1 /* = default */, ImVec2 uv2 /* = ImVec2(1, 0) */, ImVec2 uv3 /* = ImVec2(1, 1) */, ImVec2 uv4 /* = ImVec2(0, 1) */, uint col /* = IM_COL32_WHITE */);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddImageRounded(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min, ImVec2 uv_max, uint col, float rounding, ImDrawFlags flags = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathClear(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathLineTo(ImDrawList* self, ImVec2 pos);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathLineToMergeDuplicate(ImDrawList* self, ImVec2 pos);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathFillConvex(ImDrawList* self, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathStroke(ImDrawList* self, uint col, ImDrawFlags flags = default, float thickness = 1.0f);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathArcTo(ImDrawList* self, ImVec2 center, float radius, float a_min, float a_max, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathArcToFast(ImDrawList* self, ImVec2 center, float radius, int a_min_of_12, int a_max_of_12);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathBezierCubicCurveTo(ImDrawList* self, ImVec2 p2, ImVec2 p3, ImVec2 p4, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathBezierQuadraticCurveTo(ImDrawList* self, ImVec2 p2, ImVec2 p3, int num_segments = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PathRect(ImDrawList* self, ImVec2 rect_min, ImVec2 rect_max, float rounding = default, ImDrawFlags flags = default);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddCallback(ImDrawList* self, delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void> callback, void* callback_data);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_AddDrawCmd(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImDrawList* ImDrawList_CloneOutput(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_ChannelsSplit(ImDrawList* self, int count);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_ChannelsMerge(ImDrawList* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_ChannelsSetCurrent(ImDrawList* self, int n);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimReserve(ImDrawList* self, int idx_count, int vtx_count);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimUnreserve(ImDrawList* self, int idx_count, int vtx_count);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimRect(ImDrawList* self, ImVec2 a, ImVec2 b, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimRectUV(ImDrawList* self, ImVec2 a, ImVec2 b, ImVec2 uv_a, ImVec2 uv_b, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimQuadUV(ImDrawList* self, ImVec2 a, ImVec2 b, ImVec2 c, ImVec2 d, ImVec2 uv_a, ImVec2 uv_b, ImVec2 uv_c, ImVec2 uv_d, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimWriteVtx(ImDrawList* self, ImVec2 pos, ImVec2 uv, uint col);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimWriteIdx(ImDrawList* self, ImDrawIdx idx);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawList_PrimVtx(ImDrawList* self, ImVec2 pos, ImVec2 uv, uint col);
+
+        public struct ImDrawData
+        {
+            public bool Valid;
+            public int CmdListsCount;
+            public int TotalIdxCount;
+            public int TotalVtxCount;
+            public ImDrawList** CmdLists;
+            public ImVec2 DisplayPos;
+            public ImVec2 DisplaySize;
+            public ImVec2 FramebufferScale;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawData_Clear(ImDrawData* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawData_DeIndexAllBuffers(ImDrawData* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImDrawData_ScaleClipRects(ImDrawData* self, ImVec2 fb_scale);
+
+        #endregion
+
+        #region Font API
+
+        public struct ImFontConfig
+        {
+            public void* FontData;
+            public int FontDataSize;
+            public bool FontDataOwnedByAtlas;
+            public int FontNo;
+            public float SizePixels;
+            public int OversampleH;
+            public int OversampleV;
+            public bool PixelSnapH;
+            public ImVec2 GlyphExtraSpacing;
+            public ImVec2 GlyphOffset;
+            public char* GlyphRanges;
+            public float GlyphMinAdvanceX;
+            public float GlyphMaxAdvanceX;
+            public bool MergeMode;
+            public uint FontBuilderFlags;
+            public float RasterizerMultiply;
+            public char EllipsisChar;
+
+            public fixed byte Name[40];
+            public ImFont* DstFont;
+        }
+
+        public struct ImFontGlyph
+        {
+            // Note, top 2 bits are Colored and Visible bools
+            public uint Codepoint;
+            public float AdvanceX;
+            public float X0, Y0, X1, Y1;
+            public float U0, V0, U1, V1;
+        }
+
+        public struct ImVector_ImU32
+        {
+            public int Size;
+            public int Capacity;
+            public uint* Data;
+        }
+
+        public struct ImFontGlyphRangesBuilder
+        {
+            ImVector_ImU32 UsedChars;
+        }
+
+        public struct ImVector_ImWchar
+        {
+            public int Size;
+            public int Capacity;
+            public char* Data;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_Clear(ImFontGlyphRangesBuilder* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImFontGlyphRangesBuilder_GetBit(ImFontGlyphRangesBuilder* self, nuint n);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_SetBit(ImFontGlyphRangesBuilder* self, nuint n);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_AddChar(ImFontGlyphRangesBuilder* self, char c);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_AddText(ImFontGlyphRangesBuilder* self, byte* text, byte* text_end = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_AddRanges(ImFontGlyphRangesBuilder* self, char* ranges);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontGlyphRangesBuilder_BuildRanges(ImFontGlyphRangesBuilder* self, ImVector_ImWchar* out_ranges);
+
+        public struct ImFontAtlasCustomRect
+        {
+            public ushort Width, Height;
+            public ushort X, Y;
+            public uint GlyphID;
+            public float GlyphAdvanceX;
+            public ImVec2 GlyphOffset;
+            public ImFont* Font;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImFontAtlasCustomRect_IsPacked(ImFontAtlasCustomRect* self);
+
+        public enum ImFontAtlasFlags
+        {
+            ImFontAtlasFlags_None = 0,
+            ImFontAtlasFlags_NoPowerOfTwoHeight = 1 << 0,
+            ImFontAtlasFlags_NoMouseCursors = 1 << 1,
+            ImFontAtlasFlags_NoBakedLines = 1 << 2,
+        }
+
+        public struct ImFontAtlas
+        {
+            public ImFontAtlasFlags Flags;
+            public ImTextureID TexID;
+            public int TexDesiredWidth;
+            public int TexGlyphPadding;
+            public bool Locked;
+            public void* UserData;
+
+            // Internal fields omitted...
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFont(ImFontAtlas* self, ImFontConfig* font_cfg);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFontDefault(ImFontAtlas* self, ImFontConfig* font_cfg = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFontFromFileTTF(ImFontAtlas* self, byte* filename, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFontFromMemoryTTF(ImFontAtlas* self, void* font_data, int font_size, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFontFromMemoryCompressedTTF(ImFontAtlas* self, void* compressed_font_data, int compressed_font_size, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFont* ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(ImFontAtlas* self, byte* compressed_font_data_base85, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_ClearInputData(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_ClearTexData(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_ClearFonts(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_Clear(ImFontAtlas* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImFontAtlas_Build(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_GetTexDataAsAlpha8(ImFontAtlas* self, byte** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_GetTexDataAsRGBA32(ImFontAtlas* self, byte** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImFontAtlas_IsBuilt(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFontAtlas_SetTexID(ImFontAtlas* self, ImTextureID id);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesDefault(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesGreek(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesKorean(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesJapanese(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesChineseFull(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesCyrillic(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesThai(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern char* ImFontAtlas_GetGlyphRangesVietnamese(ImFontAtlas* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ImFontAtlas_AddCustomRectRegular(ImFontAtlas* self, int width, int height);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int ImFontAtlas_AddCustomRectFontGlyph(ImFontAtlas* self, ImFont* font, char id, int width, int height, float advance_x, ImVec2 offset = default);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFontAtlasCustomRect* ImFontAtlas_GetCustomRectByIndex(ImFontAtlas* self, int index);
+
+        public struct ImVector_float
+        {
+            public int Size;
+            public int Capacity;
+            public float* Data;
+        }
+
+        public struct ImVector_ImFontGlyph
+        {
+            public int Size;
+            public int Capacity;
+            public ImFontGlyph* Data;
+        }
+
+        public struct ImFont
+        {
+            public ImVector_float IndexAdvanceX;
+            public float FallbackAdvanceX;
+            public float FontSize;
+
+            public ImVector_ImWchar IndexLookup;
+            public ImVector_ImFontGlyph Glyphs;
+            public ImFontGlyph* FallbackGlyph;
+
+            public ImFontAtlas* ContainerAtlas;
+            public ImFontConfig* ConfigData;
+            public short ConfigDataCount;
+            public char FallbackChar;
+            public char EllipsisChar;
+            public char DotChar;
+            public bool DirtyLookupTables;
+            public float Scale;
+            public float Ascent, Descent;
+            public int MetricsTotalSurface;
+            public fixed byte Used4kPagesMap[(IM_UNICODE_CODEPOINT_MAX + 1) / 4096 / 8];
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFontGlyph* ImFont_FindGlyph(ImFont* self, char c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImFontGlyph* ImFont_FindGlyphNoFallback(ImFont* self, char c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern float ImFont_GetCharAdvance(ImFont* self, char c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImFont_IsLoaded(ImFont* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern byte* ImFont_GetDebugName(ImFont* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImFont_CalcTextSizeA(ImFont* self, float size, float max_width, float wrap_width, byte* text_begin);          // Implied text_end = default, remaining = default
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImFont_CalcTextSizeAEx(ImFont* self, float size, float max_width, float wrap_width, byte* text_begin, byte* text_end = default, byte** remaining = default); // utf8
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern byte* ImFont_CalcWordWrapPositionA(ImFont* self, float scale, byte* text, byte* text_end, float wrap_width);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFont_RenderChar(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, uint col, char c);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImFont_RenderText(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, uint col, ImVec4 clip_rect, byte* text_begin, byte* text_end, float wrap_width = default, bool cpu_fine_clip = false);
+
+        #endregion
+
+        #region Viewports
+
+        public enum ImGuiViewportFlags
+        {
+            ImGuiViewportFlags_None = 0,
+            ImGuiViewportFlags_IsPlatformWindow = 1 << 0,
+            ImGuiViewportFlags_IsPlatformMonitor = 1 << 1,
+            ImGuiViewportFlags_OwnedByApp = 1 << 2,
+        }
+
+        public struct ImGuiViewport
+        {
+            public ImGuiViewportFlags Flags;
+            public ImVec2 Pos;
+            public ImVec2 Size;
+            public ImVec2 WorkPos;
+            public ImVec2 WorkSize;
+
+            public void* PlatformHandleRaw;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImGuiViewport_GetCenter(ImGuiViewport* self);
+        
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern ImVec2 ImGuiViewport_GetWorkCenter(ImGuiViewport* self);
+
+        #endregion
+
+        #region Platform Dependent Interfaces
+
+        public struct ImGuiPlatformImeData
+        {
+            public bool WantVisible;
+            public ImVec2 InputPos;
+            public float InputLineHeight;
+        }
 
         #endregion
     }
