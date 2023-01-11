@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 // Interop structures have unused private members for padding
 #pragma warning disable IDE0051 // Private member ... is unused
@@ -2337,7 +2336,6 @@ namespace SdlSharp.Imgui
             public bool AntiAliasedFill;
             public float CurveTessellationTol;
             public float CircleTessellationMaxError;
-            // TODO
             public fixed float /* ImVec4 */ Colors[(int)ImGuiCol.ImGuiCol_COUNT * 4];
         }
 
