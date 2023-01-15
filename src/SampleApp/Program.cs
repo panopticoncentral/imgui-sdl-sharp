@@ -1,6 +1,7 @@
 ﻿using SdlSharp;
 using SdlSharp.Graphics;
-using SdlSharp.Imgui;
+
+using Imgui = SdlSharp.Imgui;
 
 using var application = new Application(Subsystems.Video | Subsystems.Timer | Subsystems.GameController);
 
@@ -9,10 +10,9 @@ using var window = Window.Create("Dear ImGui SDL2+SDL_Renderer C# example", new(
 
 using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | RendererOptions.Accelerated);
 
-using var context = Context.Create();
-var io = Io.Instance;
+using var context = new Imgui.Context();
+var io = Imgui.Io.Current;
 //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-Style.Dark();
-//Style.Light();
+Imgui.Style.Current.Dark();

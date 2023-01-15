@@ -1,6 +1,6 @@
 ﻿namespace SdlSharp.Imgui
 {
-    public sealed unsafe class FontAtlas
+    public readonly unsafe struct FontAtlas
     {
         private readonly Native.ImFontAtlas* _fontAtlas;
 

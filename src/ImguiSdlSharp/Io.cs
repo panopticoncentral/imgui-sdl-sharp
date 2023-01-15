@@ -1,13 +1,11 @@
 ﻿namespace SdlSharp.Imgui
 {
-    public sealed unsafe class Io
+    public readonly unsafe struct Io
     {
-        private Native.ImGuiIO* _io;
-
-        public static Io Instance => new(Native.ImGui_GetIO());
+        private readonly Native.ImGuiIO* _io;
 
         internal Io(Native.ImGuiIO* io)
-        { 
+        {
             _io = io;
         }
 

@@ -1,14 +1,12 @@
 ﻿namespace SdlSharp.Imgui
 {
-    public sealed unsafe class DrawData
+    public readonly unsafe struct DrawData
     {
-        private Native.ImDrawData* _data;
+        private readonly Native.ImDrawData* _data;
 
-        public static DrawData Instance => new(Native.ImGui_GetDrawData());
-
-        internal DrawData(Native.ImDrawData* data) 
-        { 
-            _data = data; 
+        internal DrawData(Native.ImDrawData* data)
+        {
+            _data = data;
         }
 
         internal Native.ImDrawData* ToNative() => _data;

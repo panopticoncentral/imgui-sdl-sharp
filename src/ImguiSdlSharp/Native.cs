@@ -1,10 +1,34 @@
 ﻿using System.Runtime.InteropServices;
 
-// Interop structures have unused private members for padding
-#pragma warning disable IDE0051 // Private member ... is unused
+// We are intentionally exposing the P/Invoke calls so people can do low-level calls if needed
+#pragma warning disable CA1401 // P/Invokes should not be visible
+
+// Underscores are part of the public P/Invoke surface
+#pragma warning disable CA1707 // Remove the underscores from member name ...
 
 // Some interop structures have unused fields
 #pragma warning disable CS0169 // The field ... is never used
+
+// Don't want to use LibraryImportAttribute since we don't need pruning at the moment
+#pragma warning disable SYSLIB1054
+
+// Identifiers should not have incorrect suffix
+#pragma warning disable CA1711 
+
+// Do not prefix enum values with type name
+#pragma warning disable CA1712
+
+// Naming doesn't follow general rules
+#pragma warning disable IDE1006
+
+// Interop structures have unused private members for padding
+#pragma warning disable IDE0051 // Private member ... is unused
+
+// Some interop structures have public fields
+#pragma warning disable CA1051 // Do not declare visible instance fields
+
+// Identifier contains type name
+#pragma warning disable CA1720
 
 namespace SdlSharp.Imgui
 {
@@ -21,9 +45,9 @@ namespace SdlSharp.Imgui
 
         public readonly record struct ImDrawIdx(ushort Value);
 
-        public readonly record struct ImVec2(float x, float y) { }
+        public readonly record struct ImVec2(float X, float Y) { }
 
-        public readonly record struct ImVec4(float x, float y, float z, float w) { }
+        public readonly record struct ImVec4(float X, float Y, float Z, float W) { }
 
         public readonly struct ImGuiContext { }
 
@@ -563,7 +587,6 @@ namespace SdlSharp.Imgui
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_Bullet();
-
 
         #endregion
 
@@ -1867,7 +1890,6 @@ namespace SdlSharp.Imgui
             ImGuiHoveredFlags_RectOnly = ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_AllowWhenOverlapped,
             ImGuiHoveredFlags_RootAndChildWindows = ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows,
 
-
             ImGuiHoveredFlags_DelayNormal = 1 << 11,
             ImGuiHoveredFlags_DelayShort = 1 << 12,
             ImGuiHoveredFlags_NoSharedDelay = 1 << 13,
@@ -2348,10 +2370,10 @@ namespace SdlSharp.Imgui
 
         public struct ImGuiKeyData
         {
-            bool Down;
-            float DownDuration;
-            float DownDurationPrev;
-            float AnalogValue;
+            public bool Down;
+            public float DownDuration;
+            public float DownDurationPrev;
+            public float AnalogValue;
         }
 
         public struct ImGuiIO
@@ -2390,7 +2412,7 @@ namespace SdlSharp.Imgui
             public float ConfigMemoryCompactTimer;
 
             // Platform functions
-            public byte* BackendPlatformName; 
+            public byte* BackendPlatformName;
             public byte* BackendRendererName;
             public void* BackendPlatformUserData;
             public void* BackendRendererUserData;
@@ -2539,8 +2561,8 @@ namespace SdlSharp.Imgui
         public struct ImGuiTableSortSpecs
         {
             public ImGuiTableColumnSortSpecs* Specs;
-            int SpecsCount;
-            bool SpecsDirty;
+            public int SpecsCount;
+            public bool SpecsDirty;
         }
 
         #endregion
@@ -2554,11 +2576,11 @@ namespace SdlSharp.Imgui
 
         // StringBuilder should be used instead of ImGuiTextBuffer
 
-        public struct ImGuiStorage
+        public readonly struct ImGuiStorage
         {
-            private int _size;
-            private int _capacity;
-            private nuint _data;
+            private readonly int _size;
+            private readonly int _capacity;
+            private readonly nuint _data;
         }
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -2610,10 +2632,10 @@ namespace SdlSharp.Imgui
         {
             public int DisplayStart;
             public int DisplayEnd;
-            private int ItemsCount;
-            private float ItemsHeight;
-            private float StartPosY;
-            private void* TempData;
+            private readonly int ItemsCount;
+            private readonly float ItemsHeight;
+            private readonly float StartPosY;
+            private readonly void* TempData;
         }
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
@@ -2635,9 +2657,9 @@ namespace SdlSharp.Imgui
         public const uint IM_COL32_A_MASK = 0xFF000000;
 
         public static uint IM_COL32(byte R, byte G, byte B, byte A) => ((uint)A << IM_COL32_A_SHIFT) | ((uint)B << IM_COL32_B_SHIFT) | ((uint)G << IM_COL32_G_SHIFT) | ((uint)R << IM_COL32_R_SHIFT);
-        public static uint IM_COL32_WHITE = IM_COL32(255, 255, 255, 255);
-        public static uint IM_COL32_BLACK = IM_COL32(0, 0, 0, 255);
-        public static uint IM_COL32_BLACK_TRANS = IM_COL32(0, 0, 0, 0);
+        public static readonly uint IM_COL32_WHITE = IM_COL32(255, 255, 255, 255);
+        public static readonly uint IM_COL32_BLACK = IM_COL32(0, 0, 0, 255);
+        public static readonly uint IM_COL32_BLACK_TRANS = IM_COL32(0, 0, 0, 0);
 
         #endregion
 
@@ -2663,9 +2685,9 @@ namespace SdlSharp.Imgui
 
         public struct ImDrawVert
         {
-            ImVec2 pos;
-            ImVec2 uv;
-            uint col;
+            public ImVec2 pos;
+            public ImVec2 uv;
+            public uint col;
         }
 
         public enum ImDrawFlags
@@ -2982,7 +3004,7 @@ namespace SdlSharp.Imgui
 
         public struct ImFontGlyphRangesBuilder
         {
-            ImVector_ImU32 UsedChars;
+            public ImVector_ImU32 UsedChars;
         }
 
         public struct ImVector_ImWchar
@@ -2994,22 +3016,22 @@ namespace SdlSharp.Imgui
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_Clear(ImFontGlyphRangesBuilder* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImFontGlyphRangesBuilder_GetBit(ImFontGlyphRangesBuilder* self, nuint n);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_SetBit(ImFontGlyphRangesBuilder* self, nuint n);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_AddChar(ImFontGlyphRangesBuilder* self, char c);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_AddText(ImFontGlyphRangesBuilder* self, byte* text, byte* text_end = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_AddRanges(ImFontGlyphRangesBuilder* self, char* ranges);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontGlyphRangesBuilder_BuildRanges(ImFontGlyphRangesBuilder* self, ImVector_ImWchar* out_ranges);
 
@@ -3048,82 +3070,82 @@ namespace SdlSharp.Imgui
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFont(ImFontAtlas* self, ImFontConfig* font_cfg);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFontDefault(ImFontAtlas* self, ImFontConfig* font_cfg = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFontFromFileTTF(ImFontAtlas* self, byte* filename, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFontFromMemoryTTF(ImFontAtlas* self, void* font_data, int font_size, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFontFromMemoryCompressedTTF(ImFontAtlas* self, void* compressed_font_data, int compressed_font_size, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFont* ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(ImFontAtlas* self, byte* compressed_font_data_base85, float size_pixels, ImFontConfig* font_cfg = default, char* glyph_ranges = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_ClearInputData(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_ClearTexData(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_ClearFonts(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_Clear(ImFontAtlas* self);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImFontAtlas_Build(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_GetTexDataAsAlpha8(ImFontAtlas* self, byte** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_GetTexDataAsRGBA32(ImFontAtlas* self, byte** out_pixels, int* out_width, int* out_height, int* out_bytes_per_pixel = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImFontAtlas_IsBuilt(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImFontAtlas_SetTexID(ImFontAtlas* self, ImTextureID id);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesDefault(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesGreek(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesKorean(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesJapanese(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesChineseFull(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesCyrillic(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesThai(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern char* ImFontAtlas_GetGlyphRangesVietnamese(ImFontAtlas* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern int ImFontAtlas_AddCustomRectRegular(ImFontAtlas* self, int width, int height);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern int ImFontAtlas_AddCustomRectFontGlyph(ImFontAtlas* self, ImFont* font, char id, int width, int height, float advance_x, ImVec2 offset = default);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImFontAtlasCustomRect* ImFontAtlas_GetCustomRectByIndex(ImFontAtlas* self, int index);
 
@@ -3219,7 +3241,7 @@ namespace SdlSharp.Imgui
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImVec2 ImGuiViewport_GetCenter(ImGuiViewport* self);
-        
+
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern ImVec2 ImGuiViewport_GetWorkCenter(ImGuiViewport* self);
 
