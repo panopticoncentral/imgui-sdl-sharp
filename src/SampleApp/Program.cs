@@ -48,18 +48,19 @@ using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 #endif
 
-var done = false;
-while (!done)
+Window.Closed += (sender, args) =>
+{
+    if (((Window)sender!).Id == window.Id)
+    {
+        application.Quit();
+    }
+};
+
+while (application.DispatchEvents())
 {
 #if false
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            if (event.type == SDL_QUIT)
-                done = true;
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-                done = true;
         }
 
         // Start the Dear ImGui frame
@@ -107,10 +108,12 @@ while (!done)
         // Rendering
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-        SDL_RenderClear(renderer);
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-        SDL_RenderPresent(renderer);
 #endif
+    renderer.Clear();
+#if false
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+#endif
+    renderer.Present();
 }
 
 #if false
