@@ -1700,11 +1700,11 @@ namespace SdlSharp.Imgui
         public enum ImGuiPopupFlags
         {
             ImGuiPopupFlags_None = 0,
-            ImGuiPopupFlags_MouseButtonLeft = 0,
+            ImGuiPopupFlags_MouseButtonLeft = ImGuiPopupFlags_None /* 0 */,
             ImGuiPopupFlags_MouseButtonRight = 1,
             ImGuiPopupFlags_MouseButtonMiddle = 2,
             ImGuiPopupFlags_MouseButtonMask_ = 0x1F,
-            ImGuiPopupFlags_MouseButtonDefault_ = 1,
+            ImGuiPopupFlags_MouseButtonDefault_ = ImGuiPopupFlags_MouseButtonRight /* 1 */,
             ImGuiPopupFlags_NoOpenOverExistingPopup = 1 << 5,
             ImGuiPopupFlags_NoOpenOverItems = 1 << 6,
             ImGuiPopupFlags_AnyPopupId = 1 << 7,
@@ -2095,7 +2095,7 @@ namespace SdlSharp.Imgui
             ImGuiKey_ReservedForModSuper,
             ImGuiKey_COUNT,
 
-            ImGuiMod_None = 0,
+            ImGuiMod_None = ImGuiKey_None /* 0 */,
             ImGuiMod_Ctrl = 1 << 12,
             ImGuiMod_Shift = 1 << 13,
             ImGuiMod_Alt = 1 << 14,
@@ -2103,11 +2103,11 @@ namespace SdlSharp.Imgui
             ImGuiMod_Shortcut = 1 << 11,
             ImGuiMod_Mask_ = 0xF800,
 
-            ImGuiKey_NamedKey_BEGIN = 512,
+            ImGuiKey_NamedKey_BEGIN = ImGuiKey_Tab /* 512 */,
             ImGuiKey_NamedKey_END = ImGuiKey_COUNT,
             ImGuiKey_NamedKey_COUNT = ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN,
             ImGuiKey_KeysData_SIZE = ImGuiKey_NamedKey_COUNT,
-            ImGuiKey_KeysData_OFFSET = ImGuiKey_NamedKey_BEGIN,
+            ImGuiKey_KeysData_OFFSET = ImGuiKey_Tab /* ImGuiKey_NamedKey_BEGIN */,
         };
 
         public enum ImGuiConfigFlags

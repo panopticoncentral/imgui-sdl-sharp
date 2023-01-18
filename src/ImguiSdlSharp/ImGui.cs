@@ -6,11 +6,8 @@ namespace SdlSharp.Imgui
 {
     public static unsafe class Imgui
     {
-        private static Dictionary<nuint, SizeCallback>? s_sizeCallbacks;
-        private static Dictionary<nuint, StateText>? s_textResizeCallbacks;
-
-        private static Dictionary<nuint, SizeCallback> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, SizeCallback>();
-        private static Dictionary<nuint, StateText> TextResizeCallbacks = s_textResizeCallbacks ??= new Dictionary<nuint, StateText>();
+        private static Dictionary<nuint, Func<Position, Size, Size, Size>>? s_sizeCallbacks;
+        private static Dictionary<nuint, Func<Position, Size, Size, Size>> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, Func<Position, Size, Size, Size>>();
 
         public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => new(Native.ImGui_CreateContext(sharedFontAtlas == null ? null : sharedFontAtlas.Value.ToNative()));
 
@@ -46,7 +43,7 @@ namespace SdlSharp.Imgui
 
         public static void ShowAboutWindow(State<bool>? openState = null) => Native.ImGui_ShowAboutWindow(openState == null ? null : openState.ToNative());
 
-        public static void ShowStyleEditor(Style? style = null) => Native.ImGui_ShowStyleEditor(style == null ? null : style.ToNative());
+        public static void ShowStyleEditor(Style? style = null) => Native.ImGui_ShowStyleEditor(style == null ? null : style.Value.ToNative());
 
         public static bool ShowStyleSelector(string label) => SdlSharp.Native.StringToUtf8Func(label, Native.ImGui_ShowStyleSelector);
 
@@ -54,11 +51,11 @@ namespace SdlSharp.Imgui
 
         public static void ShowUserGuide() => Native.ImGui_ShowUserGuide();
 
-        public static void StyleColorsDark(Style? style) => Native.ImGui_StyleColorsDark(style == null ? null : style.ToNative());
+        public static void StyleColorsDark(Style? style) => Native.ImGui_StyleColorsDark(style == null ? null : style.Value.ToNative());
 
-        public static void StyleColorsLight(Style? style) => Native.ImGui_StyleColorsLight(style == null ? null : style.ToNative());
+        public static void StyleColorsLight(Style? style) => Native.ImGui_StyleColorsLight(style == null ? null : style.Value.ToNative());
 
-        public static void StyleColorsClassic(Style? style) => Native.ImGui_StyleColorsClassic(style == null ? null : style.ToNative());
+        public static void StyleColorsClassic(Style? style) => Native.ImGui_StyleColorsClassic(style == null ? null : style.Value.ToNative());
 
         public static bool Begin(string name, State<bool>? openState = null, WindowOptions options = default) => SdlSharp.Native.StringToUtf8Func(name, ptr => Native.ImGui_Begin(ptr, openState == null ? null : openState.ToNative(), (Native.ImGuiWindowFlags)options));
 
@@ -100,12 +97,11 @@ namespace SdlSharp.Imgui
         {
             if (SizeCallbacks.TryGetValue((nuint)data->UserData, out var callback))
             {
-                SizeCallbackData wrapper = new(data);
-                callback(ref wrapper);
+                data->DesiredSize = callback(new(data->Pos), new(data->CurrentSize), new(data->DesiredSize)).ToNative();
             }
         }
 
-        public static void SetNextWindowSizeConstraints(Size minimum, Size maximum, SizeCallback? callback = null)
+        public static void SetNextWindowSizeConstraints(Size minimum, Size maximum, Func<Position, Size, Size, Size>? callback = null)
         {
             if (callback != null)
             {
@@ -381,7 +377,7 @@ namespace SdlSharp.Imgui
                 _ => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, speed, (void*)BitConverter.SingleToUInt32Bits(min), (void*)BitConverter.SingleToUInt32Bits(max), formatPtr, (Native.ImGuiSliderFlags)options),
             });
 
-        public static bool DragRange(string label, State<float> currentMin, State<float> currentMax) => 
+        public static bool DragRange(string label, State<float> currentMin, State<float> currentMax) =>
             SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragFloatRange2(labelPtr, currentMin.ToNative(), currentMax.ToNative()));
 
         public static bool DragRange(string label, State<float> currentMin, State<float> currentMax, float speed = 1.0f, float min = default, float max = default, string? format = "%.3f", string? formatMax = default, SliderOptions options = default) =>
@@ -720,178 +716,166 @@ namespace SdlSharp.Imgui
         public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max, string? format = default, SliderOptions options = default) =>
             SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
-        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-        private static int NativeTextResizeCallback(Native.ImGuiInputTextCallbackData* data)
-        {
-            if (TextResizeCallbacks.TryGetValue((nuint)data->UserData, out var v))
-            {
-                v.Resize(data->BufSize);
-                data->Buf = v.ToNative();
-            }
+        //public static bool InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputText();
 
-            return 0;
-        }
+        //public static bool InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextEx();
 
-        public static bool InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputText();
+        //public static bool InputTextMultiline(byte* label, char* buf, nuint buf_size) => Native.ImGui_InputTextMultiline();
 
-        public static bool InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextEx();
+        //public static bool InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextMultilineEx();
 
-        public static bool InputTextMultiline(byte* label, char* buf, nuint buf_size) => Native.ImGui_InputTextMultiline();
+        //public static bool InputTextWithHint(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputTextWithHint();
 
-        public static bool InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextMultilineEx();
+        //public static bool InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextWithHintEx();
 
-        public static bool InputTextWithHint(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputTextWithHint();
+        //public static bool InputFloat(byte* label, float* v) => Native.ImGui_InputFloat();
 
-        public static bool InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextWithHintEx();
+        //public static bool InputFloatEx(byte* label, float* v, float step = default, float step_fast = default, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloatEx();
 
-        public static bool InputFloat(byte* label, float* v) => Native.ImGui_InputFloat();
+        //public static bool InputFloat2(byte* label, float* v) => Native.ImGui_InputFloat2();
 
-        public static bool InputFloatEx(byte* label, float* v, float step = default, float step_fast = default, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloatEx();
+        //public static bool InputFloat2Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat2Ex();
 
-        public static bool InputFloat2(byte* label, float* v) => Native.ImGui_InputFloat2();
+        //public static bool InputFloat3(byte* label, float* v) => Native.ImGui_InputFloat3();
 
-        public static bool InputFloat2Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat2Ex();
+        //public static bool InputFloat3Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat3Ex();
 
-        public static bool InputFloat3(byte* label, float* v) => Native.ImGui_InputFloat3();
+        //public static bool InputFloat4(byte* label, float* v) => Native.ImGui_InputFloat4();
 
-        public static bool InputFloat3Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat3Ex();
+        //public static bool InputFloat4Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat4Ex();
 
-        public static bool InputFloat4(byte* label, float* v) => Native.ImGui_InputFloat4();
+        //public static bool InputInt(byte* label, int* v) => Native.ImGui_InputInt();
 
-        public static bool InputFloat4Ex(byte* label, float* v, byte* format = default /* = "%.3f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputFloat4Ex();
+        //public static bool InputIntEx(byte* label, int* v, int step = 1, int step_fast = 100, ImGuiInputTextFlags flags = default) => Native.ImGui_InputIntEx();
 
-        public static bool InputInt(byte* label, int* v) => Native.ImGui_InputInt();
+        //public static bool InputInt2(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt2();
 
-        public static bool InputIntEx(byte* label, int* v, int step = 1, int step_fast = 100, ImGuiInputTextFlags flags = default) => Native.ImGui_InputIntEx();
+        //public static bool InputInt3(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt3();
 
-        public static bool InputInt2(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt2();
+        //public static bool InputInt4(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt4();
 
-        public static bool InputInt3(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt3();
+        //public static bool InputDouble(byte* label, double* v) => Native.ImGui_InputDouble();
 
-        public static bool InputInt4(byte* label, int* v, ImGuiInputTextFlags flags = default) => Native.ImGui_InputInt4();
+        //public static bool InputDoubleEx(byte* label, double* v, double step /* = 0.0 */, double step_fast /* = 0.0 */, byte* format /* = "%.6f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputDoubleEx();
 
-        public static bool InputDouble(byte* label, double* v) => Native.ImGui_InputDouble();
+        //public static bool InputScalar(byte* label, ImGuiDataType data_type, void* p_data) => Native.ImGui_InputScalar();
 
-        public static bool InputDoubleEx(byte* label, double* v, double step /* = 0.0 */, double step_fast /* = 0.0 */, byte* format /* = "%.6f" */, ImGuiInputTextFlags flags = default) => Native.ImGui_InputDoubleEx();
+        //public static bool InputScalarEx(byte* label, ImGuiDataType data_type, void* p_data, void* p_step = default, void* p_step_fast = default, byte* format = default, ImGuiInputTextFlags flags = default) => Native.ImGui_InputScalarEx();
 
-        public static bool InputScalar(byte* label, ImGuiDataType data_type, void* p_data) => Native.ImGui_InputScalar();
+        //public static bool InputScalarN(byte* label, ImGuiDataType data_type, void* p_data, int components) => Native.ImGui_InputScalarN();
 
-        public static bool InputScalarEx(byte* label, ImGuiDataType data_type, void* p_data, void* p_step = default, void* p_step_fast = default, byte* format = default, ImGuiInputTextFlags flags = default) => Native.ImGui_InputScalarEx();
+        //public static bool InputScalarNEx(byte* label, ImGuiDataType data_type, void* p_data, int components, void* p_step = default, void* p_step_fast = default, byte* format = default, ImGuiInputTextFlags flags = default) => Native.ImGui_InputScalarNEx();
 
-        public static bool InputScalarN(byte* label, ImGuiDataType data_type, void* p_data, int components) => Native.ImGui_InputScalarN();
+        //public static bool ColorEdit3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit3();
 
-        public static bool InputScalarNEx(byte* label, ImGuiDataType data_type, void* p_data, int components, void* p_step = default, void* p_step_fast = default, byte* format = default, ImGuiInputTextFlags flags = default) => Native.ImGui_InputScalarNEx();
+        //public static bool ColorEdit4(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit4();
 
-        public static bool ColorEdit3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit3();
+        //public static bool ColorPicker3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorPicker3();
 
-        public static bool ColorEdit4(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit4();
+        //public static bool ColorPicker4(byte* label, float* col, ImGuiColorEditFlags flags = default, float* ref_col = default) => Native.ImGui_ColorPicker4();
 
-        public static bool ColorPicker3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorPicker3();
+        //public static bool ColorButton(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorButton();
 
-        public static bool ColorPicker4(byte* label, float* col, ImGuiColorEditFlags flags = default, float* ref_col = default) => Native.ImGui_ColorPicker4();
+        //public static bool ColorButtonEx(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default, ImVec2 size = default) => Native.ImGui_ColorButtonEx();
 
-        public static bool ColorButton(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorButton();
+        //public static void SetColorEditOptions(ImGuiColorEditFlags flags) => Native.ImGui_SetColorEditOptions();
 
-        public static bool ColorButtonEx(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default, ImVec2 size = default) => Native.ImGui_ColorButtonEx();
+        //public static bool TreeNode(byte* label) => Native.ImGui_TreeNode();
 
-        public static void SetColorEditOptions(ImGuiColorEditFlags flags) => Native.ImGui_SetColorEditOptions();
+        //public static bool TreeNodeStr(byte* str_id, byte* fmt, __arglist) => Native.ImGui_TreeNodeStr();
 
-        public static bool TreeNode(byte* label) => Native.ImGui_TreeNode();
+        //public static bool TreeNodePtr(void* ptr_id, byte* fmt, __arglist) => Native.ImGui_TreeNodePtr();
 
-        public static bool TreeNodeStr(byte* str_id, byte* fmt, __arglist) => Native.ImGui_TreeNodeStr();
+        //public static bool TreeNodeV(byte* str_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeV();
 
-        public static bool TreeNodePtr(void* ptr_id, byte* fmt, __arglist) => Native.ImGui_TreeNodePtr();
+        //public static bool TreeNodeVPtr(void* ptr_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeVPtr();
 
-        public static bool TreeNodeV(byte* str_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeV();
+        //public static bool TreeNodeEx(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_TreeNodeEx();
 
-        public static bool TreeNodeVPtr(void* ptr_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeVPtr();
+        //public static bool TreeNodeExStr(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExStr();
 
-        public static bool TreeNodeEx(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_TreeNodeEx();
+        //public static bool TreeNodeExPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExPtr();
 
-        public static bool TreeNodeExStr(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExStr();
+        //public static bool TreeNodeExV(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExV();
 
-        public static bool TreeNodeExPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExPtr();
+        //public static bool TreeNodeExVPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExVPtr();
 
-        public static bool TreeNodeExV(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExV();
+        //public static void TreePush(byte* str_id) => Native.ImGui_TreePush();
 
-        public static bool TreeNodeExVPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExVPtr();
+        //public static void TreePushPtr(void* ptr_id) => Native.ImGui_TreePushPtr();
 
-        public static void TreePush(byte* str_id) => Native.ImGui_TreePush();
+        //public static void TreePop() => Native.ImGui_TreePop();
 
-        public static void TreePushPtr(void* ptr_id) => Native.ImGui_TreePushPtr();
+        //public static float GetTreeNodeToLabelSpacing() => Native.ImGui_GetTreeNodeToLabelSpacing();
 
-        public static void TreePop() => Native.ImGui_TreePop();
+        //public static bool CollapsingHeader(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeader();
 
-        public static float GetTreeNodeToLabelSpacing() => Native.ImGui_GetTreeNodeToLabelSpacing();
+        //public static bool CollapsingHeaderBoolPtr(byte* label, bool* p_visible, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeaderBoolPtr();
 
-        public static bool CollapsingHeader(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeader();
+        //public static void SetNextItemOpen(bool is_open, ImGuiCond cond = default) => Native.ImGui_SetNextItemOpen();
 
-        public static bool CollapsingHeaderBoolPtr(byte* label, bool* p_visible, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeaderBoolPtr();
+        //public static bool Selectable(byte* label) => Native.ImGui_Selectable();
 
-        public static void SetNextItemOpen(bool is_open, ImGuiCond cond = default) => Native.ImGui_SetNextItemOpen();
+        //public static bool SelectableEx(byte* label, bool selected = false, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableEx();
 
-        public static bool Selectable(byte* label) => Native.ImGui_Selectable();
+        //public static bool SelectableBoolPtr(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default) => Native.ImGui_SelectableBoolPtr();
 
-        public static bool SelectableEx(byte* label, bool selected = false, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableEx();
+        //public static bool SelectableBoolPtrEx(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableBoolPtrEx();
 
-        public static bool SelectableBoolPtr(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default) => Native.ImGui_SelectableBoolPtr();
+        //public static bool BeginListBox(byte* label, ImVec2 size = default) => Native.ImGui_BeginListBox();
 
-        public static bool SelectableBoolPtrEx(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableBoolPtrEx();
+        //public static void EndListBox() => Native.ImGui_EndListBox();
 
-        public static bool BeginListBox(byte* label, ImVec2 size = default) => Native.ImGui_BeginListBox();
+        //public static bool ListBox(byte* label, int* current_item, byte** items, int items_count, int height_in_items = -1) => Native.ImGui_ListBox();
 
-        public static void EndListBox() => Native.ImGui_EndListBox();
+        //public static bool ListBoxCallback(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count) => Native.ImGui_ListBoxCallback();
 
-        public static bool ListBox(byte* label, int* current_item, byte** items, int items_count, int height_in_items = -1) => Native.ImGui_ListBox();
+        //public static bool ListBoxCallbackEx(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count, int height_in_items = -1) => Native.ImGui_ListBoxCallbackEx();
 
-        public static bool ListBoxCallback(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count) => Native.ImGui_ListBoxCallback();
+        //public static void PlotLines(byte* label, float* values, int values_count) => Native.ImGui_PlotLines();
 
-        public static bool ListBoxCallbackEx(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count, int height_in_items = -1) => Native.ImGui_ListBoxCallbackEx();
+        //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern void ImGui_PlotLinesEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
 
-        public static void PlotLines(byte* label, float* values, int values_count) => Native.ImGui_PlotLines();
+        //public static void PlotLinesCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotLinesCallback();
 
-        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_PlotLinesEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        //public static void PlotLinesCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotLinesCallbackEx();
 
-        public static void PlotLinesCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotLinesCallback();
+        //public static void PlotHistogram(byte* label, float* values, int values_count) => Native.ImGui_PlotHistogram();
 
-        public static void PlotLinesCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotLinesCallbackEx();
+        //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        //public static extern void ImGui_PlotHistogramEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
 
-        public static void PlotHistogram(byte* label, float* values, int values_count) => Native.ImGui_PlotHistogram();
+        //public static void PlotHistogramCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotHistogramCallback();
 
-        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_PlotHistogramEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        //public static void PlotHistogramCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotHistogramCallbackEx();
 
-        public static void PlotHistogramCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotHistogramCallback();
+        //public static bool BeginMenuBar() => Native.ImGui_BeginMenuBar();
 
-        public static void PlotHistogramCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotHistogramCallbackEx();
+        //public static void EndMenuBar() => Native.ImGui_EndMenuBar();
 
-        public static bool BeginMenuBar() => Native.ImGui_BeginMenuBar();
+        //public static bool BeginMainMenuBar() => Native.ImGui_BeginMainMenuBar();
 
-        public static void EndMenuBar() => Native.ImGui_EndMenuBar();
+        //public static void EndMainMenuBar() => Native.ImGui_EndMainMenuBar();
 
-        public static bool BeginMainMenuBar() => Native.ImGui_BeginMainMenuBar();
+        //public static bool BeginMenu(byte* label) => Native.ImGui_BeginMenu();
 
-        public static void EndMainMenuBar() => Native.ImGui_EndMainMenuBar();
+        //public static bool BeginMenuEx(byte* label, bool enabled = true) => Native.ImGui_BeginMenuEx();
 
-        public static bool BeginMenu(byte* label) => Native.ImGui_BeginMenu();
+        //public static void EndMenu() => Native.ImGui_EndMenu();
 
-        public static bool BeginMenuEx(byte* label, bool enabled = true) => Native.ImGui_BeginMenuEx();
+        //public static bool MenuItem(byte* label) => Native.ImGui_MenuItem();
 
-        public static void EndMenu() => Native.ImGui_EndMenu();
+        //public static bool MenuItemEx(byte* label, byte* shortcut = default, bool selected = false, bool enabled = true) => Native.ImGui_MenuItemEx();
 
-        public static bool MenuItem(byte* label) => Native.ImGui_MenuItem();
+        //public static bool MenuItemBoolPtr(byte* label, byte* shortcut, bool* p_selected, bool enabled = true) => Native.ImGui_MenuItemBoolPtr();
 
-        public static bool MenuItemEx(byte* label, byte* shortcut = default, bool selected = false, bool enabled = true) => Native.ImGui_MenuItemEx();
+        //public static void BeginTooltip() => Native.ImGui_BeginTooltip();
 
-        public static bool MenuItemBoolPtr(byte* label, byte* shortcut, bool* p_selected, bool enabled = true) => Native.ImGui_MenuItemBoolPtr();
+        //public static void EndTooltip() => Native.ImGui_EndTooltip();
 
-        public static void BeginTooltip() => Native.ImGui_BeginTooltip();
+        //public static void SetTooltip(byte* fmt, __arglist) => Native.ImGui_SetTooltip();
 
-        public static void EndTooltip() => Native.ImGui_EndTooltip();
-
-        public static void SetTooltip(byte* fmt, __arglist) => Native.ImGui_SetTooltip();
-
-        public static void SetTooltipV(byte* fmt, nuint /* va_list */ args) => Native.ImGui_SetTooltipV();
+        //public static void SetTooltipV(byte* fmt, nuint /* va_list */ args) => Native.ImGui_SetTooltipV();
     }
 }

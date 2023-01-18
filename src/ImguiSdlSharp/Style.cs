@@ -1,6 +1,6 @@
 ﻿namespace SdlSharp.Imgui
 {
-    public unsafe record Style
+    public readonly unsafe struct Style
     {
         private readonly Native.ImGuiStyle* _style;
 

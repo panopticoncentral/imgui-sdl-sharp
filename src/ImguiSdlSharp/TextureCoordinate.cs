@@ -6,6 +6,6 @@
         {
         }
 
-        internal Native.ImVec2 ToNative() => new(X, Y);
+        internal Native.ImVec2 ToNative() => new(U, V);
     }
 }
