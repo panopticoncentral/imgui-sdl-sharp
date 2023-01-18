@@ -7,7 +7,10 @@ namespace SdlSharp.Imgui
     public static unsafe class Imgui
     {
         private static Dictionary<nuint, SizeCallback>? s_sizeCallbacks;
+        private static Dictionary<nuint, StateText>? s_textResizeCallbacks;
+
         private static Dictionary<nuint, SizeCallback> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, SizeCallback>();
+        private static Dictionary<nuint, StateText> TextResizeCallbacks = s_textResizeCallbacks ??= new Dictionary<nuint, StateText>();
 
         public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => new(Native.ImGui_CreateContext(sharedFontAtlas == null ? null : sharedFontAtlas.Value.ToNative()));
 
@@ -355,121 +358,379 @@ namespace SdlSharp.Imgui
 
         public static void EndCombo() => Native.ImGui_EndCombo();
 
-        public static bool Combo(string label, State<int> currentItem, Span<string> items) => Native.ImGui_ComboChar();
+        public static bool Drag(string label, State<float> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragFloat(labelPtr, v.ToNative()));
 
-        public static bool Combo(string label, State<int> currentItem, Span<string> items, int popupMaxHeightInItems = -1) => Native.ImGui_ComboCharEx();
+        public static bool Drag(string label, State<float> v, float speed = 1.0f, float min = default, float max = default, string? format = "%.3f", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragFloatEx(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool Combo(string label, State<int> currentItem, string itemsSeparatedByZeros) => Native.ImGui_Combo();
+        public static bool Drag(string label, StateVector<float> v) => SdlSharp.Native.StringToUtf8Func(label, labelPtr => v.Length switch
+            {
+                2 => Native.ImGui_DragFloat2(labelPtr, v.ToNative()),
+                3 => Native.ImGui_DragFloat3(labelPtr, v.ToNative()),
+                4 => Native.ImGui_DragFloat4(labelPtr, v.ToNative()),
+                _ => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length),
+            });
 
-        public static bool Combo(string label, State<int> currentItem, string itemsSeparatedByZeros, int popupMaxHeightInItems = -1) => Native.ImGui_ComboEx();
+        public static bool Drag(string label, StateVector<float> v, float speed = 1.0f, float min = default, float max = default, string? format = "%.3f", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+            {
+                2 => Native.ImGui_DragFloat2Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                3 => Native.ImGui_DragFloat3Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                4 => Native.ImGui_DragFloat4Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                _ => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, speed, (void*)BitConverter.SingleToUInt32Bits(min), (void*)BitConverter.SingleToUInt32Bits(max), formatPtr, (Native.ImGuiSliderFlags)options),
+            });
 
-        public static bool Combo(string label, State<int> currentItem, delegate* unmanaged[Cdecl]<void*, int, string*, bool> items_getter, void* data, int items_count) => Native.ImGui_ComboCallback();
+        public static bool DragRange(string label, State<float> currentMin, State<float> currentMax) => 
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragFloatRange2(labelPtr, currentMin.ToNative(), currentMax.ToNative()));
 
-        public static bool Combo(string label, State<int> currentItem, delegate* unmanaged[Cdecl]<void*, int, string*, bool> items_getter, void* data, int items_count, int popupMaxHeightInItems = -1) => Native.ImGui_ComboCallbackEx();
+        public static bool DragRange(string label, State<float> currentMin, State<float> currentMax, float speed = 1.0f, float min = default, float max = default, string? format = "%.3f", string? formatMax = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, formatMax, (labelPtr, formatPtr, formatMaxPtr) => Native.ImGui_DragFloatRange2Ex(labelPtr, currentMin.ToNative(), currentMax.ToNative(), speed, min, max, formatPtr, formatMaxPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragFloat(byte* label, float* v) => Native.ImGui_DragFloat();
+        public static bool Drag(string label, State<int> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragInt(labelPtr, v.ToNative()));
 
-        public static bool DragFloatEx(byte* label, float* v, float v_speed = 1.0f, float v_min = default, float v_max = default, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragFloatEx();
+        public static bool Drag(string label, State<int> v, float speed = 1.0f, int min = default, int max = default, string? format = "%d", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragIntEx(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragFloat2(byte* label, float* v) => Native.ImGui_DragFloat2();
+        public static bool Drag(string label, StateVector<int> v) => SdlSharp.Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_DragInt2(labelPtr, v.ToNative()),
+            3 => Native.ImGui_DragInt3(labelPtr, v.ToNative()),
+            4 => Native.ImGui_DragInt4(labelPtr, v.ToNative()),
+            _ => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length),
+        });
 
-        public static bool DragFloat2Ex(byte* label, float* v, float v_speed = 1.0f, float v_min = default, float v_max = default, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragFloat2Ex();
+        public static bool Drag(string label, StateVector<int> v, float speed = 1.0f, int min = default, int max = default, string? format = "%d", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+            {
+                2 => Native.ImGui_DragInt2Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                3 => Native.ImGui_DragInt3Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                4 => Native.ImGui_DragInt4Ex(labelPtr, v.ToNative(), speed, min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                _ => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options),
+            });
 
-        public static bool DragFloat3(byte* label, float* v) => Native.ImGui_DragFloat3();
+        public static bool DragRange(string label, State<int> currentMin, State<int> currentMax) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragIntRange2(labelPtr, currentMin.ToNative(), currentMax.ToNative()));
 
-        public static bool DragFloat3Ex(byte* label, float* v, float v_speed = 1.0f, float v_min = default, float v_max = default, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragFloat3Ex();
+        public static bool DragRange(string label, State<int> currentMin, State<int> currentMax, float speed = 1.0f, int min = default, int max = default, string? format = "%d", string? formatMax = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, formatMax, (labelPtr, formatPtr, formatMaxPtr) => Native.ImGui_DragIntRange2Ex(labelPtr, currentMin.ToNative(), currentMax.ToNative(), speed, min, max, formatPtr, formatMaxPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragFloat4(byte* label, float* v) => Native.ImGui_DragFloat4();
+        public static bool Drag(string label, State<byte> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative()));
 
-        public static bool DragFloat4Ex(byte* label, float* v, float v_speed = 1.0f, float v_min = default, float v_max = default, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragFloat4Ex();
+        public static bool Drag(string label, State<byte> v, float speed = 1.0f, byte min = default, byte max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragFloatRange2(byte* label, float* v_current_min, float* v_current_max) => Native.ImGui_DragFloatRange2();
+        public static bool Drag(string label, State<sbyte> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative()));
 
-        public static bool DragFloatRange2Ex(byte* label, float* v_current_min, float* v_current_max, float v_speed = 1.0f, float v_min = default, float v_max = default, byte* format = default /* = "%.3f" */, byte* format_max = default, ImGuiSliderFlags flags = default) => Native.ImGui_DragFloatRange2Ex();
+        public static bool Drag(string label, State<sbyte> v, float speed = 1.0f, sbyte min = default, sbyte max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragInt(byte* label, int* v) => Native.ImGui_DragInt();
+        public static bool Drag(string label, State<ushort> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative()));
 
-        public static bool DragIntEx(byte* label, int* v, float v_speed = 1.0f, int v_min = default, int v_max = default, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragIntEx();
+        public static bool Drag(string label, State<ushort> v, float speed = 1.0f, ushort min = default, ushort max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragInt2(byte* label, int* v) => Native.ImGui_DragInt2();
+        public static bool Drag(string label, State<short> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative()));
 
-        public static bool DragInt2Ex(byte* label, int* v, float v_speed = 1.0f, int v_min = default, int v_max = default, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragInt2Ex();
+        public static bool Drag(string label, State<short> v, float speed = 1.0f, short min = default, short max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragInt3(byte* label, int* v) => Native.ImGui_DragInt3();
+        public static bool Drag(string label, State<uint> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative()));
 
-        public static bool DragInt3Ex(byte* label, int* v, float v_speed = 1.0f, int v_min = default, int v_max = default, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragInt3Ex();
+        public static bool Drag(string label, State<uint> v, float speed = 1.0f, uint min = default, uint max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragInt4(byte* label, int* v) => Native.ImGui_DragInt4();
+        public static bool Drag(string label, State<ulong> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative()));
 
-        public static bool DragInt4Ex(byte* label, int* v, float v_speed = 1.0f, int v_min = default, int v_max = default, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_DragInt4Ex();
+        public static bool Drag(string label, State<ulong> v, float speed = 1.0f, ulong min = default, ulong max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragIntRange2(byte* label, int* v_current_min, int* v_current_max) => Native.ImGui_DragIntRange2();
+        public static bool Drag(string label, State<long> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative()));
 
-        public static bool DragIntRange2Ex(byte* label, int* v_current_min, int* v_current_max, float v_speed = 1.0f, int v_min = default, int v_max = default, byte* format = default /* = "%d" */, byte* format_max = default, ImGuiSliderFlags flags = default) => Native.ImGui_DragIntRange2Ex();
+        public static bool Drag(string label, State<long> v, float speed = 1.0f, long min = default, long max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragScalar(byte* label, ImGuiDataType data_type, void* p_data) => Native.ImGui_DragScalar();
+        public static bool Drag(string label, State<double> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative()));
 
-        public static bool DragScalarEx(byte* label, ImGuiDataType data_type, void* p_data, float v_speed = 1.0f, void* p_min = default, void* p_max = default, byte* format = default, ImGuiSliderFlags flags = default) => Native.ImGui_DragScalarEx();
+        public static bool Drag(string label, State<double> v, float speed = 1.0f, double min = default, double max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), speed, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool DragScalarN(byte* label, ImGuiDataType data_type, void* p_data, int components) => Native.ImGui_DragScalarN();
+        public static bool Drag(string label, StateVector<byte> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), v.Length));
 
-        public static bool DragScalarNEx(byte* label, ImGuiDataType data_type, void* p_data, int components, float v_speed = 1.0f, void* p_min = default, void* p_max = default, byte* format = default, ImGuiSliderFlags flags = default) => Native.ImGui_DragScalarNEx();
+        public static bool Drag(string label, StateVector<byte> v, float speed = 1.0f, byte min = default, byte max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderFloat(byte* label, float* v, float v_min, float v_max) => Native.ImGui_SliderFloat();
+        public static bool Drag(string label, StateVector<sbyte> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), v.Length));
 
-        public static bool SliderFloatEx(byte* label, float* v, float v_min, float v_max, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderFloatEx();
+        public static bool Drag(string label, StateVector<sbyte> v, float speed = 1.0f, sbyte min = default, sbyte max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderFloat2(byte* label, float* v, float v_min, float v_max) => Native.ImGui_SliderFloat2();
+        public static bool Drag(string label, StateVector<ushort> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), v.Length));
 
-        public static bool SliderFloat2Ex(byte* label, float* v, float v_min, float v_max, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderFloat2Ex();
+        public static bool Drag(string label, StateVector<ushort> v, float speed = 1.0f, ushort min = default, ushort max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderFloat3(byte* label, float* v, float v_min, float v_max) => Native.ImGui_SliderFloat3();
+        public static bool Drag(string label, StateVector<short> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), v.Length));
 
-        public static bool SliderFloat3Ex(byte* label, float* v, float v_min, float v_max, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderFloat3Ex();
+        public static bool Drag(string label, StateVector<short> v, float speed = 1.0f, short min = default, short max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderFloat4(byte* label, float* v, float v_min, float v_max) => Native.ImGui_SliderFloat4();
+        public static bool Drag(string label, StateVector<uint> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), v.Length));
 
-        public static bool SliderFloat4Ex(byte* label, float* v, float v_min, float v_max, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderFloat4Ex();
+        public static bool Drag(string label, StateVector<uint> v, float speed = 1.0f, uint min = default, uint max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderAngle(byte* label, float* v_rad) => Native.ImGui_SliderAngle();
+        public static bool Drag(string label, StateVector<ulong> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), v.Length));
 
-        public static bool SliderAngleEx(byte* label, float* v_rad, float v_degrees_min /* = -360.0f */, float v_degrees_max /* = +360.0f */, byte* format /* = "%.0f deg" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderAngleEx();
+        public static bool Drag(string label, StateVector<ulong> v, float speed = 1.0f, ulong min = default, ulong max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderInt(byte* label, int* v, int v_min, int v_max) => Native.ImGui_SliderInt();
+        public static bool Drag(string label, StateVector<long> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), v.Length));
 
-        public static bool SliderIntEx(byte* label, int* v, int v_min, int v_max, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderIntEx();
+        public static bool Drag(string label, StateVector<long> v, float speed = 1.0f, long min = default, long max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), v.Length, speed, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderInt2(byte* label, int* v, int v_min, int v_max) => Native.ImGui_SliderInt2();
+        public static bool Drag(string label, StateVector<double> v) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length));
 
-        public static bool SliderInt2Ex(byte* label, int* v, int v_min, int v_max, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderInt2Ex();
+        public static bool Drag(string label, StateVector<double> v, float speed = 1.0f, double min = default, double max = default, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length, speed, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderInt3(byte* label, int* v, int v_min, int v_max) => Native.ImGui_SliderInt3();
+        public static bool Slider(string label, State<float> v, float min, float max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderFloat(labelPtr, v.ToNative(), min, max));
 
-        public static bool SliderInt3Ex(byte* label, int* v, int v_min, int v_max, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderInt3Ex();
+        public static bool Slider(string label, State<float> v, float min, float max, string? format = "%.3f", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderFloatEx(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderInt4(byte* label, int* v, int v_min, int v_max) => Native.ImGui_SliderInt4();
+        public static bool Slider(string label, StateVector<float> v, float min, float max) => SdlSharp.Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_SliderFloat2(labelPtr, v.ToNative(), min, max),
+            3 => Native.ImGui_SliderFloat3(labelPtr, v.ToNative(), min, max),
+            4 => Native.ImGui_SliderFloat4(labelPtr, v.ToNative(), min, max),
+            _ => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, (void*)BitConverter.SingleToUInt32Bits(min), (void*)BitConverter.SingleToUInt32Bits(max)),
+        });
 
-        public static bool SliderInt4Ex(byte* label, int* v, int v_min, int v_max, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_SliderInt4Ex();
+        public static bool Slider(string label, StateVector<float> v, float min, float max, string? format = "%.3f", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+            {
+                2 => Native.ImGui_SliderFloat2Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                3 => Native.ImGui_SliderFloat3Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                4 => Native.ImGui_SliderFloat4Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                _ => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, (void*)BitConverter.SingleToUInt32Bits(min), (void*)BitConverter.SingleToUInt32Bits(max), formatPtr, (Native.ImGuiSliderFlags)options),
+            });
 
-        public static bool SliderScalar(byte* label, ImGuiDataType data_type, void* p_data, void* p_min, void* p_max) => Native.ImGui_SliderScalar();
+        public static bool SliderAngle(string label, State<float> radian) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderAngle(labelPtr, radian.ToNative()));
 
-        public static bool SliderScalarEx(byte* label, ImGuiDataType data_type, void* p_data, void* p_min, void* p_max, byte* format = default, ImGuiSliderFlags flags = default) => Native.ImGui_SliderScalarEx();
+        public static bool SliderAngle(string label, State<float> radian, float degreesMin = -360.0f, float degreesMax = 360.0f, string? format = "%.3f deg", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderAngleEx(labelPtr, radian.ToNative(), degreesMin, degreesMax, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool SliderScalarN(byte* label, ImGuiDataType data_type, void* p_data, int components, void* p_min, void* p_max) => Native.ImGui_SliderScalarN();
+        public static bool Slider(string label, State<int> v, int min, int max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderInt(labelPtr, v.ToNative(), min, max));
 
-        public static bool SliderScalarNEx(byte* label, ImGuiDataType data_type, void* p_data, int components, void* p_min, void* p_max, byte* format = default, ImGuiSliderFlags flags = default) => Native.ImGui_SliderScalarNEx();
+        public static bool Slider(string label, State<int> v, int min, int max, string? format = "%d", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderIntEx(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VSliderFloat(byte* label, ImVec2 size, float* v, float v_min, float v_max) => Native.ImGui_VSliderFloat();
+        public static bool Slider(string label, StateVector<int> v, int min, int max) => SdlSharp.Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_SliderInt2(labelPtr, v.ToNative(), min, max),
+            3 => Native.ImGui_SliderInt3(labelPtr, v.ToNative(), min, max),
+            4 => Native.ImGui_SliderInt4(labelPtr, v.ToNative(), min, max),
+            _ => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length, (void*)min, (void*)max),
+        });
 
-        public static bool VSliderFloatEx(byte* label, ImVec2 size, float* v, float v_min, float v_max, byte* format = default /* = "%.3f" */, ImGuiSliderFlags flags = default) => Native.ImGui_VSliderFloatEx();
+        public static bool Slider(string label, StateVector<int> v, int min, int max, string? format = "%d", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+            {
+                2 => Native.ImGui_SliderInt2Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                3 => Native.ImGui_SliderInt3Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                4 => Native.ImGui_SliderInt4Ex(labelPtr, v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options),
+                _ => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options),
+            });
 
-        public static bool VSliderInt(byte* label, ImVec2 size, int* v, int v_min, int v_max) => Native.ImGui_VSliderInt();
+        public static bool Slider(string label, State<byte> v, byte min, byte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VSliderIntEx(byte* label, ImVec2 size, int* v, int v_min, int v_max, byte* format = default /* = "%d" */, ImGuiSliderFlags flags = default) => Native.ImGui_VSliderIntEx();
+        public static bool Slider(string label, State<byte> v, byte min, byte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VSliderScalar(byte* label, ImVec2 size, ImGuiDataType data_type, void* p_data, void* p_min, void* p_max) => Native.ImGui_VSliderScalar();
+        public static bool Slider(string label, State<sbyte> v, sbyte min, sbyte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VSliderScalarEx(byte* label, ImVec2 size, ImGuiDataType data_type, void* p_data, void* p_min, void* p_max, byte* format = default, ImGuiSliderFlags flags = default) => Native.ImGui_VSliderScalarEx();
+        public static bool Slider(string label, State<sbyte> v, sbyte min, sbyte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<ushort> v, ushort min, ushort max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool Slider(string label, State<ushort> v, ushort min, ushort max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<short> v, short min, short max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool Slider(string label, State<short> v, short min, short max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<uint> v, uint min, uint max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool Slider(string label, State<uint> v, uint min, uint max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<ulong> v, ulong min, ulong max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool Slider(string label, State<ulong> v, ulong min, ulong max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<long> v, long min, long max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool Slider(string label, State<long> v, long min, long max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, State<double> v, double min, double max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max)));
+
+        public static bool Slider(string label, State<double> v, double min, double max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<byte> v, byte min, byte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<byte> v, byte min, byte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<sbyte> v, sbyte min, sbyte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<sbyte> v, sbyte min, sbyte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<ushort> v, ushort min, ushort max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<ushort> v, ushort min, ushort max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<short> v, short min, short max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<short> v, short min, short max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<uint> v, uint min, uint max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<uint> v, uint min, uint max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<ulong> v, ulong min, ulong max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<ulong> v, ulong min, ulong max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<long> v, long min, long max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), v.Length, (void*)min, (void*)max));
+
+        public static bool Slider(string label, StateVector<long> v, long min, long max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), v.Length, (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool Slider(string label, StateVector<double> v, double min, double max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max)));
+
+        public static bool Slider(string label, StateVector<double> v, double min, double max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<float> v, float min, float max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderFloat(labelPtr, size.ToNative(), v.ToNative(), min, max));
+
+        public static bool VerticalSlider(string label, Size size, State<float> v, float min, float max, string? format = "%.3f", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderFloatEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<int> v, int min, int max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderInt(labelPtr, size.ToNative(), v.ToNative(), min, max));
+
+        public static bool VerticalSlider(string label, Size size, State<int> v, int min, int max, string? format = "%d", SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderIntEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<byte> v, byte min, byte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<byte> v, byte min, byte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<sbyte> v, sbyte min, sbyte max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<sbyte> v, sbyte min, sbyte max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<ushort> v, ushort min, ushort max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<ushort> v, ushort min, ushort max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<short> v, short min, short max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<short> v, short min, short max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<uint> v, uint min, uint max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<uint> v, uint min, uint max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<ulong> v, ulong min, ulong max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<ulong> v, ulong min, ulong max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<long> v, long min, long max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max));
+
+        public static bool VerticalSlider(string label, Size size, State<long> v, long min, long max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+
+        public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max) =>
+            SdlSharp.Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max)));
+
+        public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max, string? format = default, SliderOptions options = default) =>
+            SdlSharp.Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
+
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static int NativeTextResizeCallback(Native.ImGuiInputTextCallbackData* data)
+        {
+            if (TextResizeCallbacks.TryGetValue((nuint)data->UserData, out var v))
+            {
+                v.Resize(data->BufSize);
+                data->Buf = v.ToNative();
+            }
+
+            return 0;
+        }
 
         public static bool InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputText();
 

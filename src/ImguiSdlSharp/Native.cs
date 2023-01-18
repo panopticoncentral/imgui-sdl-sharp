@@ -2498,7 +2498,7 @@ namespace SdlSharp.Imgui
 
             public char EventChar;
             public ImGuiKey EventKey;
-            public char* Buf;
+            public byte* Buf;
             public int BufTextLen;
             public int BufSize;
             public bool BufDirty;
