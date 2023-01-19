@@ -72,7 +72,7 @@ while (application.DispatchEvents())
         // Start the Dear ImGui frame
         ImGui_ImplSDLRenderer_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-#endif
+
     Imgui.NewFrame();
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -81,7 +81,6 @@ while (application.DispatchEvents())
         Imgui.ShowDemoWindow(showDemoWindow);
     }
 
-#if false
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
             static float f = 0.0f;
@@ -116,11 +115,9 @@ while (application.DispatchEvents())
         }
 
         // Rendering
-        ImGui::Render();
-        SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
+    //Imgui.Render();
 #endif
-    Imgui.Render();
-    renderer.DrawColor = new((byte)clearColor.Red * 255, (byte)clearColor.Green * 255, (byte)clearColor.Blue * 255, (byte)clearColor.Alpha * 255);
+    renderer.DrawColor = new((byte)(clearColor.Red * 255), (byte)(clearColor.Green * 255), (byte)(clearColor.Blue * 255), (byte)(clearColor.Alpha * 255));
     renderer.Clear();
 #if false
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());

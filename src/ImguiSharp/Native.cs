@@ -35,7 +35,7 @@ namespace ImguiSharp
 {
     public static unsafe class Native
     {
-        public const string ImguiLibrary = "ImguiNative.dll";
+        public const string ImguiLibrary = "ImguiSharp.Native.dll";
 
         public const string IMGUI_VERSION = "1.89.2";
         public const int IMGUI_VERSION_NUM = 18920;
