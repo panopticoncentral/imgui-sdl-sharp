@@ -1,5 +1,6 @@
 ﻿namespace SdlSharp.Imgui
 {
+    [Flags]
     public enum WindowOptions
     {
         None = Native.ImGuiWindowFlags.ImGuiWindowFlags_None,

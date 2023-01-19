@@ -1,11 +1,10 @@
 ﻿using SdlSharp;
 using SdlSharp.Graphics;
-
-//using Imgui = SdlSharp.Imgui;
+using SdlSharp.Imgui;
 
 using var application = new Application(Subsystems.Video | Subsystems.Timer | Subsystems.GameController);
 
-var windowOptions = WindowOptions.Resizable | WindowOptions.AllowHighDpi;
+var windowOptions = SdlSharp.Graphics.WindowOptions.Resizable | SdlSharp.Graphics.WindowOptions.AllowHighDpi;
 using var window = Window.Create("Dear ImGui SDL2+SDL_Renderer C# example", new(Window.CenteredWindowLocation, new(1280, 720)), windowOptions);
 
 using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | RendererOptions.Accelerated);
@@ -13,15 +12,21 @@ using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | 
 #if false
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+#endif
+
+Imgui.CreateContext();
+var io = Imgui.GetIo();
+
+#if false
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+#endif
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
+// Setup Dear ImGui style
+Imgui.StyleColorsDark();
+// Imgui.StyleColorsLight();
 
+#if false
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
@@ -42,11 +47,12 @@ using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | 
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
 
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 #endif
+
+// Our state
+var showDemoWindow = new State<bool>(true);
+var showAnotherWindow = new State<bool>(false);
+var clearColor = new SdlSharp.Imgui.Color(0.45f, 0.55f, 0.60f, 1.00f);
 
 Window.Closed += (sender, args) =>
 {
@@ -66,14 +72,18 @@ while (application.DispatchEvents())
         // Start the Dear ImGui frame
         ImGui_ImplSDLRenderer_NewFrame();
         ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
+#endif
+    Imgui.NewFrame();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
+    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+    if (showDemoWindow)
+    {
+        Imgui.ShowDemoWindow(showDemoWindow);
+    }
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
+#if false
+    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    {
             static float f = 0.0f;
             static int counter = 0;
 
@@ -109,6 +119,8 @@ while (application.DispatchEvents())
         ImGui::Render();
         SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
 #endif
+    Imgui.Render();
+    renderer.DrawColor = new((byte)clearColor.Red * 255, (byte)clearColor.Green * 255, (byte)clearColor.Blue * 255, (byte)clearColor.Alpha * 255);
     renderer.Clear();
 #if false
         ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
@@ -120,5 +132,5 @@ while (application.DispatchEvents())
     // Cleanup
     ImGui_ImplSDLRenderer_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
 #endif
+Imgui.DestroyContext();

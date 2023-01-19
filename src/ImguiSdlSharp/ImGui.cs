@@ -51,11 +51,11 @@ namespace SdlSharp.Imgui
 
         public static void ShowUserGuide() => Native.ImGui_ShowUserGuide();
 
-        public static void StyleColorsDark(Style? style) => Native.ImGui_StyleColorsDark(style == null ? null : style.Value.ToNative());
+        public static void StyleColorsDark(Style? style = null) => Native.ImGui_StyleColorsDark(style == null ? null : style.Value.ToNative());
 
-        public static void StyleColorsLight(Style? style) => Native.ImGui_StyleColorsLight(style == null ? null : style.Value.ToNative());
+        public static void StyleColorsLight(Style? style = null) => Native.ImGui_StyleColorsLight(style == null ? null : style.Value.ToNative());
 
-        public static void StyleColorsClassic(Style? style) => Native.ImGui_StyleColorsClassic(style == null ? null : style.Value.ToNative());
+        public static void StyleColorsClassic(Style? style = null) => Native.ImGui_StyleColorsClassic(style == null ? null : style.Value.ToNative());
 
         public static bool Begin(string name, State<bool>? openState = null, WindowOptions options = default) => SdlSharp.Native.StringToUtf8Func(name, ptr => Native.ImGui_Begin(ptr, openState == null ? null : openState.ToNative(), (Native.ImGuiWindowFlags)options));
 
