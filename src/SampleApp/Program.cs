@@ -1,6 +1,6 @@
 ﻿using SdlSharp;
 using SdlSharp.Graphics;
-using SdlSharp.Imgui;
+using ImguiSharp;
 
 using var application = new Application(Subsystems.Video | Subsystems.Timer | Subsystems.GameController);
 
@@ -52,7 +52,7 @@ Imgui.StyleColorsDark();
 // Our state
 var showDemoWindow = new State<bool>(true);
 var showAnotherWindow = new State<bool>(false);
-var clearColor = new SdlSharp.Imgui.Color(0.45f, 0.55f, 0.60f, 1.00f);
+var clearColor = new ImguiSharp.Color(0.45f, 0.55f, 0.60f, 1.00f);
 
 Window.Closed += (sender, args) =>
 {

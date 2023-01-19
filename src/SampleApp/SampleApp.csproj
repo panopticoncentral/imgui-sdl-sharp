@@ -12,12 +12,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\lib\sdl-sharp\src\SdlSharp\SdlSharp.csproj" />
-    <ProjectReference Include="..\ImguiSdlSharp.Native\ImguiSdlSharp.Native.vcxproj">
+    <ProjectReference Include="..\ImguiSharp.Native\ImguiSharp.Native.vcxproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Content</OutputItemType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="..\ImguiSdlSharp\ImguiSdlSharp.csproj" />
+    <ProjectReference Include="..\ImguiSharp\ImguiSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
