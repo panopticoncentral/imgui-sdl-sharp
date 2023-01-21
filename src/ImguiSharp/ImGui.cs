@@ -13,7 +13,11 @@ namespace ImguiSharp
 
         public static void DestroyContext(Context? context = null) => Native.ImGui_DestroyContext(context == null ? null : context.Value.ToNative());
 
-        public static Context GetCurrentContext() => new(Native.ImGui_GetCurrentContext());
+        public static Context? GetCurrentContext()
+        {
+            var context = Native.ImGui_GetCurrentContext();
+            return context == null ? null : new(context);
+        }
 
         public static void SetCurrentContext(Context? context) => Native.ImGui_SetCurrentContext(context == null ? null : context.Value.ToNative());
 

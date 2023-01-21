@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImguiSharp", "src\ImguiShar
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImguiSharp.Native", "src\ImguiSharp.Native\ImguiSharp.Native.vcxproj", "{22AC315C-F1E2-4014-9905-3BED66F72A35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImguiSharp.Platform.Sdl", "src\ImguiSharp.Platform.Sdl\ImguiSharp.Platform.Sdl.csproj", "{00058A28-A00C-409A-964D-AC62064E54DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,18 @@ Global
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x64.Build.0 = Release|x64
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x86.ActiveCfg = Release|Win32
 		{22AC315C-F1E2-4014-9905-3BED66F72A35}.Release|x86.Build.0 = Release|Win32
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|x64.Build.0 = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Debug|x86.Build.0 = Debug|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|x64.ActiveCfg = Release|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|x64.Build.0 = Release|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|x86.ActiveCfg = Release|Any CPU
+		{00058A28-A00C-409A-964D-AC62064E54DB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2202,7 +2202,6 @@ namespace ImguiSharp
             ImGuiConfigFlags_NoMouse = 1 << 4,
             ImGuiConfigFlags_NoMouseCursorChange = 1 << 5,
 
-
             ImGuiConfigFlags_IsSRGB = 1 << 20,
             ImGuiConfigFlags_IsTouchScreen = 1 << 21,
         }
