@@ -22,7 +22,11 @@
             set => _io->DisplaySize = value.ToNative();
         }
 
-        public float DeltaTime => _io->DeltaTime;
+        public float DeltaTime
+        {
+            get => _io->DeltaTime;
+            set => _io->DeltaTime = value;
+        }
 
         public float IniSavingRate
         {
@@ -244,69 +248,118 @@
             set => _io->ClipboardUserData = (void*)value;
         }
 
-#if false
-    //------------------------------------------------------------------
-    // Platform Functions
-    // (the imgui_impl_xxxx backend files are setting those up for you)
-    //------------------------------------------------------------------
+        public delegate* unmanaged[Cdecl]<Native.ImGuiViewport*, Native.ImGuiPlatformImeData*, void> SetPlatformImeData
+        {
+            set => _io->SetPlatformImeDataFn = value;
+        }
 
-    // Optional: Access OS clipboard
-    // (default to use native Win32 clipboard on Windows, otherwise uses a private clipboard. Override to access OS clipboard on other architectures)
-    const char* (*GetClipboardTextFn)(void* user_data);
-    void        (*SetClipboardTextFn)(void* user_data, const char* text);
-    void*       ClipboardUserData;
-
-    // Optional: Notify OS Input Method Editor of the screen position of your cursor for text input position (e.g. when using Japanese/Chinese IME on Windows)
-    // (default to use native imm32 api on Windows)
-    void        (*SetPlatformImeDataFn)(ImGuiViewport* viewport, ImGuiPlatformImeData* data);
-    void* _UnusedPadding;                                     // Unused field to keep data structure the same size.
-
-        //------------------------------------------------------------------
-        // Input - Call before calling NewFrame()
-        //------------------------------------------------------------------
-
-        // Input Functions
-        IMGUI_API void AddKeyEvent(ImGuiKey key, bool down);                   // Queue a new key down/up event. Key should be "translated" (as in, generally ImGuiKey_A matches the key end-user would use to emit an 'A' character)
-        IMGUI_API void AddKeyAnalogEvent(ImGuiKey key, bool down, float v);    // Queue a new key down/up event for analog values (e.g. ImGuiKey_Gamepad_ values). Dead-zones should be handled by the backend.
-        IMGUI_API void AddMousePosEvent(float x, float y);                     // Queue a mouse position update. Use -FLT_MAX,-FLT_MAX to signify no mouse (e.g. app not focused and not hovered)
-        IMGUI_API void AddMouseButtonEvent(int button, bool down);             // Queue a mouse button change
-        IMGUI_API void AddMouseWheelEvent(float wh_x, float wh_y);             // Queue a mouse wheel update
-        IMGUI_API void AddFocusEvent(bool focused);                            // Queue a gain/loss of focus for the application (generally based on OS/platform focus of your window)
-        IMGUI_API void AddInputCharacter(unsigned int c);                      // Queue a new character input
-        IMGUI_API void AddInputCharacterUTF16(ImWchar16 c);                    // Queue a new character input from a UTF-16 character, it can be a surrogate
-        IMGUI_API void AddInputCharactersUTF8(const char* str);                // Queue a new characters input from a UTF-8 string
-
-        IMGUI_API void SetKeyEventNativeData(ImGuiKey key, int native_keycode, int native_scancode, int native_legacy_index = -1); // [Optional] Specify index for legacy <1.87 IsKeyXXX() functions with native indices + specify native keycode, scancode.
-        IMGUI_API void SetAppAcceptingEvents(bool accepting_events);           // Set master flag for accepting key/mouse/text events (default to true). Useful if you have native dialog boxes that are interrupting your application loop/refresh, and you want to disable events being queued while your app is frozen.
-        IMGUI_API void ClearInputCharacters();                                 // [Internal] Clear the text input buffer manually
-        IMGUI_API void ClearInputKeys();                                       // [Internal] Release all keys
-
-        //------------------------------------------------------------------
-        // Output - Updated by NewFrame() or EndFrame()/Render()
-        // (when reading from the io.WantCaptureMouse, io.WantCaptureKeyboard flags to dispatch your inputs, it is
-        //  generally easier and more correct to use their state BEFORE calling NewFrame(). See FAQ for details!)
-        //------------------------------------------------------------------
-
-        bool WantCaptureMouse;                   // Set when Dear ImGui will use mouse inputs, in this case do not dispatch them to your main game/application (either way, always pass on mouse inputs to imgui). (e.g. unclicked mouse is hovering over an imgui window, widget is active, mouse was clicked over an imgui window, etc.).
-        bool WantCaptureKeyboard;                // Set when Dear ImGui will use keyboard inputs, in this case do not dispatch them to your main game/application (either way, always pass keyboard inputs to imgui). (e.g. InputText active, or an imgui window is focused and navigation is enabled, etc.).
-        bool WantTextInput;                      // Mobile/console: when set, you may display an on-screen keyboard. This is set by Dear ImGui when it wants textual keyboard input to happen (e.g. when a InputText widget is active).
-        bool WantSetMousePos;                    // MousePos has been altered, backend should reposition mouse on next frame. Rarely used! Set only when ImGuiConfigFlags_NavEnableSetMousePos flag is enabled.
-        bool WantSaveIniSettings;                // When manual .ini load/save is active (io.IniFilename == NULL), this will be set to notify your application that you can call SaveIniSettingsToMemory() and save yourself. Important: clear io.WantSaveIniSettings yourself after saving!
-        bool NavActive;                          // Keyboard/Gamepad navigation is currently allowed (will handle ImGuiKey_NavXXX events) = a window is focused and it doesn't use the ImGuiWindowFlags_NoNavInputs flag.
-        bool NavVisible;                         // Keyboard/Gamepad navigation is visible and allowed (will handle ImGuiKey_NavXXX events).
-        float Framerate;                          // Estimate of application framerate (rolling average over 60 frames, based on io.DeltaTime), in frame per second. Solely for convenience. Slow applications may not want to use a moving average or may want to reset underlying buffers occasionally.
-        int MetricsRenderVertices;              // Vertices output during last call to Render()
-        int MetricsRenderIndices;               // Indices output during last call to Render() = number of triangles * 3
-        int MetricsRenderWindows;               // Number of visible windows
-        int MetricsActiveWindows;               // Number of active windows
-        int MetricsActiveAllocations;           // Number of active allocations, updated by MemAlloc/MemFree based on current context. May be off if you have multiple imgui contexts.
-        ImVec2 MouseDelta;                         // Mouse delta. Note that this is zero if either current or previous position are invalid (-FLT_MAX,-FLT_MAX), so a disappearing/reappearing mouse won't have a huge delta.
-#endif
+        public bool WantCaptureMouse
+        {
+            get => _io->WantCaptureMouse;
+            set => _io->WantCaptureMouse = value;
+        }
+        public bool WantCaptureKeyboard
+        {
+            get => _io->WantCaptureKeyboard;
+            set => _io->WantCaptureKeyboard = value;
+        }
+        public bool WantTextInput
+        {
+            get => _io->WantTextInput;
+            set => _io->WantTextInput = value;
+        }
+        public bool WantSetMousePos
+        {
+            get => _io->WantSetMousePos;
+            set => _io->WantSetMousePos = value;
+        }
+        public bool WantSaveIniSettings
+        {
+            get => _io->WantSaveIniSettings;
+            set => _io->WantSaveIniSettings = value;
+        }
+        public bool NavActive
+        {
+            get => _io->NavActive;
+            set => _io->NavActive = value;
+        }
+        public bool NavVisible
+        {
+            get => _io->NavVisible;
+            set => _io->NavVisible = value;
+        }
+        public float Framerate
+        {
+            get => _io->Framerate;
+            set => _io->Framerate = value;
+        }
+        public int MetricsRenderVertices
+        {
+            get => _io->MetricsRenderVertices;
+            set => _io->MetricsRenderVertices = value;
+        }
+        public int MetricsRenderIndices
+        {
+            get => _io->MetricsRenderIndices;
+            set => _io->MetricsRenderIndices = value;
+        }
+        public int MetricsRenderWindows
+        {
+            get => _io->MetricsRenderWindows;
+            set => _io->MetricsRenderWindows = value;
+        }
+        public int MetricsActiveWindows
+        {
+            get => _io->MetricsActiveWindows;
+            set => _io->MetricsActiveWindows = value;
+        }
+        public int MetricsActiveAllocations
+        {
+            get => _io->MetricsActiveAllocations;
+            set => _io->MetricsActiveAllocations = value;
+        }
+        public Size MouseDelta
+        {
+            get => new(_io->MouseDelta);
+            set => _io->MouseDelta = value.ToNative();
+        }
 
         internal Io(Native.ImGuiIO* io)
         {
             _io = io;
         }
+
+        public void AddKeyEvent(Key key, bool down) => Native.ImGuiIO_AddKeyEvent(_io, (Native.ImGuiKey)key, down);
+
+        public void AddKeyAnalogEvent(Key key, bool down, float v) => Native.ImGuiIO_AddKeyAnalogEvent(_io, (Native.ImGuiKey)key, down, v);
+
+        public void AddMousePosEvent(Position position) => Native.ImGuiIO_AddMousePosEvent(_io, position.X, position.Y);
+
+        public void AddMouseButtonEvent(int button, bool down) => Native.ImGuiIO_AddMouseButtonEvent(_io, button, down);
+
+        public void AddMouseWheelEvent(Position location) => Native.ImGuiIO_AddMouseWheelEvent(_io, location.X, location.Y);
+
+        public void AddFocusEvent(bool focused) => Native.ImGuiIO_AddFocusEvent(_io, focused);
+
+        public void AddInputCharacter(char c) => Native.ImGuiIO_AddInputCharacter(_io, c);
+
+        public void AddInputCharacterUTF16(char c) => Native.ImGuiIO_AddInputCharacterUTF16(_io, c);
+
+        public void AddInputCharactersUTF8(string str)
+        {
+            var io = _io;
+            Native.StringToUtf8Action(str, ptr => Native.ImGuiIO_AddInputCharactersUTF8(io, ptr));
+        }
+
+        public void SetKeyEventNativeData(Key key, int nativeKeycode, int nativeScancode) => Native.ImGuiIO_SetKeyEventNativeData(_io, (Native.ImGuiKey)key, nativeKeycode, nativeScancode);
+
+        public void SetKeyEventNativeData(Key key, int nativeKeycode, int nativeScancode, int nativeLegacyIndex) => Native.ImGuiIO_SetKeyEventNativeDataEx(_io, (Native.ImGuiKey)key, nativeKeycode, nativeScancode, nativeLegacyIndex);
+
+        public void SetAppAcceptingEvents(bool acceptingEvents) => Native.ImGuiIO_SetAppAcceptingEvents(_io, acceptingEvents);
+
+        public void ClearInputCharacters() => Native.ImGuiIO_ClearInputCharacters(_io);
+
+        public void ClearInputKeys() => Native.ImGuiIO_ClearInputKeys(_io);
 
         internal Native.ImGuiIO* ToNative() => _io;
     }

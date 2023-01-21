@@ -415,43 +415,48 @@ namespace ImguiSharp.Platform.Sdl
         //#undef MAP_ANALOG
         //    }
 
-        //    void ImGui_ImplSDL2_NewFrame()
-        //    {
-        //        ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
-        //        IM_ASSERT(bd != nullptr && "Did you call ImGui_ImplSDL2_Init()?");
-        //        ImGuiIO & io = ImGui::GetIO();
+        public static void NewFrame()
+        {
+            var bd = GetBackendData();
+            if (bd == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-        //        // Setup display size (every frame to accommodate for window resizing)
-        //        int w, h;
-        //        int display_w, display_h;
-        //        SDL_GetWindowSize(bd->Window, &w, &h);
-        //        if (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_MINIMIZED)
-        //            w = h = 0;
-        //        if (bd->Renderer != nullptr)
-        //            SDL_GetRendererOutputSize(bd->Renderer, &display_w, &display_h);
-        //        else
-        //            SDL_GL_GetDrawableSize(bd->Window, &display_w, &display_h);
-        //        io.DisplaySize = ImVec2((float)w, (float)h);
-        //        if (w > 0 && h > 0)
-        //            io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
+            var io = Imgui.GetIo();
 
-        //        // Setup time step (we don't use SDL_GetTicks() because it is using millisecond resolution)
-        //        static Uint64 frequency = SDL_GetPerformanceFrequency();
-        //        Uint64 current_time = SDL_GetPerformanceCounter();
-        //        io.DeltaTime = bd->Time > 0 ? (float)((double)(current_time - bd->Time) / frequency) : (float)(1.0f / 60.0f);
-        //        bd->Time = current_time;
+            int width, height;
+            int displayWidth, displayHeight;
+            SdlSharp.Native.SDL_GetWindowSize(bd._window, &width, &height);
+            if ((SdlSharp.Native.SDL_GetWindowFlags(bd._window) & (uint)SdlSharp.Native.SDL_WindowFlags.SDL_WINDOW_MINIMIZED) != 0)
+            {
+                width = height = 0;
+            }
 
-        //        if (bd->PendingMouseLeaveFrame && bd->PendingMouseLeaveFrame >= ImGui::GetFrameCount() && bd->MouseButtonsDown == 0)
-        //        {
-        //            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
-        //            bd->PendingMouseLeaveFrame = 0;
-        //        }
+            _ = SdlSharp.Native.SDL_GetRendererOutputSize(bd._renderer, &displayWidth, &displayHeight);
 
-        //        ImGui_ImplSDL2_UpdateMouseData();
-        //        ImGui_ImplSDL2_UpdateMouseCursor();
+            io.DisplaySize = new(width, height);
+            if (width > 0 && height > 0)
+            {
+                io.DisplayFramebufferScale = new((float)displayWidth / width, (float)displayHeight / height);
+            }
 
-        //        // Update game controllers (if enabled and available)
-        //        ImGui_ImplSDL2_UpdateGamepads();
-        //    }
+            //ulong frequency = SdlSharp.Native.SDL_GetPerformanceFrequency();
+            //ulong current_time = SdlSharp.Native.SDL_GetPerformanceCounter();
+            //io.DeltaTime = bd._time > 0 ? (float)((double)(current_time - bd._time) / frequency) : (float)(1.0f / 60.0f);
+            //bd._time = current_time;
+
+            //if (bd._pendingMouseLeaveFrame && bd._pendingMouseLeaveFrame >= Imgui.GetFrameCount() && bd._mouseButtonsDown == 0)
+            //{
+            //    io.AddMousePosEvent(new(-float.MaxValue, -float.MaxValue));
+            //    bd._pendingMouseLeaveFrame = 0;
+            //}
+
+            //        ImGui_ImplSDL2_UpdateMouseData();
+            //        ImGui_ImplSDL2_UpdateMouseCursor();
+
+            //        // Update game controllers (if enabled and available)
+            //        ImGui_ImplSDL2_UpdateGamepads();
+        }
     }
 }
