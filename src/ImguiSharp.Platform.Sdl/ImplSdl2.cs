@@ -1,9 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-using SdlSharp.Graphics;
-using SdlSharp.Input;
-
 namespace ImguiSharp.Platform.Sdl
 {
     public static unsafe class ImplSdl2
@@ -13,19 +10,19 @@ namespace ImguiSharp.Platform.Sdl
 
         private sealed class Data
         {
-            public Window _window;
-            public Renderer _renderer;
+            public SdlSharp.Native.SDL_Window* _window;
+            public SdlSharp.Native.SDL_Renderer* _renderer;
             public ulong _time;
             public int _mouseButtonsDown;
-            public Cursor[] _mouseCursors;
+            public SdlSharp.Native.SDL_Cursor*[] _mouseCursors;
             public int _pendingMouseLeaveFrame;
             public byte* _clipboardTextData;
 
-            public Data(Window window, Renderer renderer)
+            public Data(SdlSharp.Native.SDL_Window* window, SdlSharp.Native.SDL_Renderer* renderer)
             {
                 _window = window;
                 _renderer = renderer;
-                _mouseCursors = Array.Empty<Cursor>();
+                _mouseCursors = new SdlSharp.Native.SDL_Cursor*[(int)MouseCursor.Count];
             }
         };
 
@@ -249,7 +246,7 @@ namespace ImguiSharp.Platform.Sdl
         //        return false;
         //    }
 
-        public static bool Init(Window window, Renderer renderer)
+        public static bool Init(SdlSharp.Native.SDL_Window* window, SdlSharp.Native.SDL_Renderer* renderer)
         {
             var io = Imgui.GetIo();
 
@@ -270,16 +267,15 @@ namespace ImguiSharp.Platform.Sdl
             io.GetClipboardText = &GetClipboardText;
             io.ClipboardUserData = 0;
 
-            //        // Load mouse cursors
-            //        bd->MouseCursors[ImGuiMouseCursor_Arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
-            //        bd->MouseCursors[ImGuiMouseCursor_TextInput] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-            //        bd->MouseCursors[ImGuiMouseCursor_ResizeAll] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
-            //        bd->MouseCursors[ImGuiMouseCursor_ResizeNS] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-            //        bd->MouseCursors[ImGuiMouseCursor_ResizeEW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
-            //        bd->MouseCursors[ImGuiMouseCursor_ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
-            //        bd->MouseCursors[ImGuiMouseCursor_ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
-            //        bd->MouseCursors[ImGuiMouseCursor_Hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
-            //        bd->MouseCursors[ImGuiMouseCursor_NotAllowed] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO);
+            bd._mouseCursors[(int)MouseCursor.Arrow] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_ARROW);
+            bd._mouseCursors[(int)MouseCursor.TextInput] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_IBEAM);
+            bd._mouseCursors[(int)MouseCursor.ResizeAll] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEALL);
+            bd._mouseCursors[(int)MouseCursor.ResizeNS] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENS);
+            bd._mouseCursors[(int)MouseCursor.ResizeEW] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZEWE);
+            bd._mouseCursors[(int)MouseCursor.ResizeNESW] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENESW);
+            bd._mouseCursors[(int)MouseCursor.ResizeNWSE] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_SIZENWSE);
+            bd._mouseCursors[(int)MouseCursor.Hand] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_HAND);
+            bd._mouseCursors[(int)MouseCursor.NotAllowed] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_NO);
 
             //        // Set platform dependent data in viewport
             //#if defined(SDL_VIDEO_DRIVER_WINDOWS)
@@ -291,38 +287,35 @@ namespace ImguiSharp.Platform.Sdl
             //        (void)window;
             //#endif
 
-            //        // From 2.0.5: Set SDL hint to receive mouse click events on window focus, otherwise SDL doesn't emit the event.
-            //        // Without this, when clicking to gain focus, our widgets wouldn't activate even though they showed as hovered.
-            //        // (This is unfortunately a global SDL setting, so enabling it might have a side-effect on your application.
-            //        // It is unlikely to make a difference, but if your app absolutely needs to ignore the initial on-focus click:
-            //        // you can ignore SDL_MOUSEBUTTONDOWN events coming right after a SDL_WINDOWEVENT_FOCUS_GAINED)
-            //# ifdef SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH
-            //        SDL_SetHint(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
-            //#endif
-
-            //        // From 2.0.22: Disable auto-capture, this is preventing drag and drop across multiple windows (see #5710)
-            //# ifdef SDL_HINT_MOUSE_AUTO_CAPTURE
-            //        SDL_SetHint(SDL_HINT_MOUSE_AUTO_CAPTURE, "0");
-            //#endif
+            _ = SdlSharp.Native.StringToUtf8Func(SdlSharp.Native.SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1", SdlSharp.Native.SDL_SetHint);
+            _ = SdlSharp.Native.StringToUtf8Func(SdlSharp.Native.SDL_HINT_MOUSE_AUTO_CAPTURE, "0", SdlSharp.Native.SDL_SetHint);
 
             return true;
         }
 
-        //    void ImGui_ImplSDL2_Shutdown()
-        //    {
-        //        ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
-        //        IM_ASSERT(bd != nullptr && "No platform backend to shutdown, or already shutdown?");
-        //        ImGuiIO & io = ImGui::GetIO();
+        public static void Shutdown()
+        {
+            var bd = GetBackendData();
+            if (bd == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-        //        if (bd->ClipboardTextData)
-        //            SDL_free(bd->ClipboardTextData);
-        //        for (ImGuiMouseCursor cursor_n = 0; cursor_n < ImGuiMouseCursor_COUNT; cursor_n++)
-        //            SDL_FreeCursor(bd->MouseCursors[cursor_n]);
+            var io = Imgui.GetIo();
 
-        //        io.BackendPlatformName = nullptr;
-        //        io.BackendPlatformUserData = nullptr;
-        //        IM_DELETE(bd);
-        //    }
+            if (bd._clipboardTextData != null)
+            {
+                SdlSharp.Native.SDL_free(bd._clipboardTextData);
+            }
+            for (MouseCursor cursor = 0; cursor < MouseCursor.Count; cursor++)
+            {
+                SdlSharp.Native.SDL_FreeCursor(bd._mouseCursors[(int)cursor]);
+            }
+
+            io.BackendPlatformName = null;
+            io.BackendPlatformUserData = 0;
+            _ = DataDictionary.Remove((nuint)bd.GetHashCode());
+        }
 
         //    static void ImGui_ImplSDL2_UpdateMouseData()
         //    {
