@@ -2522,6 +2522,16 @@ namespace ImguiSharp
             public int MetricsActiveAllocations;
             public ImVec2 MouseDelta;
 
+            // Internal fields that someone might use...
+            public ImVec2 MousePos;
+            public fixed bool MouseDown[5];
+            public float MouseWheel;
+            public float MouseWheelH;
+            public bool KeyCtrl;
+            public bool KeyShift;
+            public bool KeyAlt;
+            public bool KeySuper;
+
             // Internal fields follow but are omitted...
         }
 

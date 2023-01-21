@@ -258,71 +258,86 @@
             get => _io->WantCaptureMouse;
             set => _io->WantCaptureMouse = value;
         }
+
         public bool WantCaptureKeyboard
         {
             get => _io->WantCaptureKeyboard;
             set => _io->WantCaptureKeyboard = value;
         }
+
         public bool WantTextInput
         {
             get => _io->WantTextInput;
             set => _io->WantTextInput = value;
         }
+
         public bool WantSetMousePos
         {
             get => _io->WantSetMousePos;
             set => _io->WantSetMousePos = value;
         }
+
         public bool WantSaveIniSettings
         {
             get => _io->WantSaveIniSettings;
             set => _io->WantSaveIniSettings = value;
         }
+
         public bool NavActive
         {
             get => _io->NavActive;
             set => _io->NavActive = value;
         }
+
         public bool NavVisible
         {
             get => _io->NavVisible;
             set => _io->NavVisible = value;
         }
+
         public float Framerate
         {
             get => _io->Framerate;
             set => _io->Framerate = value;
         }
+
         public int MetricsRenderVertices
         {
             get => _io->MetricsRenderVertices;
             set => _io->MetricsRenderVertices = value;
         }
+
         public int MetricsRenderIndices
         {
             get => _io->MetricsRenderIndices;
             set => _io->MetricsRenderIndices = value;
         }
+
         public int MetricsRenderWindows
         {
             get => _io->MetricsRenderWindows;
             set => _io->MetricsRenderWindows = value;
         }
+
         public int MetricsActiveWindows
         {
             get => _io->MetricsActiveWindows;
             set => _io->MetricsActiveWindows = value;
         }
+
         public int MetricsActiveAllocations
         {
             get => _io->MetricsActiveAllocations;
             set => _io->MetricsActiveAllocations = value;
         }
+
         public Size MouseDelta
         {
             get => new(_io->MouseDelta);
             set => _io->MouseDelta = value.ToNative();
         }
+
+        public Position MousePosition => new(_io->MousePos);
 
         internal Io(Native.ImGuiIO* io)
         {

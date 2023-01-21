@@ -49,127 +49,127 @@ namespace ImguiSharp.Platform.Sdl
         [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
         private static void SetClipboardText(void* unused, byte* text) => _ = SdlSharp.Native.SDL_SetClipboardText(text);
 
-        //    static ImGuiKey ImGui_ImplSDL2_KeycodeToImGuiKey(int keycode)
-        //    {
-        //        switch (keycode)
-        //        {
-        //            case SDLK_TAB: return ImGuiKey_Tab;
-        //            case SDLK_LEFT: return ImGuiKey_LeftArrow;
-        //            case SDLK_RIGHT: return ImGuiKey_RightArrow;
-        //            case SDLK_UP: return ImGuiKey_UpArrow;
-        //            case SDLK_DOWN: return ImGuiKey_DownArrow;
-        //            case SDLK_PAGEUP: return ImGuiKey_PageUp;
-        //            case SDLK_PAGEDOWN: return ImGuiKey_PageDown;
-        //            case SDLK_HOME: return ImGuiKey_Home;
-        //            case SDLK_END: return ImGuiKey_End;
-        //            case SDLK_INSERT: return ImGuiKey_Insert;
-        //            case SDLK_DELETE: return ImGuiKey_Delete;
-        //            case SDLK_BACKSPACE: return ImGuiKey_Backspace;
-        //            case SDLK_SPACE: return ImGuiKey_Space;
-        //            case SDLK_RETURN: return ImGuiKey_Enter;
-        //            case SDLK_ESCAPE: return ImGuiKey_Escape;
-        //            case SDLK_QUOTE: return ImGuiKey_Apostrophe;
-        //            case SDLK_COMMA: return ImGuiKey_Comma;
-        //            case SDLK_MINUS: return ImGuiKey_Minus;
-        //            case SDLK_PERIOD: return ImGuiKey_Period;
-        //            case SDLK_SLASH: return ImGuiKey_Slash;
-        //            case SDLK_SEMICOLON: return ImGuiKey_Semicolon;
-        //            case SDLK_EQUALS: return ImGuiKey_Equal;
-        //            case SDLK_LEFTBRACKET: return ImGuiKey_LeftBracket;
-        //            case SDLK_BACKSLASH: return ImGuiKey_Backslash;
-        //            case SDLK_RIGHTBRACKET: return ImGuiKey_RightBracket;
-        //            case SDLK_BACKQUOTE: return ImGuiKey_GraveAccent;
-        //            case SDLK_CAPSLOCK: return ImGuiKey_CapsLock;
-        //            case SDLK_SCROLLLOCK: return ImGuiKey_ScrollLock;
-        //            case SDLK_NUMLOCKCLEAR: return ImGuiKey_NumLock;
-        //            case SDLK_PRINTSCREEN: return ImGuiKey_PrintScreen;
-        //            case SDLK_PAUSE: return ImGuiKey_Pause;
-        //            case SDLK_KP_0: return ImGuiKey_Keypad0;
-        //            case SDLK_KP_1: return ImGuiKey_Keypad1;
-        //            case SDLK_KP_2: return ImGuiKey_Keypad2;
-        //            case SDLK_KP_3: return ImGuiKey_Keypad3;
-        //            case SDLK_KP_4: return ImGuiKey_Keypad4;
-        //            case SDLK_KP_5: return ImGuiKey_Keypad5;
-        //            case SDLK_KP_6: return ImGuiKey_Keypad6;
-        //            case SDLK_KP_7: return ImGuiKey_Keypad7;
-        //            case SDLK_KP_8: return ImGuiKey_Keypad8;
-        //            case SDLK_KP_9: return ImGuiKey_Keypad9;
-        //            case SDLK_KP_PERIOD: return ImGuiKey_KeypadDecimal;
-        //            case SDLK_KP_DIVIDE: return ImGuiKey_KeypadDivide;
-        //            case SDLK_KP_MULTIPLY: return ImGuiKey_KeypadMultiply;
-        //            case SDLK_KP_MINUS: return ImGuiKey_KeypadSubtract;
-        //            case SDLK_KP_PLUS: return ImGuiKey_KeypadAdd;
-        //            case SDLK_KP_ENTER: return ImGuiKey_KeypadEnter;
-        //            case SDLK_KP_EQUALS: return ImGuiKey_KeypadEqual;
-        //            case SDLK_LCTRL: return ImGuiKey_LeftCtrl;
-        //            case SDLK_LSHIFT: return ImGuiKey_LeftShift;
-        //            case SDLK_LALT: return ImGuiKey_LeftAlt;
-        //            case SDLK_LGUI: return ImGuiKey_LeftSuper;
-        //            case SDLK_RCTRL: return ImGuiKey_RightCtrl;
-        //            case SDLK_RSHIFT: return ImGuiKey_RightShift;
-        //            case SDLK_RALT: return ImGuiKey_RightAlt;
-        //            case SDLK_RGUI: return ImGuiKey_RightSuper;
-        //            case SDLK_APPLICATION: return ImGuiKey_Menu;
-        //            case SDLK_0: return ImGuiKey_0;
-        //            case SDLK_1: return ImGuiKey_1;
-        //            case SDLK_2: return ImGuiKey_2;
-        //            case SDLK_3: return ImGuiKey_3;
-        //            case SDLK_4: return ImGuiKey_4;
-        //            case SDLK_5: return ImGuiKey_5;
-        //            case SDLK_6: return ImGuiKey_6;
-        //            case SDLK_7: return ImGuiKey_7;
-        //            case SDLK_8: return ImGuiKey_8;
-        //            case SDLK_9: return ImGuiKey_9;
-        //            case SDLK_a: return ImGuiKey_A;
-        //            case SDLK_b: return ImGuiKey_B;
-        //            case SDLK_c: return ImGuiKey_C;
-        //            case SDLK_d: return ImGuiKey_D;
-        //            case SDLK_e: return ImGuiKey_E;
-        //            case SDLK_f: return ImGuiKey_F;
-        //            case SDLK_g: return ImGuiKey_G;
-        //            case SDLK_h: return ImGuiKey_H;
-        //            case SDLK_i: return ImGuiKey_I;
-        //            case SDLK_j: return ImGuiKey_J;
-        //            case SDLK_k: return ImGuiKey_K;
-        //            case SDLK_l: return ImGuiKey_L;
-        //            case SDLK_m: return ImGuiKey_M;
-        //            case SDLK_n: return ImGuiKey_N;
-        //            case SDLK_o: return ImGuiKey_O;
-        //            case SDLK_p: return ImGuiKey_P;
-        //            case SDLK_q: return ImGuiKey_Q;
-        //            case SDLK_r: return ImGuiKey_R;
-        //            case SDLK_s: return ImGuiKey_S;
-        //            case SDLK_t: return ImGuiKey_T;
-        //            case SDLK_u: return ImGuiKey_U;
-        //            case SDLK_v: return ImGuiKey_V;
-        //            case SDLK_w: return ImGuiKey_W;
-        //            case SDLK_x: return ImGuiKey_X;
-        //            case SDLK_y: return ImGuiKey_Y;
-        //            case SDLK_z: return ImGuiKey_Z;
-        //            case SDLK_F1: return ImGuiKey_F1;
-        //            case SDLK_F2: return ImGuiKey_F2;
-        //            case SDLK_F3: return ImGuiKey_F3;
-        //            case SDLK_F4: return ImGuiKey_F4;
-        //            case SDLK_F5: return ImGuiKey_F5;
-        //            case SDLK_F6: return ImGuiKey_F6;
-        //            case SDLK_F7: return ImGuiKey_F7;
-        //            case SDLK_F8: return ImGuiKey_F8;
-        //            case SDLK_F9: return ImGuiKey_F9;
-        //            case SDLK_F10: return ImGuiKey_F10;
-        //            case SDLK_F11: return ImGuiKey_F11;
-        //            case SDLK_F12: return ImGuiKey_F12;
-        //        }
-        //        return ImGuiKey_None;
-        //    }
+        private static Key KeycodeToImGuiKey(int keycode)
+        {
+            return (SdlSharp.Native.SDL_KeyCode)keycode switch
+            {
+                SdlSharp.Native.SDL_KeyCode.SDLK_TAB => Key.Tab,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LEFT => Key.LeftArrow,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RIGHT => Key.RightArrow,
+                SdlSharp.Native.SDL_KeyCode.SDLK_UP => Key.UpArrow,
+                SdlSharp.Native.SDL_KeyCode.SDLK_DOWN => Key.DownArrow,
+                SdlSharp.Native.SDL_KeyCode.SDLK_PAGEUP => Key.PageUp,
+                SdlSharp.Native.SDL_KeyCode.SDLK_PAGEDOWN => Key.PageDown,
+                SdlSharp.Native.SDL_KeyCode.SDLK_HOME => Key.Home,
+                SdlSharp.Native.SDL_KeyCode.SDLK_END => Key.End,
+                SdlSharp.Native.SDL_KeyCode.SDLK_INSERT => Key.Insert,
+                SdlSharp.Native.SDL_KeyCode.SDLK_DELETE => Key.Delete,
+                SdlSharp.Native.SDL_KeyCode.SDLK_BACKSPACE => Key.Backspace,
+                SdlSharp.Native.SDL_KeyCode.SDLK_SPACE => Key.Space,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RETURN => Key.Enter,
+                SdlSharp.Native.SDL_KeyCode.SDLK_ESCAPE => Key.Escape,
+                SdlSharp.Native.SDL_KeyCode.SDLK_QUOTE => Key.Apostrophe,
+                SdlSharp.Native.SDL_KeyCode.SDLK_COMMA => Key.Comma,
+                SdlSharp.Native.SDL_KeyCode.SDLK_MINUS => Key.Minus,
+                SdlSharp.Native.SDL_KeyCode.SDLK_PERIOD => Key.Period,
+                SdlSharp.Native.SDL_KeyCode.SDLK_SLASH => Key.Slash,
+                SdlSharp.Native.SDL_KeyCode.SDLK_SEMICOLON => Key.Semicolon,
+                SdlSharp.Native.SDL_KeyCode.SDLK_EQUALS => Key.Equal,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LEFTBRACKET => Key.LeftBracket,
+                SdlSharp.Native.SDL_KeyCode.SDLK_BACKSLASH => Key.Backslash,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RIGHTBRACKET => Key.RightBracket,
+                SdlSharp.Native.SDL_KeyCode.SDLK_BACKQUOTE => Key.GraveAccent,
+                SdlSharp.Native.SDL_KeyCode.SDLK_CAPSLOCK => Key.CapsLock,
+                SdlSharp.Native.SDL_KeyCode.SDLK_SCROLLLOCK => Key.ScrollLock,
+                SdlSharp.Native.SDL_KeyCode.SDLK_NUMLOCKCLEAR => Key.NumLock,
+                SdlSharp.Native.SDL_KeyCode.SDLK_PRINTSCREEN => Key.PrintScreen,
+                SdlSharp.Native.SDL_KeyCode.SDLK_PAUSE => Key.Pause,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_0 => Key.Keypad0,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_1 => Key.Keypad1,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_2 => Key.Keypad2,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_3 => Key.Keypad3,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_4 => Key.Keypad4,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_5 => Key.Keypad5,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_6 => Key.Keypad6,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_7 => Key.Keypad7,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_8 => Key.Keypad8,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_9 => Key.Keypad9,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_PERIOD => Key.KeypadDecimal,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_DIVIDE => Key.KeypadDivide,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_MULTIPLY => Key.KeypadMultiply,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_MINUS => Key.KeypadSubtract,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_PLUS => Key.KeypadAdd,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_ENTER => Key.KeypadEnter,
+                SdlSharp.Native.SDL_KeyCode.SDLK_KP_EQUALS => Key.KeypadEqual,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LCTRL => Key.LeftCtrl,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LSHIFT => Key.LeftShift,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LALT => Key.LeftAlt,
+                SdlSharp.Native.SDL_KeyCode.SDLK_LGUI => Key.LeftSuper,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RCTRL => Key.RightCtrl,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RSHIFT => Key.RightShift,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RALT => Key.RightAlt,
+                SdlSharp.Native.SDL_KeyCode.SDLK_RGUI => Key.RightSuper,
+                SdlSharp.Native.SDL_KeyCode.SDLK_APPLICATION => Key.Menu,
+                SdlSharp.Native.SDL_KeyCode.SDLK_0 => Key.Num0,
+                SdlSharp.Native.SDL_KeyCode.SDLK_1 => Key.Num1,
+                SdlSharp.Native.SDL_KeyCode.SDLK_2 => Key.Num2,
+                SdlSharp.Native.SDL_KeyCode.SDLK_3 => Key.Num3,
+                SdlSharp.Native.SDL_KeyCode.SDLK_4 => Key.Num4,
+                SdlSharp.Native.SDL_KeyCode.SDLK_5 => Key.Num5,
+                SdlSharp.Native.SDL_KeyCode.SDLK_6 => Key.Num6,
+                SdlSharp.Native.SDL_KeyCode.SDLK_7 => Key.Num7,
+                SdlSharp.Native.SDL_KeyCode.SDLK_8 => Key.Num8,
+                SdlSharp.Native.SDL_KeyCode.SDLK_9 => Key.Num9,
+                SdlSharp.Native.SDL_KeyCode.SDLK_a => Key.A,
+                SdlSharp.Native.SDL_KeyCode.SDLK_b => Key.B,
+                SdlSharp.Native.SDL_KeyCode.SDLK_c => Key.C,
+                SdlSharp.Native.SDL_KeyCode.SDLK_d => Key.D,
+                SdlSharp.Native.SDL_KeyCode.SDLK_e => Key.E,
+                SdlSharp.Native.SDL_KeyCode.SDLK_f => Key.F,
+                SdlSharp.Native.SDL_KeyCode.SDLK_g => Key.G,
+                SdlSharp.Native.SDL_KeyCode.SDLK_h => Key.H,
+                SdlSharp.Native.SDL_KeyCode.SDLK_i => Key.I,
+                SdlSharp.Native.SDL_KeyCode.SDLK_j => Key.J,
+                SdlSharp.Native.SDL_KeyCode.SDLK_k => Key.K,
+                SdlSharp.Native.SDL_KeyCode.SDLK_l => Key.L,
+                SdlSharp.Native.SDL_KeyCode.SDLK_m => Key.M,
+                SdlSharp.Native.SDL_KeyCode.SDLK_n => Key.N,
+                SdlSharp.Native.SDL_KeyCode.SDLK_o => Key.O,
+                SdlSharp.Native.SDL_KeyCode.SDLK_p => Key.P,
+                SdlSharp.Native.SDL_KeyCode.SDLK_q => Key.Q,
+                SdlSharp.Native.SDL_KeyCode.SDLK_r => Key.R,
+                SdlSharp.Native.SDL_KeyCode.SDLK_s => Key.S,
+                SdlSharp.Native.SDL_KeyCode.SDLK_t => Key.T,
+                SdlSharp.Native.SDL_KeyCode.SDLK_u => Key.U,
+                SdlSharp.Native.SDL_KeyCode.SDLK_v => Key.V,
+                SdlSharp.Native.SDL_KeyCode.SDLK_w => Key.W,
+                SdlSharp.Native.SDL_KeyCode.SDLK_x => Key.X,
+                SdlSharp.Native.SDL_KeyCode.SDLK_y => Key.Y,
+                SdlSharp.Native.SDL_KeyCode.SDLK_z => Key.Z,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F1 => Key.F1,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F2 => Key.F2,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F3 => Key.F3,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F4 => Key.F4,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F5 => Key.F5,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F6 => Key.F6,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F7 => Key.F7,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F8 => Key.F8,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F9 => Key.F9,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F10 => Key.F10,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F11 => Key.F11,
+                SdlSharp.Native.SDL_KeyCode.SDLK_F12 => Key.F12,
+                _ => Key.None,
+            };
+        }
 
-        //    static void ImGui_ImplSDL2_UpdateKeyModifiers(SDL_Keymod sdl_key_mods)
-        //    {
-        //        ImGuiIO & io = ImGui::GetIO();
-        //        io.AddKeyEvent(ImGuiMod_Ctrl, (sdl_key_mods & KMOD_CTRL) != 0);
-        //        io.AddKeyEvent(ImGuiMod_Shift, (sdl_key_mods & KMOD_SHIFT) != 0);
-        //        io.AddKeyEvent(ImGuiMod_Alt, (sdl_key_mods & KMOD_ALT) != 0);
-        //        io.AddKeyEvent(ImGuiMod_Super, (sdl_key_mods & KMOD_GUI) != 0);
-        //    }
+        private static void UpdateKeyModifiers(SdlSharp.Native.SDL_Keymod sdl_key_mods)
+        {
+            var io = Imgui.GetIo();
+            io.AddKeyEvent(Key.ModCtrl, (sdl_key_mods & SdlSharp.Native.SDL_Keymod.KMOD_CTRL) != 0);
+            io.AddKeyEvent(Key.ModShift, (sdl_key_mods & SdlSharp.Native.SDL_Keymod.KMOD_SHIFT) != 0);
+            io.AddKeyEvent(Key.ModAlt, (sdl_key_mods & SdlSharp.Native.SDL_Keymod.KMOD_ALT) != 0);
+            io.AddKeyEvent(Key.ModSuper, (sdl_key_mods & SdlSharp.Native.SDL_Keymod.KMOD_GUI) != 0);
+        }
 
         //    // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         //    // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
@@ -221,7 +221,7 @@ namespace ImguiSharp.Platform.Sdl
         //                ImGui_ImplSDL2_UpdateKeyModifiers((SDL_Keymod)event->key.keysym.mod);
         //                ImGuiKey key = ImGui_ImplSDL2_KeycodeToImGuiKey(event->key.keysym.sym);
         //                io.AddKeyEvent(key, (event->type == SDL_KEYDOWN));
-        //                io.SetKeyEventNativeData(key, event->key.keysym.sym, event->key.keysym.scancode, event->key.keysym.scancode); // To support legacy indexing (<1.87 user code). Legacy backend uses SDLK_*** as indices to IsKeyXXX() functions.
+        //                io.SetKeyEventNativeData(key, event->key.keysym.sym, event->key.keysym.scancode, event->key.keysym.scancode); // To support legacy indexing (<1.87 user code). Legacy backend uses SdlSharp.Native.SDL_KeyCode.SDLK_*** as indices to IsKeyXXX() functions.
         //                return true;
         //            }
         //    case SDL_WINDOWEVENT:
@@ -277,15 +277,12 @@ namespace ImguiSharp.Platform.Sdl
             bd._mouseCursors[(int)MouseCursor.Hand] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_HAND);
             bd._mouseCursors[(int)MouseCursor.NotAllowed] = SdlSharp.Native.SDL_CreateSystemCursor(SdlSharp.Native.SDL_SystemCursor.SDL_SYSTEM_CURSOR_NO);
 
-            //        // Set platform dependent data in viewport
-            //#if defined(SDL_VIDEO_DRIVER_WINDOWS)
-            //SDL_SysWMinfo info;
-            //SDL_VERSION(&info.version);
-            //if (SDL_GetWindowWMInfo(window, &info))
-            //    ImGui::GetMainViewport()->PlatformHandleRaw = (void*)info.info.win.window;
-            //#else
-            //        (void)window;
-            //#endif
+            SDL_SysWMinfo info;
+            SDL_VERSION(&info.version);
+            if (SDL_GetWindowWMInfo(window, &info))
+            {
+                Imgui.GetMainViewport()->PlatformHandleRaw = (void*)info.info.win.window;
+            }
 
             _ = SdlSharp.Native.StringToUtf8Func(SdlSharp.Native.SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1", SdlSharp.Native.SDL_SetHint);
             _ = SdlSharp.Native.StringToUtf8Func(SdlSharp.Native.SDL_HINT_MOUSE_AUTO_CAPTURE, "0", SdlSharp.Native.SDL_SetHint);
@@ -317,36 +314,35 @@ namespace ImguiSharp.Platform.Sdl
             _ = DataDictionary.Remove((nuint)bd.GetHashCode());
         }
 
-        //    static void ImGui_ImplSDL2_UpdateMouseData()
-        //    {
-        //        ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
-        //        ImGuiIO & io = ImGui::GetIO();
+        private static void UpdateMouseData()
+        {
+            var bd = GetBackendData();
+            if (bd == null)
+            {
+                throw new InvalidOperationException();
+            }
 
-        //        // We forward mouse input when hovered or captured (via SDL_MOUSEMOTION) or when focused (below)
-        //#if SDL_HAS_CAPTURE_AND_GLOBAL_MOUSE
-        //// SDL_CaptureMouse() let the OS know e.g. that our imgui drag outside the SDL window boundaries shouldn't e.g. trigger other operations outside
-        //SDL_CaptureMouse((bd->MouseButtonsDown != 0 && ImGui::GetDragDropPayload() == nullptr) ? SDL_TRUE : SDL_FALSE);
-        //SDL_Window* focused_window = SDL_GetKeyboardFocus();
-        //const bool is_app_focused = (bd->Window == focused_window);
-        //#else
-        //        const bool is_app_focused = (SDL_GetWindowFlags(bd->Window) & SDL_WINDOW_INPUT_FOCUS) != 0; // SDL 2.0.3 and non-windowed systems: single-viewport only
-        //#endif
-        //        if (is_app_focused)
-        //        {
-        //            // (Optional) Set OS mouse position from Dear ImGui if requested (rarely used, only when ImGuiConfigFlags_NavEnableSetMousePos is enabled by user)
-        //            if (io.WantSetMousePos)
-        //                SDL_WarpMouseInWindow(bd->Window, (int)io.MousePos.x, (int)io.MousePos.y);
+            var io = Imgui.GetIo();
 
-        //            // (Optional) Fallback to provide mouse position when focused (SDL_MOUSEMOTION already provides this when hovered or captured)
-        //            if (bd->MouseButtonsDown == 0)
-        //            {
-        //                int window_x, window_y, mouse_x_global, mouse_y_global;
-        //                SDL_GetGlobalMouseState(&mouse_x_global, &mouse_y_global);
-        //                SDL_GetWindowPosition(bd->Window, &window_x, &window_y);
-        //                io.AddMousePosEvent((float)(mouse_x_global - window_x), (float)(mouse_y_global - window_y));
-        //            }
-        //        }
-        //    }
+            _ = SdlSharp.Native.SDL_CaptureMouse(bd._mouseButtonsDown != 0 && Imgui.GetDragDropPayload() == null);
+            var focusedWindow = SdlSharp.Native.SDL_GetKeyboardFocus();
+
+            if (bd._window == focusedWindow)
+            {
+                if (io.WantSetMousePos)
+                {
+                    SdlSharp.Native.SDL_WarpMouseInWindow(bd._window, (int)io.MousePosition.X, (int)io.MousePosition.Y);
+                }
+
+                if (bd._mouseButtonsDown == 0)
+                {
+                    int windowX, windowY, mouseXGlobal, mouseYGlobal;
+                    _ = SdlSharp.Native.SDL_GetGlobalMouseState(&mouseXGlobal, &mouseYGlobal);
+                    SdlSharp.Native.SDL_GetWindowPosition(bd._window, &windowX, &windowY);
+                    io.AddMousePosEvent(new(mouseXGlobal - windowX, mouseYGlobal - windowY));
+                }
+            }
+        }
 
         //    static void ImGui_ImplSDL2_UpdateMouseCursor()
         //    {
@@ -387,30 +383,30 @@ namespace ImguiSharp.Platform.Sdl
         //#define MAP_BUTTON(KEY_NO, BUTTON_NO)       { io.AddKeyEvent(KEY_NO, SDL_GameControllerGetButton(game_controller, BUTTON_NO) != 0); }
         //#define MAP_ANALOG(KEY_NO, AXIS_NO, V0, V1) { float vn = (float)(SDL_GameControllerGetAxis(game_controller, AXIS_NO) - V0) / (float)(V1 - V0); vn = IM_SATURATE(vn); io.AddKeyAnalogEvent(KEY_NO, vn > 0.1f, vn); }
         //        const int thumb_dead_zone = 8000;           // SDL_gamecontroller.h suggests using this value.
-        //        MAP_BUTTON(ImGuiKey_GamepadStart, SDL_CONTROLLER_BUTTON_START);
-        //        MAP_BUTTON(ImGuiKey_GamepadBack, SDL_CONTROLLER_BUTTON_BACK);
-        //        MAP_BUTTON(ImGuiKey_GamepadFaceLeft, SDL_CONTROLLER_BUTTON_X);              // Xbox X, PS Square
-        //        MAP_BUTTON(ImGuiKey_GamepadFaceRight, SDL_CONTROLLER_BUTTON_B);              // Xbox B, PS Circle
-        //        MAP_BUTTON(ImGuiKey_GamepadFaceUp, SDL_CONTROLLER_BUTTON_Y);              // Xbox Y, PS Triangle
-        //        MAP_BUTTON(ImGuiKey_GamepadFaceDown, SDL_CONTROLLER_BUTTON_A);              // Xbox A, PS Cross
-        //        MAP_BUTTON(ImGuiKey_GamepadDpadLeft, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-        //        MAP_BUTTON(ImGuiKey_GamepadDpadRight, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-        //        MAP_BUTTON(ImGuiKey_GamepadDpadUp, SDL_CONTROLLER_BUTTON_DPAD_UP);
-        //        MAP_BUTTON(ImGuiKey_GamepadDpadDown, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-        //        MAP_BUTTON(ImGuiKey_GamepadL1, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-        //        MAP_BUTTON(ImGuiKey_GamepadR1, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-        //        MAP_ANALOG(ImGuiKey_GamepadL2, SDL_CONTROLLER_AXIS_TRIGGERLEFT, 0.0f, 32767);
-        //        MAP_ANALOG(ImGuiKey_GamepadR2, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, 0.0f, 32767);
-        //        MAP_BUTTON(ImGuiKey_GamepadL3, SDL_CONTROLLER_BUTTON_LEFTSTICK);
-        //        MAP_BUTTON(ImGuiKey_GamepadR3, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
-        //        MAP_ANALOG(ImGuiKey_GamepadLStickLeft, SDL_CONTROLLER_AXIS_LEFTX, -thumb_dead_zone, -32768);
-        //        MAP_ANALOG(ImGuiKey_GamepadLStickRight, SDL_CONTROLLER_AXIS_LEFTX, +thumb_dead_zone, +32767);
-        //        MAP_ANALOG(ImGuiKey_GamepadLStickUp, SDL_CONTROLLER_AXIS_LEFTY, -thumb_dead_zone, -32768);
-        //        MAP_ANALOG(ImGuiKey_GamepadLStickDown, SDL_CONTROLLER_AXIS_LEFTY, +thumb_dead_zone, +32767);
-        //        MAP_ANALOG(ImGuiKey_GamepadRStickLeft, SDL_CONTROLLER_AXIS_RIGHTX, -thumb_dead_zone, -32768);
-        //        MAP_ANALOG(ImGuiKey_GamepadRStickRight, SDL_CONTROLLER_AXIS_RIGHTX, +thumb_dead_zone, +32767);
-        //        MAP_ANALOG(ImGuiKey_GamepadRStickUp, SDL_CONTROLLER_AXIS_RIGHTY, -thumb_dead_zone, -32768);
-        //        MAP_ANALOG(ImGuiKey_GamepadRStickDown, SDL_CONTROLLER_AXIS_RIGHTY, +thumb_dead_zone, +32767);
+        //        MAP_BUTTON(Key.GamepadStart, SDL_CONTROLLER_BUTTON_START);
+        //        MAP_BUTTON(Key.GamepadBack, SDL_CONTROLLER_BUTTON_BACK);
+        //        MAP_BUTTON(Key.GamepadFaceLeft, SDL_CONTROLLER_BUTTON_X);              // Xbox X, PS Square
+        //        MAP_BUTTON(Key.GamepadFaceRight, SDL_CONTROLLER_BUTTON_B);              // Xbox B, PS Circle
+        //        MAP_BUTTON(Key.GamepadFaceUp, SDL_CONTROLLER_BUTTON_Y);              // Xbox Y, PS Triangle
+        //        MAP_BUTTON(Key.GamepadFaceDown, SDL_CONTROLLER_BUTTON_A);              // Xbox A, PS Cross
+        //        MAP_BUTTON(Key.GamepadDpadLeft, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+        //        MAP_BUTTON(Key.GamepadDpadRight, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+        //        MAP_BUTTON(Key.GamepadDpadUp, SDL_CONTROLLER_BUTTON_DPAD_UP);
+        //        MAP_BUTTON(Key.GamepadDpadDown, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+        //        MAP_BUTTON(Key.GamepadL1, SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+        //        MAP_BUTTON(Key.GamepadR1, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+        //        MAP_ANALOG(Key.GamepadL2, SDL_CONTROLLER_AXIS_TRIGGERLEFT, 0.0f, 32767);
+        //        MAP_ANALOG(Key.GamepadR2, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, 0.0f, 32767);
+        //        MAP_BUTTON(Key.GamepadL3, SDL_CONTROLLER_BUTTON_LEFTSTICK);
+        //        MAP_BUTTON(Key.GamepadR3, SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+        //        MAP_ANALOG(Key.GamepadLStickLeft, SDL_CONTROLLER_AXIS_LEFTX, -thumb_dead_zone, -32768);
+        //        MAP_ANALOG(Key.GamepadLStickRight, SDL_CONTROLLER_AXIS_LEFTX, +thumb_dead_zone, +32767);
+        //        MAP_ANALOG(Key.GamepadLStickUp, SDL_CONTROLLER_AXIS_LEFTY, -thumb_dead_zone, -32768);
+        //        MAP_ANALOG(Key.GamepadLStickDown, SDL_CONTROLLER_AXIS_LEFTY, +thumb_dead_zone, +32767);
+        //        MAP_ANALOG(Key.GamepadRStickLeft, SDL_CONTROLLER_AXIS_RIGHTX, -thumb_dead_zone, -32768);
+        //        MAP_ANALOG(Key.GamepadRStickRight, SDL_CONTROLLER_AXIS_RIGHTX, +thumb_dead_zone, +32767);
+        //        MAP_ANALOG(Key.GamepadRStickUp, SDL_CONTROLLER_AXIS_RIGHTY, -thumb_dead_zone, -32768);
+        //        MAP_ANALOG(Key.GamepadRStickDown, SDL_CONTROLLER_AXIS_RIGHTY, +thumb_dead_zone, +32767);
         //#undef MAP_BUTTON
         //#undef MAP_ANALOG
         //    }
@@ -441,22 +437,21 @@ namespace ImguiSharp.Platform.Sdl
                 io.DisplayFramebufferScale = new((float)displayWidth / width, (float)displayHeight / height);
             }
 
-            //ulong frequency = SdlSharp.Native.SDL_GetPerformanceFrequency();
-            //ulong current_time = SdlSharp.Native.SDL_GetPerformanceCounter();
-            //io.DeltaTime = bd._time > 0 ? (float)((double)(current_time - bd._time) / frequency) : (float)(1.0f / 60.0f);
-            //bd._time = current_time;
+            ulong frequency = SdlSharp.Native.SDL_GetPerformanceFrequency();
+            ulong current_time = SdlSharp.Native.SDL_GetPerformanceCounter();
+            io.DeltaTime = bd._time > 0 ? (float)((double)(current_time - bd._time) / frequency) : (float)(1.0f / 60.0f);
+            bd._time = current_time;
 
-            //if (bd._pendingMouseLeaveFrame && bd._pendingMouseLeaveFrame >= Imgui.GetFrameCount() && bd._mouseButtonsDown == 0)
-            //{
-            //    io.AddMousePosEvent(new(-float.MaxValue, -float.MaxValue));
-            //    bd._pendingMouseLeaveFrame = 0;
-            //}
+            if (bd._pendingMouseLeaveFrame && bd._pendingMouseLeaveFrame >= Imgui.GetFrameCount() && bd._mouseButtonsDown == 0)
+            {
+                io.AddMousePosEvent(new(-float.MaxValue, -float.MaxValue));
+                bd._pendingMouseLeaveFrame = 0;
+            }
 
-            //        ImGui_ImplSDL2_UpdateMouseData();
-            //        ImGui_ImplSDL2_UpdateMouseCursor();
+            UpdateMouseData();
+            UpdateMouseCursor();
 
-            //        // Update game controllers (if enabled and available)
-            //        ImGui_ImplSDL2_UpdateGamepads();
+            UpdateGamepads();
         }
     }
 }
