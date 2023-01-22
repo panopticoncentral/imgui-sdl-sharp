@@ -213,7 +213,7 @@ namespace ImguiSharp.Platform.Sdl
             var wmInfo = window.WindowManagerInfo;
             if (wmInfo != null)
             {
-                Imgui.GetMainViewport()->PlatformHandleRaw = (void*)wmInfo.Value.Window;
+                Imgui.GetMainViewport().PlatformHandleRaw = wmInfo.Value.Window;
             }
 
             _ = Hint.MouseFocusClickthrough.Set("1");
@@ -508,7 +508,7 @@ namespace ImguiSharp.Platform.Sdl
             io.DeltaTime = bd._time > 0 ? (float)((double)(current_time - bd._time) / frequency) : (float)(1.0f / 60.0f);
             bd._time = current_time;
 
-            if (bd._pendingMouseLeaveFrame && bd._pendingMouseLeaveFrame >= Imgui.GetFrameCount() && bd._mouseButtonsDown == 0)
+            if (bd._pendingMouseLeaveFrame > 0 && bd._pendingMouseLeaveFrame >= Imgui.GetFrameCount() && bd._mouseButtonsDown == 0)
             {
                 io.AddMousePosEvent(new(-float.MaxValue, -float.MaxValue));
                 bd._pendingMouseLeaveFrame = 0;

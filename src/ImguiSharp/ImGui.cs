@@ -2,8 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-using static ImguiSharp.Native;
-
 namespace ImguiSharp
 {
     public static unsafe class Imgui
@@ -1240,9 +1238,9 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Viewports
+        #region Viewports
 
-        //public static ImGuiViewport* ImGui_GetMainViewport();
+        public static Viewport GetMainViewport() => new(Native.ImGui_GetMainViewport());
 
         #endregion
 
@@ -1254,28 +1252,25 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Miscellaneous Utilities
+        #region Miscellaneous Utilities
 
-        //public static bool ImGui_IsRectVisibleBySize(ImVec2 size);
+        public static bool IsRectVisibleBySize(Size size) => Native.ImGui_IsRectVisibleBySize(size.ToNative());
 
-        //public static bool ImGui_IsRectVisible(ImVec2 rect_min, ImVec2 rect_max);
+        public static bool IsRectVisible(Position rectMinimum, Position rectMaximum) => Native.ImGui_IsRectVisible(rectMinimum.ToNative(), rectMaximum.ToNative());
 
-        //public static double ImGui_GetTime();
+        public static double GetTime() => Native.ImGui_GetTime();
 
-        //public static int ImGui_GetFrameCount();
+        public static int GetFrameCount() => Native.ImGui_GetFrameCount();
 
-        //// ImDrawListSharedData is internal
-        ////        // public static ImDrawListSharedData* ImGui_GetDrawListSharedData();
+        public static string GetStyleColorName(StyleColor color) => Native.Utf8ToString(Native.ImGui_GetStyleColorName((Native.ImGuiCol)color))!;
 
-        //public static byte* ImGui_GetStyleColorName(ImGuiCol idx);
+        public static void SetStateStorage(Storage storage) => Native.ImGui_SetStateStorage(storage.ToNative());
 
-        //public static void ImGui_SetStateStorage(ImGuiStorage* storage);
+        public static Storage GetStateStorage() => new(Native.ImGui_GetStateStorage());
 
-        //public static ImGuiStorage* ImGui_GetStateStorage();
+        public static bool BeginChildFrame(Id id, Size size, WindowOptions flags = default) => Native.ImGui_BeginChildFrame(id.ToNative(), size.ToNative(), (Native.ImGuiWindowFlags)flags);
 
-        //public static bool ImGui_BeginChildFrame(ImGuiID id, ImVec2 size, ImGuiWindowFlags flags = default);
-
-        //public static void ImGui_EndChildFrame();
+        public static void EndChildFrame() => Native.ImGui_EndChildFrame();
 
         #endregion
 
