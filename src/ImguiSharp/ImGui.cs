@@ -2,12 +2,16 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+using static ImguiSharp.Native;
+
 namespace ImguiSharp
 {
     public static unsafe class Imgui
     {
         private static Dictionary<nuint, Func<Position, Size, Size, Size>>? s_sizeCallbacks;
         private static Dictionary<nuint, Func<Position, Size, Size, Size>> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, Func<Position, Size, Size, Size>>();
+
+        #region Context creation and access
 
         public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => new(Native.ImGui_CreateContext(sharedFontAtlas == null ? null : sharedFontAtlas.Value.ToNative()));
 
@@ -20,6 +24,10 @@ namespace ImguiSharp
         }
 
         public static void SetCurrentContext(Context? context) => Native.ImGui_SetCurrentContext(context == null ? null : context.Value.ToNative());
+
+        #endregion
+
+        #region Main
 
         public static Io GetIo() => new(Native.ImGui_GetIO());
 
@@ -36,6 +44,10 @@ namespace ImguiSharp
         public static void Render() => Native.ImGui_Render();
 
         public static DrawData GetDrawData() => new(Native.ImGui_GetDrawData());
+
+        #endregion
+
+        #region Demo, Debug, Information
 
         public static void ShowDemoWindow(State<bool>? openState = null) => Native.ImGui_ShowDemoWindow(openState == null ? null : openState.ToNative());
 
@@ -55,15 +67,29 @@ namespace ImguiSharp
 
         public static void ShowUserGuide() => Native.ImGui_ShowUserGuide();
 
+        public static string GetVersion() => Native.Utf8ToString(Native.ImGui_GetVersion())!;
+
+        #endregion
+
+        #region Styles
+
         public static void StyleColorsDark(Style? style = null) => Native.ImGui_StyleColorsDark(style == null ? null : style.Value.ToNative());
 
         public static void StyleColorsLight(Style? style = null) => Native.ImGui_StyleColorsLight(style == null ? null : style.Value.ToNative());
 
         public static void StyleColorsClassic(Style? style = null) => Native.ImGui_StyleColorsClassic(style == null ? null : style.Value.ToNative());
 
+        #endregion
+
+        #region Windows
+
         public static bool Begin(string name, State<bool>? openState = null, WindowOptions options = default) => Native.StringToUtf8Func(name, ptr => Native.ImGui_Begin(ptr, openState == null ? null : openState.ToNative(), (Native.ImGuiWindowFlags)options));
 
         public static void End() => Native.ImGui_End();
+
+        #endregion
+
+        #region Child Windows
 
         public static bool BeginChild(string name, Size? size = null, bool border = false, WindowOptions options = default) => Native.StringToUtf8Func(name, ptr => Native.ImGui_BeginChild(ptr, size == null ? default : size.Value.ToNative(), border, (Native.ImGuiWindowFlags)options));
 
@@ -71,6 +97,10 @@ namespace ImguiSharp
             Native.ImGui_BeginChildID(id.ToNative(), size == null ? default : size.Value.ToNative(), border, (Native.ImGuiWindowFlags)options);
 
         public static void EndChild() => Native.ImGui_EndChild();
+
+        #endregion
+
+        #region Windows Utilities
 
         public static bool IsWindowAppearing() => Native.ImGui_IsWindowAppearing();
 
@@ -89,6 +119,10 @@ namespace ImguiSharp
         public static float GetWindowWidth() => Native.ImGui_GetWindowWidth();
 
         public static float GetWindowHeight() => Native.ImGui_GetWindowHeight();
+
+        #endregion
+
+        #region Window Manipulation
 
         public static void SetNextWindowPosition(Position position, Condition condition = default) => Native.ImGui_SetNextWindowPos(position.ToNative(), (Native.ImGuiCond)condition);
 
@@ -144,6 +178,10 @@ namespace ImguiSharp
 
         public static void SetNamedWindowFocus(string name) => Native.StringToUtf8Action(name, Native.ImGui_SetWindowFocusStr);
 
+        #endregion
+
+        #region Content region
+
         public static Size GetContentRegionAvailable() => new(Native.ImGui_GetContentRegionAvail());
 
         public static Position GetContentRegionMax() => new(Native.ImGui_GetContentRegionMax());
@@ -151,6 +189,10 @@ namespace ImguiSharp
         public static Position GetWindowContentRegionMin() => new(Native.ImGui_GetWindowContentRegionMin());
 
         public static Position GetWindowContentRegionMax() => new(Native.ImGui_GetWindowContentRegionMax());
+
+        #endregion
+
+        #region Windows Scrolling
 
         public static float GetScrollX() => Native.ImGui_GetScrollX();
 
@@ -171,6 +213,10 @@ namespace ImguiSharp
         public static void SetScrollFromPositionX(float localX, float centerRatio = 0.5f) => Native.ImGui_SetScrollFromPosX(localX, centerRatio);
 
         public static void SetScrollFromPositionY(float localY, float centerRatio = 0.5f) => Native.ImGui_SetScrollFromPosY(localY, centerRatio);
+
+        #endregion
+
+        #region Parameters stacks (shared)
 
         public static void PushFont(Font font) => Native.ImGui_PushFont(font.ToNative());
 
@@ -200,6 +246,10 @@ namespace ImguiSharp
 
         public static void PopButtonRepeat() => Native.ImGui_PopButtonRepeat();
 
+        #endregion
+
+        #region Parameters stacks (current window)
+
         public static void PushItemWidth(float itemWidth) => Native.ImGui_PushItemWidth(itemWidth);
 
         public static void PopItemWidth() => Native.ImGui_PopItemWidth();
@@ -211,6 +261,10 @@ namespace ImguiSharp
         public static void PushTextWrapPosition(float wrapLocalPositionX = 0.0f) => Native.ImGui_PushTextWrapPos(wrapLocalPositionX);
 
         public static void PopTextWrapPosition() => Native.ImGui_PopTextWrapPos();
+
+        #endregion
+
+        #region Style read access
 
         public static Font GetFont() => new(Native.ImGui_GetFont());
 
@@ -227,6 +281,10 @@ namespace ImguiSharp
         public static uint GetColor(uint color) => Native.ImGui_GetColorU32uint(color);
 
         public static Color GetStyleColor(StyleColor color) => new(Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
+
+        #endregion
+
+        #region Cursor / Layout
 
         public static void Separator() => Native.ImGui_Separator();
 
@@ -280,6 +338,10 @@ namespace ImguiSharp
 
         public static float GetFrameHeightWithSpacing() => Native.ImGui_GetFrameHeightWithSpacing();
 
+        #endregion
+
+        #region ID stack/scopes
+
         public static void PushID(string id) => Native.StringToUtf8Action(id, Native.ImGui_PushID);
 
         public static void PushID(nuint id) => Native.ImGui_PushIDPtr((void*)id);
@@ -291,6 +353,10 @@ namespace ImguiSharp
         public static Id GetID(string id) => Native.StringToUtf8Func(id, ptr => new Id(Native.ImGui_GetID(ptr)));
 
         public static Id GetIDPtr(nuint id) => new(Native.ImGui_GetIDPtr((void*)id));
+
+        #endregion
+
+        #region Widgets: Text
 
         public static void TextUnformatted(string text) => Native.StringToUtf8Action(text, Native.ImGui_TextUnformatted);
 
@@ -305,6 +371,10 @@ namespace ImguiSharp
         public static void LabelText(string label, string text) => Native.StringToUtf8Action(label, text, (labelPtr, textPtr) => Native.ImGui_LabelText(labelPtr, textPtr, __arglist()));
 
         public static void BulletText(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_BulletText(ptr, __arglist()));
+
+        #endregion
+
+        #region Widgets: Main
 
         public static bool Button(string label) => Native.StringToUtf8Func(label, Native.ImGui_Button);
 
@@ -334,6 +404,10 @@ namespace ImguiSharp
 
         public static void Bullet() => Native.ImGui_Bullet();
 
+        #endregion
+
+        #region Widgets: Images
+
         public static void Image(TextureId userTextureId, Size size) => Native.ImGui_Image(userTextureId.ToNative(), size.ToNative());
 
         public static void Image(TextureId userTextureId, Size size, TextureCoordinate uv0) => Image(userTextureId, size, uv0, new(1, 1));
@@ -354,9 +428,17 @@ namespace ImguiSharp
 
         public static bool ImageButton(string id, TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1, Color backgroundColor, Color tintColor) => Native.StringToUtf8Func(id, ptr => Native.ImGui_ImageButtonEx(ptr, userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), backgroundColor.ToNative(), tintColor.ToNative()));
 
+        #endregion
+
+        #region Widgets: Combo Box (Dropdown)
+
         public static bool BeginCombo(string label, string previewValue, ComboOptions options = default) => Native.StringToUtf8Func(label, previewValue, (labelPtr, previewValuePtr) => Native.ImGui_BeginCombo(labelPtr, previewValuePtr, (Native.ImGuiComboFlags)options));
 
         public static void EndCombo() => Native.ImGui_EndCombo();
+
+        #endregion
+
+        #region Widgets: Drag Sliders
 
         public static bool Drag(string label, State<float> v) =>
             Native.StringToUtf8Func(label, labelPtr => Native.ImGui_DragFloat(labelPtr, v.ToNative()));
@@ -511,6 +593,10 @@ namespace ImguiSharp
 
         public static bool Drag(string label, StateVector<double> v, float speed = 1.0f, double min = default, double max = default, string? format = default, SliderOptions options = default) =>
             Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_DragScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length, speed, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
+
+        #endregion
+
+        #region Widgets: Regular Sliders
 
         public static bool Slider(string label, State<float> v, float min, float max) =>
             Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SliderFloat(labelPtr, v.ToNative(), min, max));
@@ -720,6 +806,10 @@ namespace ImguiSharp
         public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max, string? format = default, SliderOptions options = default) =>
             Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
+        #endregion
+
+        #region * Widgets: Input with Keyboard
+
         //public static bool InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default) => Native.ImGui_InputText();
 
         //public static bool InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.ImGui_InputTextEx();
@@ -770,6 +860,10 @@ namespace ImguiSharp
 
         //public static bool InputScalarNEx(byte* label, ImGuiDataType data_type, void* p_data, int components, void* p_step = default, void* p_step_fast = default, byte* format = default, ImGuiInputTextFlags flags = default) => Native.ImGui_InputScalarNEx();
 
+        #endregion
+
+        #region * Widgets: Color Editor/Picker
+
         //public static bool ColorEdit3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit3();
 
         //public static bool ColorEdit4(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit4();
@@ -783,6 +877,10 @@ namespace ImguiSharp
         //public static bool ColorButtonEx(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default, ImVec2 size = default) => Native.ImGui_ColorButtonEx();
 
         //public static void SetColorEditOptions(ImGuiColorEditFlags flags) => Native.ImGui_SetColorEditOptions();
+
+        #endregion
+
+        #region * Widgets: Trees
 
         //public static bool TreeNode(byte* label) => Native.ImGui_TreeNode();
 
@@ -818,6 +916,10 @@ namespace ImguiSharp
 
         //public static void SetNextItemOpen(bool is_open, ImGuiCond cond = default) => Native.ImGui_SetNextItemOpen();
 
+        #endregion
+
+        #region * Widgets: Selectables
+
         //public static bool Selectable(byte* label) => Native.ImGui_Selectable();
 
         //public static bool SelectableEx(byte* label, bool selected = false, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableEx();
@@ -825,6 +927,10 @@ namespace ImguiSharp
         //public static bool SelectableBoolPtr(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default) => Native.ImGui_SelectableBoolPtr();
 
         //public static bool SelectableBoolPtrEx(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableBoolPtrEx();
+
+        #endregion
+
+        #region * Widgets: List Boxes
 
         //public static bool BeginListBox(byte* label, ImVec2 size = default) => Native.ImGui_BeginListBox();
 
@@ -836,10 +942,14 @@ namespace ImguiSharp
 
         //public static bool ListBoxCallbackEx(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count, int height_in_items = -1) => Native.ImGui_ListBoxCallbackEx();
 
+        #endregion
+
+        #region * Widgets: Data Plotting
+
         //public static void PlotLines(byte* label, float* values, int values_count) => Native.ImGui_PlotLines();
 
         //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void ImGui_PlotLinesEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        //public static void ImGui_PlotLinesEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
 
         //public static void PlotLinesCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotLinesCallback();
 
@@ -848,11 +958,15 @@ namespace ImguiSharp
         //public static void PlotHistogram(byte* label, float* values, int values_count) => Native.ImGui_PlotHistogram();
 
         //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        //public static extern void ImGui_PlotHistogramEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        //public static void ImGui_PlotHistogramEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
 
         //public static void PlotHistogramCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotHistogramCallback();
 
         //public static void PlotHistogramCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotHistogramCallbackEx();
+
+        #endregion
+
+        #region * Widgets: Menus
 
         //public static bool BeginMenuBar() => Native.ImGui_BeginMenuBar();
 
@@ -874,6 +988,10 @@ namespace ImguiSharp
 
         //public static bool MenuItemBoolPtr(byte* label, byte* shortcut, bool* p_selected, bool enabled = true) => Native.ImGui_MenuItemBoolPtr();
 
+        #endregion
+
+        #region * Tooltips
+
         //public static void BeginTooltip() => Native.ImGui_BeginTooltip();
 
         //public static void EndTooltip() => Native.ImGui_EndTooltip();
@@ -881,5 +999,405 @@ namespace ImguiSharp
         //public static void SetTooltip(byte* fmt, __arglist) => Native.ImGui_SetTooltip();
 
         //public static void SetTooltipV(byte* fmt, nuint /* va_list */ args) => Native.ImGui_SetTooltipV();
+
+        #endregion
+
+        #region * Popups: begin/end functions
+
+        //public static bool ImGui_BeginPopup(byte* str_id, ImGuiWindowFlags flags = default);
+
+        //public static bool ImGui_BeginPopupModal(byte* name, bool* p_open = default, ImGuiWindowFlags flags = default);
+
+        //public static void ImGui_EndPopup();
+
+        #endregion
+
+        #region * Popups: open/close functions
+
+        //public static void ImGui_OpenPopup(byte* str_id, ImGuiPopupFlags popup_flags = default);
+
+        //public static void ImGui_OpenPopupID(ImGuiID id, ImGuiPopupFlags popup_flags = default);
+
+        //public static void ImGui_OpenPopupOnItemClick(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+
+        //public static void ImGui_CloseCurrentPopup();
+
+        #endregion
+
+        #region * Popups: open+begin combined functions helpers
+
+        //public static bool ImGui_BeginPopupContextItem();
+
+        //public static bool ImGui_BeginPopupContextItemEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+
+        //public static bool ImGui_BeginPopupContextWindow();
+
+        //public static bool ImGui_BeginPopupContextWindowEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+
+        //public static bool ImGui_BeginPopupContextVoid();
+
+        //public static bool ImGui_BeginPopupContextVoidEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+
+        #endregion
+
+        #region * Popups: query functions
+
+        //public static bool ImGui_IsPopupOpen(byte* str_id, ImGuiPopupFlags flags = default);
+
+        #endregion
+
+        #region * Tables
+
+        //public static bool ImGui_BeginTable(byte* str_id, int column, ImGuiTableFlags flags = default);
+
+        //public static bool ImGui_BeginTableEx(byte* str_id, int column, ImGuiTableFlags flags = default, ImVec2 outer_size = default, float inner_width = default);
+
+        //public static void ImGui_EndTable();
+
+        //public static void ImGui_TableNextRow();
+
+        //public static void ImGui_TableNextRowEx(ImGuiTableRowFlags row_flags = default, float min_row_height = default);
+
+        //public static bool ImGui_TableNextColumn();
+
+        //public static bool ImGui_TableSetColumnIndex(int column_n);
+
+        #endregion
+
+        #region * Tables: Headers & Columns declaration
+
+        //public static void ImGui_TableSetupColumn(byte* label, ImGuiTableColumnFlags flags = default);
+
+        //public static void ImGui_TableSetupColumnEx(byte* label, ImGuiTableColumnFlags flags = default, float init_width_or_weight = default, ImGuiID user_id = default);
+
+        //public static void ImGui_TableSetupScrollFreeze(int cols, int rows);
+
+        //public static void ImGui_TableHeadersRow();
+
+        //public static void ImGui_TableHeader(byte* label);
+
+        #endregion
+
+        #region * Tables: Sorting & Miscellaneous functions
+
+        //public static ImGuiTableSortSpecs* ImGui_TableGetSortSpecs();
+
+        //public static int ImGui_TableGetColumnCount();
+
+        //public static int ImGui_TableGetColumnIndex();
+
+        //public static int ImGui_TableGetRowIndex();
+
+        //public static byte* ImGui_TableGetColumnName(int column_n = -1);
+
+        //public static ImGuiTableColumnFlags ImGui_TableGetColumnFlags(int column_n = -1);
+
+        //public static void ImGui_TableSetColumnEnabled(int column_n, bool v);
+
+        //public static void ImGui_TableSetBgColor(ImGuiTableBgTarget target, uint color, int column_n = -1);
+
+        #endregion
+
+        #region * Legacy Columns API (prefer using Tables!)
+
+        //public static void ImGui_Columns();
+
+        //public static void ImGui_ColumnsEx(int count = 1, byte* id = default, bool border = true);
+
+        //public static void ImGui_NextColumn();
+
+        //public static int ImGui_GetColumnIndex();
+
+        //public static float ImGui_GetColumnWidth(int column_index = -1);
+
+        //public static void ImGui_SetColumnWidth(int column_index, float width);
+
+        //public static float ImGui_GetColumnOffset(int column_index = -1);
+
+        //public static void ImGui_SetColumnOffset(int column_index, float offset_x);
+
+        //public static int ImGui_GetColumnsCount();
+
+        #endregion
+
+        #region * Tab Bars, Tabs
+
+        //public static bool ImGui_BeginTabBar(byte* str_id, ImGuiTabBarFlags flags = default);
+
+        //public static void ImGui_EndTabBar();
+
+        //public static bool ImGui_BeginTabItem(byte* label, bool* p_open = default, ImGuiTabItemFlags flags = default);
+
+        //public static void ImGui_EndTabItem();
+
+        //public static bool ImGui_TabItemButton(byte* label, ImGuiTabItemFlags flags = default);
+
+        //public static void ImGui_SetTabItemClosed(byte* tab_or_docked_window_label);
+
+        #endregion
+
+        #region * Logging/Capture
+
+        //public static void ImGui_LogToTTY(int auto_open_depth = -1);
+
+        //public static void ImGui_LogToFile(int auto_open_depth = -1, byte* filename = default);
+
+        //public static void ImGui_LogToClipboard(int auto_open_depth = -1);
+
+        //public static void ImGui_LogFinish();
+
+        //public static void ImGui_LogButtons();
+
+        //public static void ImGui_LogText(byte* fmt, __arglist);
+
+        //public static void ImGui_LogTextV(byte* fmt, nuint /* va_list */ args);
+
+        #endregion
+
+        #region * Drag and Drop
+
+        //public static bool ImGui_BeginDragDropSource(ImGuiDragDropFlags flags = default);
+
+        //public static bool ImGui_SetDragDropPayload(byte* type, void* data, nuint sz, ImGuiCond cond = default);
+
+        //public static void ImGui_EndDragDropSource();
+
+        //public static bool ImGui_BeginDragDropTarget();
+
+        //public static ImGuiPayload* ImGui_AcceptDragDropPayload(byte* type, ImGuiDragDropFlags flags = default);
+
+        //public static void ImGui_EndDragDropTarget();
+
+        //public static ImGuiPayload* ImGui_GetDragDropPayload();
+
+        #endregion
+
+        #region * Disabling [BETA API]
+
+        //public static void ImGui_BeginDisabled(bool disabled = true);
+
+        //public static void ImGui_EndDisabled();
+
+        #endregion
+
+        #region * Clipping
+
+        //public static void ImGui_PushClipRect(ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect);
+
+        //public static void ImGui_PopClipRect();
+
+        #endregion
+
+        #region * Focus, Activation
+
+        //public static void ImGui_SetItemDefaultFocus();
+
+        //public static void ImGui_SetKeyboardFocusHere();
+
+        //public static void ImGui_SetKeyboardFocusHereEx(int offset = default);
+
+        #endregion
+
+        #region * Item/Widgets Utilities and Query Functions
+
+        //public static bool ImGui_IsItemHovered(ImGuiHoveredFlags flags = default);
+
+        //public static bool ImGui_IsItemActive();
+
+        //public static bool ImGui_IsItemFocused();
+
+        //public static bool ImGui_IsItemClicked();
+
+        //public static bool ImGui_IsItemClickedEx(ImGuiMouseButton mouse_button = default);
+
+        //public static bool ImGui_IsItemVisible();
+
+        //public static bool ImGui_IsItemEdited();
+
+        //public static bool ImGui_IsItemActivated();
+
+        //public static bool ImGui_IsItemDeactivated();
+
+        //public static bool ImGui_IsItemDeactivatedAfterEdit();
+
+        //public static bool ImGui_IsItemToggledOpen();
+
+        //public static bool ImGui_IsAnyItemHovered();
+
+        //public static bool ImGui_IsAnyItemActive();
+
+        //public static bool ImGui_IsAnyItemFocused();
+
+        //public static ImGuiID ImGui_GetItemID();
+
+        //public static ImVec2 ImGui_GetItemRectMin();
+
+        //public static ImVec2 ImGui_GetItemRectMax();
+
+        //public static ImVec2 ImGui_GetItemRectSize();
+
+        //public static void ImGui_SetItemAllowOverlap();
+
+        #endregion
+
+        #region * Viewports
+
+        //public static ImGuiViewport* ImGui_GetMainViewport();
+
+        #endregion
+
+        #region * Background/Foreground Draw Lists
+
+        //public static ImDrawList* ImGui_GetBackgroundDrawList();
+
+        //public static ImDrawList* ImGui_GetForegroundDrawList();
+
+        #endregion
+
+        #region * Miscellaneous Utilities
+
+        //public static bool ImGui_IsRectVisibleBySize(ImVec2 size);
+
+        //public static bool ImGui_IsRectVisible(ImVec2 rect_min, ImVec2 rect_max);
+
+        //public static double ImGui_GetTime();
+
+        //public static int ImGui_GetFrameCount();
+
+        //// ImDrawListSharedData is internal
+        ////        // public static ImDrawListSharedData* ImGui_GetDrawListSharedData();
+
+        //public static byte* ImGui_GetStyleColorName(ImGuiCol idx);
+
+        //public static void ImGui_SetStateStorage(ImGuiStorage* storage);
+
+        //public static ImGuiStorage* ImGui_GetStateStorage();
+
+        //public static bool ImGui_BeginChildFrame(ImGuiID id, ImVec2 size, ImGuiWindowFlags flags = default);
+
+        //public static void ImGui_EndChildFrame();
+
+        #endregion
+
+        #region * Text Utilities
+
+        //public static ImVec2 ImGui_CalcTextSize(byte* text);
+
+        //public static ImVec2 ImGui_CalcTextSizeEx(byte* text, byte* text_end = default, bool hide_text_after_double_hash = false, float wrap_width = -1.0f);
+
+        #endregion
+
+        #region * Color Utilities
+
+        //public static ImVec4 ImGui_ColorConvertU32ToFloat4(uint @in);
+
+        //public static uint ImGui_ColorConvertFloat4ToU32(ImVec4 @in);
+
+        //public static void ImGui_ColorConvertRGBtoHSV(float r, float g, float b, float* out_h, float* out_s, float* out_v);
+
+        //public static void ImGui_ColorConvertHSVtoRGB(float h, float s, float v, float* out_r, float* out_g, float* out_b);
+
+        #endregion
+
+        #region * Inputs Utilities: Keyboard/Mouse/Gamepad
+
+        //public static bool ImGui_IsKeyDown(ImGuiKey key);
+
+        //public static bool ImGui_IsKeyPressed(ImGuiKey key);
+
+        //public static bool ImGui_IsKeyPressedEx(ImGuiKey key, bool repeat = true);
+
+        //public static bool ImGui_IsKeyReleased(ImGuiKey key);
+
+        //public static int ImGui_GetKeyPressedAmount(ImGuiKey key, float repeat_delay, float rate);
+
+        //public static byte* ImGui_GetKeyName(ImGuiKey key);
+
+        //public static void ImGui_SetNextFrameWantCaptureKeyboard(bool want_capture_keyboard);
+
+        #endregion
+
+        #region * Inputs Utilities: Mouse specific
+
+        //public static bool ImGui_IsMouseDown(ImGuiMouseButton button);
+
+        //public static bool ImGui_IsMouseClicked(ImGuiMouseButton button);
+
+        //public static bool ImGui_IsMouseClickedEx(ImGuiMouseButton button, bool repeat = false);
+
+        //public static bool ImGui_IsMouseReleased(ImGuiMouseButton button);
+
+        //public static bool ImGui_IsMouseDoubleClicked(ImGuiMouseButton button);
+
+        //public static int ImGui_GetMouseClickedCount(ImGuiMouseButton button);
+
+        //public static bool ImGui_IsMouseHoveringRect(ImVec2 r_min, ImVec2 r_max);
+
+        //public static bool ImGui_IsMouseHoveringRectEx(ImVec2 r_min, ImVec2 r_max, bool clip = true);
+
+        //public static bool ImGui_IsMousePosValid(ImVec2* mouse_pos = default);
+
+        //public static bool ImGui_IsAnyMouseDown();
+
+        //public static ImVec2 ImGui_GetMousePos();
+
+        //public static ImVec2 ImGui_GetMousePosOnOpeningCurrentPopup();
+
+        //public static bool ImGui_IsMouseDragging(ImGuiMouseButton button, float lock_threshold = -1.0f);
+
+        //public static ImVec2 ImGui_GetMouseDragDelta(ImGuiMouseButton button = default, float lock_threshold = -1.0f);
+
+        //public static void ImGui_ResetMouseDragDelta();
+
+        //public static void ImGui_ResetMouseDragDeltaEx(ImGuiMouseButton button = default);
+
+        //public static ImGuiMouseCursor ImGui_GetMouseCursor();
+
+        //public static void ImGui_SetMouseCursor(ImGuiMouseCursor cursor_type);
+
+        //public static void ImGui_SetNextFrameWantCaptureMouse(bool want_capture_mouse);
+
+        #endregion
+
+        #region * Clipboard Utilities
+
+        //public static byte* ImGui_GetClipboardText();
+
+        //public static void ImGui_SetClipboardText(byte* text);
+
+        #endregion
+
+        #region * Settings/.Ini Utilities
+
+        //public static void ImGui_LoadIniSettingsFromDisk(byte* ini_filename);
+
+        //public static void ImGui_LoadIniSettingsFromMemory(byte* ini_data, nuint ini_size = default);
+
+        //public static void ImGui_SaveIniSettingsToDisk(byte* ini_filename);
+
+        //public static byte* ImGui_SaveIniSettingsToMemory(nuint* out_ini_size = default);
+
+        #endregion
+
+        #region * Debug Utilities
+
+        //public static void ImGui_DebugTextEncoding(byte* text);
+
+        //public static bool ImGui_DebugCheckVersionAndDataLayout(byte* version_str, nuint sz_io, nuint sz_style, nuint sz_vec2, nuint sz_vec4, nuint sz_drawvert, nuint sz_drawidx);
+
+        #endregion
+
+        #region * Memory Allocators
+
+        //public static void ImGui_SetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*> alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void> free_func, void* user_data = default);
+
+        //public static void ImGui_GetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*>* p_alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void>* p_free_func, void** p_user_data);
+
+        //public static void* ImGui_MemAlloc(nuint size);
+
+        //public static void ImGui_MemFree(void* ptr);
+
+        #endregion
+
     }
 }
