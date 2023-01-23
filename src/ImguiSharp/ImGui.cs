@@ -1152,21 +1152,37 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Drag and Drop
+        #region Drag and Drop
 
-        //public static bool ImGui_BeginDragDropSource(ImGuiDragDropFlags flags = default);
+        public static bool BeginDragDropSource(DragDropOptions options = default) => Native.ImGui_BeginDragDropSource((Native.ImGuiDragDropFlags)options);
 
-        //public static bool ImGui_SetDragDropPayload(byte* type, void* data, nuint sz, ImGuiCond cond = default);
+        public static bool SetDragDropPayload(string type, Span<byte> data, Condition cond = default)
+        {
+            fixed (byte* typePtr = Native.StringToUtf8(type))
+            fixed (byte* dataPtr = data)
+            {
+                return Native.ImGui_SetDragDropPayload(typePtr, dataPtr, (nuint)data.Length, (Native.ImGuiCond)cond);
+            }
+        }
 
-        //public static void ImGui_EndDragDropSource();
+        public static void EndDragDropSource() => Native.ImGui_EndDragDropSource();
 
-        //public static bool ImGui_BeginDragDropTarget();
+        public static bool BeginDragDropTarget() => Native.ImGui_BeginDragDropTarget();
 
-        //public static ImGuiPayload* ImGui_AcceptDragDropPayload(byte* type, ImGuiDragDropFlags flags = default);
+        public static Payload? AcceptDragDropPayload(string type, DragDropOptions options = default) =>
+            Native.StringToUtf8Func<Payload?>(type, typePtr =>
+            {
+                var payload = Native.ImGui_AcceptDragDropPayload(typePtr, (Native.ImGuiDragDropFlags)options);
+                return payload == null ? null : new Payload(payload);
+            });
 
-        //public static void ImGui_EndDragDropTarget();
+        public static void EndDragDropTarget() => Native.ImGui_EndDragDropTarget();
 
-        //public static ImGuiPayload* ImGui_GetDragDropPayload();
+        public static Payload? GetDragDropPayload()
+        {
+            var payload = Native.ImGui_GetDragDropPayload();
+            return payload == null ? null : new(payload);
+        }
 
         #endregion
 
@@ -1312,45 +1328,56 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Inputs Utilities: Mouse specific
+        #region Inputs Utilities: Mouse specific
 
-        //public static bool ImGui_IsMouseDown(ImGuiMouseButton button);
+        public static bool IsMouseDown(MouseButton button) => Native.ImGui_IsMouseDown((Native.ImGuiMouseButton)button);
 
-        //public static bool ImGui_IsMouseClicked(ImGuiMouseButton button);
+        public static bool IsMouseClicked(MouseButton button) => Native.ImGui_IsMouseClicked((Native.ImGuiMouseButton)button);
 
-        //public static bool ImGui_IsMouseClickedEx(ImGuiMouseButton button, bool repeat = false);
+        public static bool IsMouseClicked(MouseButton button, bool repeat) => Native.ImGui_IsMouseClickedEx((Native.ImGuiMouseButton)button, repeat);
 
-        //public static bool ImGui_IsMouseReleased(ImGuiMouseButton button);
+        public static bool IsMouseReleased(MouseButton button) => Native.ImGui_IsMouseReleased((Native.ImGuiMouseButton)button);
 
-        //public static bool ImGui_IsMouseDoubleClicked(ImGuiMouseButton button);
+        public static bool IsMouseDoubleClicked(MouseButton button) => Native.ImGui_IsMouseDoubleClicked((Native.ImGuiMouseButton)button);
 
-        //public static int ImGui_GetMouseClickedCount(ImGuiMouseButton button);
+        public static int GetMouseClickedCount(MouseButton button) => Native.ImGui_GetMouseClickedCount((Native.ImGuiMouseButton)button);
 
-        //public static bool ImGui_IsMouseHoveringRect(ImVec2 r_min, ImVec2 r_max);
+        public static bool IsMouseHovering(Position min, Position max) => Native.ImGui_IsMouseHoveringRect(min.ToNative(), max.ToNative());
 
-        //public static bool ImGui_IsMouseHoveringRectEx(ImVec2 r_min, ImVec2 r_max, bool clip = true);
+        public static bool IsMouseHovering(Position min, Position max, bool clip) => Native.ImGui_IsMouseHoveringRectEx(min.ToNative(), max.ToNative(), clip);
 
-        //public static bool ImGui_IsMousePosValid(ImVec2* mouse_pos = default);
+        public static bool IsMousePosValid(Position? mousePosition = default)
+        {
+            if (mousePosition == null)
+            {
+                return Native.ImGui_IsMousePosValid();
+            }
+            else
+            {
+                var local = mousePosition.Value.ToNative();
+                return Native.ImGui_IsMousePosValid(&local);
+            }
+        }
 
-        //public static bool ImGui_IsAnyMouseDown();
+        public static bool IsAnyMouseDown() => Native.ImGui_IsAnyMouseDown();
 
-        //public static ImVec2 ImGui_GetMousePos();
+        public static Position GetMousePosition() => new(Native.ImGui_GetMousePos());
 
-        //public static ImVec2 ImGui_GetMousePosOnOpeningCurrentPopup();
+        public static Position GetMousePositionOnOpeningCurrentPopup() => new(Native.ImGui_GetMousePosOnOpeningCurrentPopup());
 
-        //public static bool ImGui_IsMouseDragging(ImGuiMouseButton button, float lock_threshold = -1.0f);
+        public static bool IsMouseDragging(MouseButton button, float lockThreshold = -1.0f) => Native.ImGui_IsMouseDragging((Native.ImGuiMouseButton)button, lockThreshold);
 
-        //public static ImVec2 ImGui_GetMouseDragDelta(ImGuiMouseButton button = default, float lock_threshold = -1.0f);
+        public static Size GetMouseDragDelta(MouseButton button = default, float lockThreshold = -1.0f) => new(Native.ImGui_GetMouseDragDelta((Native.ImGuiMouseButton)button, lockThreshold));
 
-        //public static void ImGui_ResetMouseDragDelta();
+        public static void ResetMouseDragDelta() => Native.ImGui_ResetMouseDragDelta();
 
-        //public static void ImGui_ResetMouseDragDeltaEx(ImGuiMouseButton button = default);
+        public static void ResetMouseDragDelta(MouseButton button) => Native.ImGui_ResetMouseDragDeltaEx((Native.ImGuiMouseButton)button);
 
-        //public static ImGuiMouseCursor ImGui_GetMouseCursor();
+        public static MouseCursor GetMouseCursor() => (MouseCursor)Native.ImGui_GetMouseCursor();
 
-        //public static void ImGui_SetMouseCursor(ImGuiMouseCursor cursor_type);
+        public static void SetMouseCursor(MouseCursor cursorType) => Native.ImGui_SetMouseCursor((Native.ImGuiMouseCursor)cursorType);
 
-        //public static void ImGui_SetNextFrameWantCaptureMouse(bool want_capture_mouse);
+        public static void SetNextFrameWantCaptureMouse(bool wantCaptureMouse) => Native.ImGui_SetNextFrameWantCaptureMouse(wantCaptureMouse);
 
         #endregion
 

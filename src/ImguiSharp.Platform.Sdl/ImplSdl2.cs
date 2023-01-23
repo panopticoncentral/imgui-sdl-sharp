@@ -233,15 +233,15 @@ namespace ImguiSharp.Platform.Sdl
                 io.AddMouseWheelEvent(new(wheelX, wheelY));
             };
 
-            static int TranslateMouseButton(MouseButton button)
+            static int TranslateMouseButton(SdlSharp.Input.MouseButton button)
             {
                 return button switch
                 {
-                    MouseButton.Left => 0,
-                    MouseButton.Right => 1,
-                    MouseButton.Middle => 2,
-                    MouseButton.X1 => 3,
-                    MouseButton.X2 => 4,
+                    SdlSharp.Input.MouseButton.Left => 0,
+                    SdlSharp.Input.MouseButton.Right => 1,
+                    SdlSharp.Input.MouseButton.Middle => 2,
+                    SdlSharp.Input.MouseButton.X1 => 3,
+                    SdlSharp.Input.MouseButton.X2 => 4,
                     _ => -1
                 };
             }
