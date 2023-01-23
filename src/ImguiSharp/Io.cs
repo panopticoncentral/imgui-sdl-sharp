@@ -102,7 +102,7 @@
             set => _io->UserData = (void*)value;
         }
 
-        public FontAtlas FontAtlas => new(_io->Fonts);
+        public FontAtlas Fonts => new(_io->Fonts);
 
         public float FontGlobalScale
         {

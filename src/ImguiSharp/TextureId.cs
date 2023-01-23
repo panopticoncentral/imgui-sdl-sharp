@@ -1,14 +1,11 @@
 ﻿namespace ImguiSharp
 {
-    public readonly record struct TextureId
+    public readonly record struct TextureId(nuint Value)
     {
-        private readonly Native.ImTextureID _textureId;
-
-        internal TextureId(Native.ImTextureID textureId)
+        internal TextureId(Native.ImTextureID textureId) : this(textureId.Value)
         {
-            _textureId = textureId;
         }
 
-        internal Native.ImTextureID ToNative() => _textureId;
+        internal Native.ImTextureID ToNative() => new(Value);
     }
 }

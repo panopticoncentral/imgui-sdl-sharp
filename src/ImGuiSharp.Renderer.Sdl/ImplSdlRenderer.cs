@@ -1,5 +1,8 @@
-﻿using ImguiSharp;
+﻿using System;
 
+using ImguiSharp;
+
+using SdlSharp;
 using SdlSharp.Graphics;
 
 using static ImguiSharp.Native;
@@ -22,7 +25,10 @@ namespace ImGuiSharp.Renderer.Sdl
             }
         };
 
-        private static Data? GetBackendData() => Imgui.GetCurrentContext() != null ? DataDictionary[Imgui.GetIo().BackendRendererUserData] : null;
+        private static Data GetBackendData() =>
+            Imgui.GetCurrentContext() != null
+                ? DataDictionary[Imgui.GetIo().BackendRendererUserData]
+                : throw new InvalidOperationException();
 
         public static bool Init(SdlSharp.Graphics.Renderer renderer)
         {
@@ -46,11 +52,6 @@ namespace ImGuiSharp.Renderer.Sdl
         private static void Shutdown()
         {
             var bd = GetBackendData();
-            if (bd == null)
-            {
-                throw new InvalidOperationException();
-            }
-
             var io = Imgui.GetIo();
 
             DestroyDeviceObjects();
@@ -62,7 +63,7 @@ namespace ImGuiSharp.Renderer.Sdl
 
         private static void SetupRenderState()
         {
-            var bd = GetBackendData()!.Value;
+            var bd = GetBackendData();
 
             bd._sdlRenderer.Viewport = null;
             bd._sdlRenderer.ClippingRectangle = null;
@@ -70,17 +71,15 @@ namespace ImGuiSharp.Renderer.Sdl
 
         public static void NewFrame()
         {
-            var bd = GetBackendData()!.Value;
+            var bd = GetBackendData();
 
             if (bd._fontTexture == null)
             {
-                CreateDeviceObjects();
+                _ = CreateDeviceObjects();
             }
         }
 
 #if false
-
-
 void ImGui_ImplSDLRenderer_RenderDrawData(ImDrawData* draw_data)
 {
 	ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
@@ -172,57 +171,45 @@ void ImGui_ImplSDLRenderer_RenderDrawData(ImDrawData* draw_data)
     SDL_RenderSetViewport(bd->SDLRenderer, &old.Viewport);
     SDL_RenderSetClipRect(bd->SDLRenderer, old.ClipEnabled ? &old.ClipRect : nullptr);
 }
-
-// Called by Init/NewFrame/Shutdown
-bool ImGui_ImplSDLRenderer_CreateFontsTexture()
-{
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
-
-    // Build texture atlas
-    unsigned char* pixels;
-    int width, height;
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   // Load as RGBA 32-bit (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-
-    // Upload texture to graphics system
-    // (Bilinear sampling is required by default. Set 'io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines' or 'style.AntiAliasedLinesUseTex = false' to allow point/nearest sampling)
-    bd->FontTexture = SDL_CreateTexture(bd->SDLRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
-    if (bd->FontTexture == nullptr)
-    {
-        SDL_Log("error creating texture");
-        return false;
-    }
-    SDL_UpdateTexture(bd->FontTexture, nullptr, pixels, 4 * width);
-    SDL_SetTextureBlendMode(bd->FontTexture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureScaleMode(bd->FontTexture, SDL_ScaleModeLinear);
-
-    // Store our identifier
-    io.Fonts->SetTexID((ImTextureID)(intptr_t)bd->FontTexture);
-
-    return true;
-}
-
-void ImGui_ImplSDLRenderer_DestroyFontsTexture()
-{
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
-    if (bd->FontTexture)
-    {
-        io.Fonts->SetTexID(0);
-        SDL_DestroyTexture(bd->FontTexture);
-        bd->FontTexture = nullptr;
-    }
-}
-
-bool ImGui_ImplSDLRenderer_CreateDeviceObjects()
-{
-    return ImGui_ImplSDLRenderer_CreateFontsTexture();
-}
-
-void ImGui_ImplSDLRenderer_DestroyDeviceObjects()
-{
-    ImGui_ImplSDLRenderer_DestroyFontsTexture();
-}
 #endif
+
+        private static bool CreateFontsTexture()
+        {
+            var io = Imgui.GetIo();
+            var bd = GetBackendData();
+
+            io.Fonts.GetTextureDataAsRgba32(out var pixels, out var width, out var height, out var _);
+            SdlSharp.Graphics.Size size = new(width, height);
+
+            bd._fontTexture = bd._sdlRenderer.CreateTexture(EnumeratedPixelFormat.Abgr8888, TextureAccess.Static, size);
+            if (bd._fontTexture == null)
+            {
+                Log.Error("error creating texture");
+                return false;
+            }
+            bd._fontTexture.Update(null, pixels, 4 * size.Width);
+            bd._fontTexture.BlendMode = BlendMode.Blend;
+            bd._fontTexture.ScaleMode = ScaleMode.Linear;
+
+            io.Fonts.SetTextureId(new(bd._fontTexture.Id));
+
+            return true;
+        }
+
+        private static void DestroyFontsTexture()
+        {
+            var io = Imgui.GetIo();
+            var bd = GetBackendData();
+            if (bd._fontTexture != null)
+            {
+                io.Fonts.SetTextureId(new(0));
+                bd._fontTexture.Dispose();
+                bd._fontTexture = null;
+            }
+        }
+
+        private static bool CreateDeviceObjects() => CreateFontsTexture();
+
+        private static void DestroyDeviceObjects() => DestroyFontsTexture();
     }
 }
