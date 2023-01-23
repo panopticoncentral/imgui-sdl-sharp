@@ -1,6 +1,7 @@
 ﻿using SdlSharp;
 using SdlSharp.Graphics;
 using ImguiSharp;
+using ImguiSharp.Platform.Sdl;
 
 using var application = new Application(Subsystems.Video | Subsystems.Timer | Subsystems.GameController);
 
@@ -26,9 +27,8 @@ var io = Imgui.GetIo();
 Imgui.StyleColorsDark();
 // Imgui.StyleColorsLight();
 
+ImplSdl2.Init(window, renderer);
 #if false
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer_Init(renderer);
 
     // Load Fonts
@@ -65,21 +65,17 @@ Window.Closed += (sender, args) =>
 while (application.DispatchEvents())
 {
 #if false
-        {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-        }
-
-        // Start the Dear ImGui frame
         ImGui_ImplSDLRenderer_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-
+#endif
+    ImplSdl2.NewFrame();
     Imgui.NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (showDemoWindow)
     {
         Imgui.ShowDemoWindow(showDemoWindow);
     }
+
+#if false
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
@@ -114,9 +110,9 @@ while (application.DispatchEvents())
             ImGui::End();
         }
 
-        // Rendering
-    //Imgui.Render();
 #endif
+    Imgui.Render();
+
     renderer.DrawColor = new((byte)(clearColor.Red * 255), (byte)(clearColor.Green * 255), (byte)(clearColor.Blue * 255), (byte)(clearColor.Alpha * 255));
     renderer.Clear();
 #if false
@@ -128,6 +124,6 @@ while (application.DispatchEvents())
 #if false
     // Cleanup
     ImGui_ImplSDLRenderer_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
 #endif
+ImplSdl2.Shutdown();
 Imgui.DestroyContext();
