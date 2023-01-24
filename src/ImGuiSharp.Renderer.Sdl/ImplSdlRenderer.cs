@@ -79,54 +79,33 @@ namespace ImGuiSharp.Renderer.Sdl
             }
         }
 
-#if false
-void ImGui_ImplSDLRenderer_RenderDrawData(ImDrawData* draw_data)
-{
-	ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
-
-	// If there's a scale factor set by the user, use that instead
-    // If the user has specified a scale factor to SDL_Renderer already via SDL_RenderSetScale(), SDL will scale whatever we pass
-    // to SDL_RenderGeometryRaw() by that scale factor. In that case we don't want to be also scaling it ourselves here.
-    float rsx = 1.0f;
-	float rsy = 1.0f;
-	SDL_RenderGetScale(bd->SDLRenderer, &rsx, &rsy);
-    ImVec2 render_scale;
-	render_scale.x = (rsx == 1.0f) ? draw_data->FramebufferScale.x : 1.0f;
-	render_scale.y = (rsy == 1.0f) ? draw_data->FramebufferScale.y : 1.0f;
-
-	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-	int fb_width = (int)(draw_data->DisplaySize.x * render_scale.x);
-	int fb_height = (int)(draw_data->DisplaySize.y * render_scale.y);
-	if (fb_width == 0 || fb_height == 0)
-		return;
-
-    // Backup SDL_Renderer state that will be modified to restore it afterwards
-    struct BackupSDLRendererState
-    {
-        SDL_Rect    Viewport;
-        bool        ClipEnabled;
-        SDL_Rect    ClipRect;
-    };
-    BackupSDLRendererState old = {};
-    old.ClipEnabled = SDL_RenderIsClipEnabled(bd->SDLRenderer) == SDL_TRUE;
-    SDL_RenderGetViewport(bd->SDLRenderer, &old.Viewport);
-    SDL_RenderGetClipRect(bd->SDLRenderer, &old.ClipRect);
-
-	// Will project scissor/clipping rectangles into framebuffer space
-	ImVec2 clip_off = draw_data->DisplayPos;         // (0,0) unless using multi-viewports
-	ImVec2 clip_scale = render_scale;
-
-    // Render command lists
-    ImGui_ImplSDLRenderer_SetupRenderState();
-    for (int n = 0; n < draw_data->CmdListsCount; n++)
-    {
-        const ImDrawList* cmd_list = draw_data->CmdLists[n];
-        const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
-        const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
-
-        for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+        public void RenderDrawData(DrawData drawData)
         {
-            const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+            var bd = GetBackendData();
+
+            var (existingScaleX, existingScaleY) = bd._sdlRenderer.Scale;
+            var renderScaleX = (existingScaleX == 1.0f) ? drawData.FramebufferScale.X : 1.0f;
+            var renderScaleY = (existingScaleY == 1.0f) ? drawData.FramebufferScale.Y : 1.0f;
+
+            var width = (int)(drawData.DisplaySize.Width * renderScaleX);
+            var height = (int)(drawData.DisplaySize.Height * renderScaleY);
+            if (width == 0 || height == 0)
+            {
+                return;
+            }
+
+            var old = (bd._sdlRenderer.ClippingEnabled, bd._sdlRenderer.Viewport, bd._sdlRenderer.ClippingRectangle);
+
+            var clipOffset = drawData.DisplayPosition;
+            var clipScaleX = renderScaleX;
+            var clipScaleY = renderScaleY;
+
+            SetupRenderState();
+            foreach (var cmdList in drawData)
+            {
+                foreach (var cmd in cmdList.Commands)
+                {
+#if false
             if (pcmd->UserCallback)
             {
                 // User callback, registered via ImDrawList::AddCallback()
@@ -164,14 +143,13 @@ void ImGui_ImplSDLRenderer_RenderDrawData(ImDrawData* draw_data)
                     cmd_list->VtxBuffer.Size - pcmd->VtxOffset,
                     idx_buffer + pcmd->IdxOffset, pcmd->ElemCount, sizeof(ImDrawIdx));
             }
-        }
-    }
-
-    // Restore modified SDL_Renderer state
-    SDL_RenderSetViewport(bd->SDLRenderer, &old.Viewport);
-    SDL_RenderSetClipRect(bd->SDLRenderer, old.ClipEnabled ? &old.ClipRect : nullptr);
-}
 #endif
+                }
+            }
+
+            bd._sdlRenderer.Viewport = old.Viewport;
+            bd._sdlRenderer.ClippingRectangle = old.ClippingEnabled ? old.ClippingRectangle : null;
+        }
 
         private static bool CreateFontsTexture()
         {
