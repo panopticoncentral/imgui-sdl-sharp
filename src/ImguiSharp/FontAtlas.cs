@@ -145,7 +145,7 @@
 
         public int AddCustomRectRegular(int width, int height) => Native.ImFontAtlas_AddCustomRectRegular(_fontAtlas, width, height);
 
-        public int AddCustomRectFontGlyph(Font font, char id, int width, int height, float advanceX, Position offset = default) => 
+        public int AddCustomRectFontGlyph(Font font, char id, int width, int height, float advanceX, Position offset = default) =>
             Native.ImFontAtlas_AddCustomRectFontGlyph(_fontAtlas, font.ToNative(), id, width, height, advanceX, offset.ToNative());
 
         public CustomRect GetCustomRectByIndex(int index) => new(Native.ImFontAtlas_GetCustomRectByIndex(_fontAtlas, index));

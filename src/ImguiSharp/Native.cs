@@ -2758,7 +2758,7 @@ namespace ImguiSharp
 
         public const int IM_DRAWLIST_TEX_LINES_WIDTH_MAX = 63;
 
-        public static readonly delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void> ImDrawCallback_ResetRenderState = (delegate* unmanaged[Cdecl]<ImDrawList*, ImDrawCmd*, void>)(-1);
+        public static readonly nint ImDrawCallback_ResetRenderState = -1;
 
         public struct ImDrawCmd
         {

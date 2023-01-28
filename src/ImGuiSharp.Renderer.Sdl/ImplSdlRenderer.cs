@@ -6,6 +6,7 @@ using SdlSharp;
 using SdlSharp.Graphics;
 
 using static ImguiSharp.Native;
+using static SdlSharp.Native;
 
 namespace ImGuiSharp.Renderer.Sdl
 {
@@ -105,45 +106,61 @@ namespace ImGuiSharp.Renderer.Sdl
             {
                 foreach (var cmd in cmdList.Commands)
                 {
-#if false
-            if (pcmd->UserCallback)
-            {
-                // User callback, registered via ImDrawList::AddCallback()
-                // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
-                if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    ImGui_ImplSDLRenderer_SetupRenderState();
-                else
-                    pcmd->UserCallback(cmd_list, pcmd);
-            }
-            else
-            {
-                // Project scissor/clipping rectangles into framebuffer space
-                ImVec2 clip_min((pcmd->ClipRect.x - clip_off.x) * clip_scale.x, (pcmd->ClipRect.y - clip_off.y) * clip_scale.y);
-                ImVec2 clip_max((pcmd->ClipRect.z - clip_off.x) * clip_scale.x, (pcmd->ClipRect.w - clip_off.y) * clip_scale.y);
-                if (clip_min.x < 0.0f) { clip_min.x = 0.0f; }
-                if (clip_min.y < 0.0f) { clip_min.y = 0.0f; }
-                if (clip_max.x > (float)fb_width) { clip_max.x = (float)fb_width; }
-                if (clip_max.y > (float)fb_height) { clip_max.y = (float)fb_height; }
-                if (clip_max.x <= clip_min.x || clip_max.y <= clip_min.y)
-                    continue;
+                    switch (cmd.Kind)
+                    {
+                        case DrawCommandKind.ResetRenderState:
+                            SetupRenderState();
+                            break;
 
-                SDL_Rect r = { (int)(clip_min.x), (int)(clip_min.y), (int)(clip_max.x - clip_min.x), (int)(clip_max.y - clip_min.y) };
-                SDL_RenderSetClipRect(bd->SDLRenderer, &r);
+                        case DrawCommandKind.Callback:
+                            cmd.DoCallback(cmdList);
+                            break;
 
-                const float* xy = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, pos));
-                const float* uv = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, uv));
-                const SDL_Color* color = (const SDL_Color*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, col)); // SDL 2.0.19+
+                        case DrawCommandKind.Vertex:
+                            Position clipMin = new((cmd.ClipRectangle.X1 - clipOffset.X) * clipScaleX, (cmd.ClipRectangle.Y1 - clipOffset.Y) * clipScaleY);
+                            Position clipMax = new((cmd.ClipRectangle.X2 - clipOffset.X) * clipScaleX, (cmd.ClipRectangle.Y2 - clipOffset.Y) * clipScaleY);
 
-                // Bind texture, Draw
-				SDL_Texture* tex = (SDL_Texture*)pcmd->GetTexID();
-                SDL_RenderGeometryRaw(bd->SDLRenderer, tex,
-                    xy, (int)sizeof(ImDrawVert),
-                    color, (int)sizeof(ImDrawVert),
-                    uv, (int)sizeof(ImDrawVert),
-                    cmd_list->VtxBuffer.Size - pcmd->VtxOffset,
-                    idx_buffer + pcmd->IdxOffset, pcmd->ElemCount, sizeof(ImDrawIdx));
-            }
-#endif
+                            if (clipMin.X < 0.0f)
+                            {
+                                clipMin = new(0.0f, clipMin.Y);
+                            }
+
+                            if (clipMin.Y < 0.0f)
+                            {
+                                clipMin = new(clipMin.X, 0.0f);
+                            }
+
+                            if (clipMax.X > width)
+                            {
+                                clipMax = new(width, clipMax.Y);
+                            }
+
+                            if (clipMax.Y > height)
+                            {
+                                clipMax = new(clipMax.X, height);
+                            }
+
+                            if (clipMax.X <= clipMin.X || clipMax.Y <= clipMin.Y)
+                            {
+                                continue;
+                            }
+
+                            bd._sdlRenderer.ClippingRectangle = new(new((int)clipMin.X, (int)clipMin.Y), new((int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y)));
+
+                            const float* xy = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, pos));
+                            const float* uv = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, uv));
+                            const SDL_Color* color = (const SDL_Color*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, col)); // SDL 2.0.19+
+
+                            // Bind texture, Draw
+                            SDL_Texture* tex = (SDL_Texture*)pcmd->GetTexID();
+                            SDL_RenderGeometryRaw(bd->SDLRenderer, tex,
+                                xy, (int)sizeof(ImDrawVert),
+                                color, (int)sizeof(ImDrawVert),
+                                uv, (int)sizeof(ImDrawVert),
+                                cmd_list->VtxBuffer.Size - pcmd->VtxOffset,
+                                idx_buffer + pcmd->IdxOffset, pcmd->ElemCount, sizeof(ImDrawIdx));
+                            break;
+                    }
                 }
             }
 
