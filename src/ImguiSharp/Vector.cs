@@ -4,21 +4,18 @@ namespace ImguiSharp
 {
     public readonly unsafe struct Vector<TNative, TManaged> : IReadOnlyList<TManaged>
         where TNative : unmanaged
+        where TManaged : struct, INativeWrapper<TManaged, TNative>
     {
-        internal delegate TManaged ConstructorFunc(TNative* native);
-
         private readonly TNative* _vector;
-        private readonly ConstructorFunc _constructor;
 
-        public TManaged this[int index] => index >= 0 && index < Count ? _constructor(_vector + index) : throw new InvalidOperationException();
+        public TManaged this[int index] => index >= 0 && index < Count ? TManaged.Wrap(_vector + index) : throw new InvalidOperationException();
 
         public int Count { get; }
 
-        internal Vector(TNative* list, int count, ConstructorFunc constructor)
+        internal Vector(TNative* list, int count)
         {
             _vector = list;
             Count = count;
-            _constructor = constructor;
         }
 
         internal TNative* ToNative() => _vector;
@@ -32,7 +29,7 @@ namespace ImguiSharp
             private readonly Vector<TNative, TManaged> _this;
             private int _index;
 
-            public TManaged Current => _index >= 0 && _index < _this.Count ? _this._constructor(_this._vector + _index) : throw new InvalidOperationException();
+            public TManaged Current => _index >= 0 && _index < _this.Count ? TManaged.Wrap(_this._vector + _index) : throw new InvalidOperationException();
 
             object IEnumerator.Current => Current!;
 

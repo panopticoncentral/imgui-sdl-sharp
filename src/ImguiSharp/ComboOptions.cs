@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum ComboOptions
     {
         None = Native.ImGuiComboFlags.ImGuiComboFlags_None,

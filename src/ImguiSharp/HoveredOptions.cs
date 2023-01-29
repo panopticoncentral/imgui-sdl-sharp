@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum HoveredOptions
     {
         None = Native.ImGuiHoveredFlags.ImGuiHoveredFlags_None,

@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum FontAtlasOptions
     {
         None = Native.ImFontAtlasFlags.ImFontAtlasFlags_None,

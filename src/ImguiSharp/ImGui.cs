@@ -11,14 +11,14 @@ namespace ImguiSharp
 
         #region Context creation and access
 
-        public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => new(Native.ImGui_CreateContext(sharedFontAtlas == null ? null : sharedFontAtlas.Value.ToNative()));
+        public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => Context.Wrap(Native.ImGui_CreateContext(sharedFontAtlas == null ? null : sharedFontAtlas.Value.ToNative()));
 
         public static void DestroyContext(Context? context = null) => Native.ImGui_DestroyContext(context == null ? null : context.Value.ToNative());
 
         public static Context? GetCurrentContext()
         {
             var context = Native.ImGui_GetCurrentContext();
-            return context == null ? null : new(context);
+            return context == null ? null : Context.Wrap(context);
         }
 
         public static void SetCurrentContext(Context? context) => Native.ImGui_SetCurrentContext(context == null ? null : context.Value.ToNative());
@@ -27,9 +27,9 @@ namespace ImguiSharp
 
         #region Main
 
-        public static Io GetIo() => new(Native.ImGui_GetIO());
+        public static Io GetIo() => Io.Wrap(Native.ImGui_GetIO());
 
-        public static Style GetStyle() => new(Native.ImGui_GetStyle());
+        public static Style GetStyle() => Style.Wrap(Native.ImGui_GetStyle());
 
         public static void NewFrame()
         {
@@ -108,7 +108,7 @@ namespace ImguiSharp
 
         public static bool IsWindowHovered(HoveredOptions options = default) => Native.ImGui_IsWindowHovered((Native.ImGuiHoveredFlags)options);
 
-        public static DrawList GetWindowDrawList() => new(Native.ImGui_GetWindowDrawList());
+        public static DrawList GetWindowDrawList() => DrawList.Wrap(Native.ImGui_GetWindowDrawList());
 
         public static Position GetWindowPosition() => new(Native.ImGui_GetWindowPos());
 
@@ -264,7 +264,7 @@ namespace ImguiSharp
 
         #region Style read access
 
-        public static Font GetFont() => new(Native.ImGui_GetFont());
+        public static Font GetFont() => Font.Wrap(Native.ImGui_GetFont());
 
         public static float GetFontSize() => Native.ImGui_GetFontSize();
 
@@ -1173,7 +1173,7 @@ namespace ImguiSharp
             Native.StringToUtf8Func<Payload?>(type, typePtr =>
             {
                 var payload = Native.ImGui_AcceptDragDropPayload(typePtr, (Native.ImGuiDragDropFlags)options);
-                return payload == null ? null : new Payload(payload);
+                return payload == null ? null : Payload.Wrap(payload);
             });
 
         public static void EndDragDropTarget() => Native.ImGui_EndDragDropTarget();
@@ -1181,7 +1181,7 @@ namespace ImguiSharp
         public static Payload? GetDragDropPayload()
         {
             var payload = Native.ImGui_GetDragDropPayload();
-            return payload == null ? null : new(payload);
+            return payload == null ? null : Payload.Wrap(payload);
         }
 
         #endregion
@@ -1256,7 +1256,7 @@ namespace ImguiSharp
 
         #region Viewports
 
-        public static Viewport GetMainViewport() => new(Native.ImGui_GetMainViewport());
+        public static Viewport GetMainViewport() => Viewport.Wrap(Native.ImGui_GetMainViewport());
 
         #endregion
 
@@ -1282,7 +1282,7 @@ namespace ImguiSharp
 
         public static void SetStateStorage(Storage storage) => Native.ImGui_SetStateStorage(storage.ToNative());
 
-        public static Storage GetStateStorage() => new(Native.ImGui_GetStateStorage());
+        public static Storage GetStateStorage() => Storage.Wrap(Native.ImGui_GetStateStorage());
 
         public static bool BeginChildFrame(Id id, Size size, WindowOptions flags = default) => Native.ImGui_BeginChildFrame(id.ToNative(), size.ToNative(), (Native.ImGuiWindowFlags)flags);
 

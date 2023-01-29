@@ -1,8 +1,6 @@
-﻿using System.Runtime.InteropServices;
-
-namespace ImguiSharp
+﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Viewport
+    public readonly unsafe struct Viewport : INativeWrapper<Viewport, Native.ImGuiViewport>
     {
         private readonly Native.ImGuiViewport* _viewport;
 
@@ -46,11 +44,13 @@ namespace ImguiSharp
             set => _viewport->PlatformHandleRaw = (void*)value;
         }
 
-        internal Viewport(Native.ImGuiViewport* viewport)
+        private Viewport(Native.ImGuiViewport* viewport)
         {
             _viewport = viewport;
         }
 
-        internal Native.ImGuiViewport* ToNative() => _viewport;
+        public static Viewport Wrap(Native.ImGuiViewport* native) => new(native);
+
+        public Native.ImGuiViewport* ToNative() => _viewport;
     }
 }

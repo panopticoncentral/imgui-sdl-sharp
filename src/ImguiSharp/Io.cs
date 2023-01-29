@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Io
+    public readonly unsafe struct Io : INativeWrapper<Io, Native.ImGuiIO>
     {
         private readonly Native.ImGuiIO* _io;
 
@@ -102,7 +102,7 @@
             set => _io->UserData = (void*)value;
         }
 
-        public FontAtlas Fonts => new(_io->Fonts);
+        public FontAtlas Fonts => FontAtlas.Wrap(_io->Fonts);
 
         public float FontGlobalScale
         {
@@ -118,7 +118,7 @@
 
         public Font? FontDefault
         {
-            get => _io->FontDefault == null ? null : new(_io->FontDefault);
+            get => _io->FontDefault == null ? null : Font.Wrap(_io->FontDefault);
             set => _io->FontDefault = value == null ? null : value.Value.ToNative();
         }
 
@@ -339,10 +339,12 @@
 
         public Position MousePosition => new(_io->MousePos);
 
-        internal Io(Native.ImGuiIO* io)
+        private Io(Native.ImGuiIO* io)
         {
             _io = io;
         }
+
+        public static Io Wrap(Native.ImGuiIO* native) => new(native);
 
         public void AddKeyEvent(Key key, bool down) => Native.ImGuiIO_AddKeyEvent(_io, (Native.ImGuiKey)key, down);
 
@@ -376,6 +378,6 @@
 
         public void ClearInputKeys() => Native.ImGuiIO_ClearInputKeys(_io);
 
-        internal Native.ImGuiIO* ToNative() => _io;
+        public Native.ImGuiIO* ToNative() => _io;
     }
 }

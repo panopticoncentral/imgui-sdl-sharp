@@ -1,14 +1,16 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Storage
+    public readonly unsafe struct Storage : INativeWrapper<Storage, Native.ImGuiStorage>
     {
         private readonly Native.ImGuiStorage* _storage;
 
-        internal Storage(Native.ImGuiStorage* storage)
+        private Storage(Native.ImGuiStorage* storage)
         {
             _storage = storage;
         }
 
-        internal Native.ImGuiStorage* ToNative() => _storage;
+        public static Storage Wrap(Native.ImGuiStorage* native) => new(native);
+
+        public Native.ImGuiStorage* ToNative() => _storage;
     }
 }

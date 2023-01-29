@@ -1,14 +1,16 @@
 ﻿namespace ImguiSharp
 {
-    public sealed unsafe class FontConfig
+    public readonly unsafe struct FontConfig : INativeWrapper<FontConfig, Native.ImFontConfig>
     {
         private readonly Native.ImFontConfig* _fontConfig;
 
-        internal FontConfig(Native.ImFontConfig* fontConfig)
+        private FontConfig(Native.ImFontConfig* fontConfig)
         {
             _fontConfig = fontConfig;
         }
 
-        internal Native.ImFontConfig* ToNative() => _fontConfig;
+        public static FontConfig Wrap(Native.ImFontConfig* native) => new(native);
+
+        public Native.ImFontConfig* ToNative() => _fontConfig;
     }
 }

@@ -1,14 +1,16 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct DrawIndex
+    public readonly unsafe struct DrawIndex : INativeWrapper<DrawIndex, Native.ImDrawIdx>
     {
         private readonly Native.ImDrawIdx* _idx;
 
-        internal DrawIndex(Native.ImDrawIdx* idx)
+        private DrawIndex(Native.ImDrawIdx* idx)
         {
             _idx = idx;
         }
 
-        internal Native.ImDrawIdx* ToNative() => _idx;
+        public static DrawIndex Wrap(Native.ImDrawIdx* native) => new(native);
+
+        public Native.ImDrawIdx* ToNative() => _idx;
     }
 }

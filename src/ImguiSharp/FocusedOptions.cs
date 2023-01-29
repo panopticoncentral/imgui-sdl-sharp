@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum FocusedOptions
     {
         None = Native.ImGuiFocusedFlags.ImGuiFocusedFlags_None,

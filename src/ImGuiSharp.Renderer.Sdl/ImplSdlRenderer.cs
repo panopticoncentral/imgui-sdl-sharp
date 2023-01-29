@@ -1,12 +1,7 @@
-﻿using System;
-
-using ImguiSharp;
+﻿using ImguiSharp;
 
 using SdlSharp;
 using SdlSharp.Graphics;
-
-using static ImguiSharp.Native;
-using static SdlSharp.Native;
 
 namespace ImGuiSharp.Renderer.Sdl
 {
@@ -80,7 +75,7 @@ namespace ImGuiSharp.Renderer.Sdl
             }
         }
 
-        public void RenderDrawData(DrawData drawData)
+        public static void RenderDrawData(DrawData drawData)
         {
             var bd = GetBackendData();
 
@@ -147,6 +142,7 @@ namespace ImGuiSharp.Renderer.Sdl
 
                             bd._sdlRenderer.ClippingRectangle = new(new((int)clipMin.X, (int)clipMin.Y), new((int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y)));
 
+#if false
                             const float* xy = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, pos));
                             const float* uv = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, uv));
                             const SDL_Color* color = (const SDL_Color*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, col)); // SDL 2.0.19+
@@ -159,6 +155,7 @@ namespace ImGuiSharp.Renderer.Sdl
                                 uv, (int)sizeof(ImDrawVert),
                                 cmd_list->VtxBuffer.Size - pcmd->VtxOffset,
                                 idx_buffer + pcmd->IdxOffset, pcmd->ElemCount, sizeof(ImDrawIdx));
+#endif
                             break;
                     }
                 }

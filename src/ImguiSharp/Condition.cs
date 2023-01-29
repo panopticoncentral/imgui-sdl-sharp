@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum Condition
     {
         None = Native.ImGuiCond.ImGuiCond_None,

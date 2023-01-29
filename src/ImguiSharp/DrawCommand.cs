@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct DrawCommand
+    public readonly unsafe struct DrawCommand : INativeWrapper<DrawCommand, Native.ImDrawCmd>
     {
         private readonly Native.ImDrawCmd* _cmd;
 
@@ -21,13 +21,15 @@
 
         public uint ElementCount => _cmd->ElemCount;
 
-        internal DrawCommand(Native.ImDrawCmd* cmd)
+        private DrawCommand(Native.ImDrawCmd* cmd)
         {
             _cmd = cmd;
         }
 
         public void DoCallback(DrawList drawList) => _cmd->UserCallback(drawList.ToNative(), _cmd);
 
-        internal Native.ImDrawCmd* ToNative() => _cmd;
+        public static DrawCommand Wrap(Native.ImDrawCmd* native) => new(native);
+
+        public Native.ImDrawCmd* ToNative() => _cmd;
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace ImguiSharp
 {
+    [Flags]
     public enum SliderOptions
     {
         None = Native.ImGuiSliderFlags.ImGuiSliderFlags_None,
