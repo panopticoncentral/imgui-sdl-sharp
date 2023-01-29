@@ -45,7 +45,7 @@ namespace ImGuiSharp.Renderer.Sdl
             return true;
         }
 
-        private static void Shutdown()
+        public static void Shutdown()
         {
             var bd = GetBackendData();
             var io = Imgui.GetIo();

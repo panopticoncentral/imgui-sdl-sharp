@@ -2,6 +2,7 @@
 using SdlSharp.Graphics;
 using ImguiSharp;
 using ImguiSharp.Platform.Sdl;
+using ImGuiSharp.Renderer.Sdl;
 
 using var application = new Application(Subsystems.Video | Subsystems.Timer | Subsystems.GameController);
 
@@ -18,36 +19,31 @@ using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | 
 Imgui.CreateContext();
 var io = Imgui.GetIo();
 
-#if false
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-#endif
+//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
 // Setup Dear ImGui style
 Imgui.StyleColorsDark();
 // Imgui.StyleColorsLight();
 
 ImplSdl2.Init(window, renderer);
-#if false
-    ImGui_ImplSDLRenderer_Init(renderer);
+ImplSdlRenderer.Init(renderer);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
-
-#endif
+// Load Fonts
+// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+// - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
+// - Read 'docs/FONTS.md' for more instructions and details.
+// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+//io.Fonts->AddFontDefault();
+//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+//IM_ASSERT(font != NULL);
 
 // Our state
 var showDemoWindow = new State<bool>(true);
@@ -64,9 +60,7 @@ Window.Closed += (sender, args) =>
 
 while (application.DispatchEvents())
 {
-#if false
-        ImGui_ImplSDLRenderer_NewFrame();
-#endif
+    ImplSdlRenderer.NewFrame();
     ImplSdl2.NewFrame();
     Imgui.NewFrame();
 
@@ -115,15 +109,10 @@ while (application.DispatchEvents())
 
     renderer.DrawColor = new((byte)(clearColor.Red * 255), (byte)(clearColor.Green * 255), (byte)(clearColor.Blue * 255), (byte)(clearColor.Alpha * 255));
     renderer.Clear();
-#if false
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
-#endif
+    ImplSdlRenderer.RenderDrawData(Imgui.GetDrawData());
     renderer.Present();
 }
 
-#if false
-    // Cleanup
-    ImGui_ImplSDLRenderer_Shutdown();
-#endif
+ImplSdlRenderer.Shutdown();
 ImplSdl2.Shutdown();
 Imgui.DestroyContext();

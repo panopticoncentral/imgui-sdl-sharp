@@ -18,6 +18,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
     <ProjectReference Include="..\ImguiSharp.Platform.Sdl\ImguiSharp.Platform.Sdl.csproj" />
+    <ProjectReference Include="..\ImGuiSharp.Renderer.Sdl\ImGuiSharp.Renderer.Sdl.csproj" />
     <ProjectReference Include="..\ImguiSharp\ImguiSharp.csproj" />
   </ItemGroup>
 
