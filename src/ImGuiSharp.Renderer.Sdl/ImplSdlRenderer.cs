@@ -13,11 +13,14 @@ namespace ImGuiSharp.Renderer.Sdl
         private struct Data
         {
             public SdlSharp.Graphics.Renderer _sdlRenderer;
-            public Texture? _fontTexture;
+            public Dictionary<TextureId, Texture> _textures;
+            public TextureId _fontTextureId;
 
             public Data(SdlSharp.Graphics.Renderer sdlRenderer)
             {
+                _fontTextureId = default;
                 _sdlRenderer = sdlRenderer;
+                _textures = new Dictionary<TextureId, Texture>();
             }
         };
 
