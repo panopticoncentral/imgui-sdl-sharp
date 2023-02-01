@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Context : INativeWrapper<Context, Native.ImGuiContext>
+    public readonly unsafe struct Context : INativeReferenceWrapper<Context, Native.ImGuiContext>
     {
         private readonly Native.ImGuiContext* _context;
 
@@ -9,7 +9,7 @@
             _context = context;
         }
 
-        public static Context Wrap(Native.ImGuiContext* context) => new(context);
+        public static Context Wrap(Native.ImGuiContext* native) => new(native);
 
         public Native.ImGuiContext* ToNative() => _context;
     }

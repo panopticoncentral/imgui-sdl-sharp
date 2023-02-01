@@ -1,11 +1,9 @@
 ﻿namespace ImguiSharp
 {
-    public readonly record struct TextureCoordinate(float U, float V)
+    public readonly unsafe record struct TextureCoordinate(float U, float V) : INativeValueWrapper<TextureCoordinate, Native.ImVec2>
     {
-        internal TextureCoordinate(Native.ImVec2 vec) : this(vec.X, vec.Y)
-        {
-        }
+        public static TextureCoordinate Wrap(Native.ImVec2 native) => new(native.X, native.Y);
 
-        internal Native.ImVec2 ToNative() => new(U, V);
+        public Native.ImVec2 ToNative() => new(U, V);
     }
 }

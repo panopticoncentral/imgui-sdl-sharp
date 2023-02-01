@@ -1,14 +1,9 @@
 ﻿namespace ImguiSharp
 {
-    public readonly record struct Id
+    public readonly unsafe record struct Id(uint Value) : INativeValueWrapper<Id, Native.ImGuiID>
     {
-        private readonly Native.ImGuiID _id;
+        public static Id Wrap(Native.ImGuiID native) => new(native.Value);
 
-        internal Id(Native.ImGuiID id)
-        {
-            _id = id;
-        }
-
-        internal Native.ImGuiID ToNative() => _id;
+        public Native.ImGuiID ToNative() => new(Value);
     }
 }

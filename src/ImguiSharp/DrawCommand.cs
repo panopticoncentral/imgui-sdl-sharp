@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct DrawCommand : INativeWrapper<DrawCommand, Native.ImDrawCmd>
+    public readonly unsafe struct DrawCommand : INativeReferenceWrapper<DrawCommand, Native.ImDrawCmd>
     {
         private readonly Native.ImDrawCmd* _cmd;
 
@@ -11,9 +11,9 @@
                     ? DrawCommandKind.ResetRenderState
                     : DrawCommandKind.Callback;
 
-        public Rectangle ClipRectangle => new(_cmd->ClipRect);
+        public Rectangle ClipRectangle => Rectangle.Wrap(_cmd->ClipRect);
 
-        public TextureId TextureId => new(_cmd->TextureId);
+        public TextureId TextureId => TextureId.Wrap(_cmd->TextureId);
 
         public uint VertexOffset => _cmd->VtxOffset;
 

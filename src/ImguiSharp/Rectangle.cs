@@ -1,11 +1,9 @@
 ﻿namespace ImguiSharp
 {
-    public readonly record struct Rectangle(float X1, float Y1, float X2, float Y2)
+    public readonly unsafe record struct Rectangle(float X1, float Y1, float X2, float Y2) : INativeValueWrapper<Rectangle, Native.ImVec4>
     {
-        internal Rectangle(Native.ImVec4 vec) : this(vec.X, vec.Y, vec.Z, vec.W)
-        {
-        }
+        public static Rectangle Wrap(Native.ImVec4 native) => new(native.X, native.Y, native.Z, native.W);
 
-        internal Native.ImVec4 ToNative() => new(X1, Y1, X2, Y2);
+        public Native.ImVec4 ToNative() => new(X1, Y1, X2, Y2);
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe record struct Color(float Red, float Green, float Blue, float Alpha)
+    public readonly unsafe record struct Color(float Red, float Green, float Blue, float Alpha) : INativeValueWrapper<Color, Native.ImVec4>
     {
-        internal Color(Native.ImVec4* color) : this(color->X, color->Y, color->Z, color->W)
+        private Color(Native.ImVec4 color) : this(color.X, color.Y, color.Z, color.W)
         {
         }
 
-        internal Native.ImVec4 ToNative() => new(Red, Green, Blue, Alpha);
+        public static Color Wrap(Native.ImVec4 native) => new(native);
+
+        public Native.ImVec4 ToNative() => new(Red, Green, Blue, Alpha);
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Io : INativeWrapper<Io, Native.ImGuiIO>
+    public readonly unsafe struct Io : INativeReferenceWrapper<Io, Native.ImGuiIO>
     {
         private readonly Native.ImGuiIO* _io;
 
@@ -18,7 +18,7 @@
 
         public Size DisplaySize
         {
-            get => new(_io->DisplaySize);
+            get => Size.Wrap(_io->DisplaySize);
             set => _io->DisplaySize = value.ToNative();
         }
 
@@ -124,7 +124,7 @@
 
         public Size DisplayFramebufferScale
         {
-            get => new(_io->DisplayFramebufferScale);
+            get => Size.Wrap(_io->DisplayFramebufferScale);
             set => _io->DisplayFramebufferScale = value.ToNative();
         }
 
@@ -333,11 +333,11 @@
 
         public Size MouseDelta
         {
-            get => new(_io->MouseDelta);
+            get => Size.Wrap(_io->MouseDelta);
             set => _io->MouseDelta = value.ToNative();
         }
 
-        public Position MousePosition => new(_io->MousePos);
+        public Position MousePosition => Position.Wrap(_io->MousePos);
 
         private Io(Native.ImGuiIO* io)
         {

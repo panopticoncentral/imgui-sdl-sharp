@@ -1,11 +1,9 @@
 ﻿namespace ImguiSharp
 {
-    public readonly record struct Size(float Width, float Height)
+    public readonly unsafe record struct Size(float Width, float Height) : INativeValueWrapper<Size, Native.ImVec2>
     {
-        internal Size(Native.ImVec2 vec) : this(vec.X, vec.Y)
-        {
-        }
+        public static Size Wrap(Native.ImVec2 native) => new(native.X, native.Y);
 
-        internal Native.ImVec2 ToNative() => new(Width, Height);
+        public Native.ImVec2 ToNative() => new(Width, Height);
     }
 }

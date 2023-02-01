@@ -1,14 +1,14 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct DrawList : INativeWrapper<DrawList, Native.ImDrawList>
+    public readonly unsafe struct DrawList : INativeReferenceWrapper<DrawList, Native.ImDrawList>
     {
         private readonly Native.ImDrawList* _list;
 
-        public IReadOnlyList<DrawCommand> Commands => new Vector<Native.ImDrawCmd, DrawCommand>(_list->CmdBuffer.Data, _list->CmdBuffer.Size);
+        public ReferenceVector<Native.ImDrawCmd, DrawCommand> Commands => new(_list->CmdBuffer.Data, _list->CmdBuffer.Size);
 
-        public IReadOnlyList<DrawIndex> Indexes => new Vector<Native.ImDrawIdx, DrawIndex>(_list->IdxBuffer.Data, _list->IdxBuffer.Size);
+        public ValueVector<Native.ImDrawIdx, DrawIndex> Indexes => new(_list->IdxBuffer.Data, _list->IdxBuffer.Size);
 
-        public IReadOnlyList<DrawVertex> Vertices => new Vector<Native.ImDrawVert, DrawVertex>(_list->VtxBuffer.Data, _list->VtxBuffer.Size);
+        public ValueVector<Native.ImDrawVert, DrawVertex> Vertices => new(_list->VtxBuffer.Data, _list->VtxBuffer.Size);
 
         public DrawListOptions Options => (DrawListOptions)_list->Flags;
 

@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Style : INativeWrapper<Style, Native.ImGuiStyle>
+    public readonly unsafe struct Style : INativeReferenceWrapper<Style, Native.ImGuiStyle>
     {
         private readonly Native.ImGuiStyle* _style;
 

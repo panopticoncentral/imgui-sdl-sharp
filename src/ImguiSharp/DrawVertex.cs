@@ -1,16 +1,9 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct DrawVertex : INativeWrapper<DrawVertex, Native.ImDrawVert>
+    public readonly unsafe record struct DrawVertex(Position Xy, TextureCoordinate Uv, uint Color) : INativeValueWrapper<DrawVertex, Native.ImDrawVert>
     {
-        private readonly Native.ImDrawVert* _vert;
+        public static DrawVertex Wrap(Native.ImDrawVert native) => new(Position.Wrap(native.pos), TextureCoordinate.Wrap(native.uv), native.col);
 
-        private DrawVertex(Native.ImDrawVert* vert)
-        {
-            _vert = vert;
-        }
-
-        public static DrawVertex Wrap(Native.ImDrawVert* native) => new(native);
-
-        public Native.ImDrawVert* ToNative() => _vert;
+        public Native.ImDrawVert ToNative() => new() { pos = Xy.ToNative(), uv = Uv.ToNative(), col = Color };
     }
 }

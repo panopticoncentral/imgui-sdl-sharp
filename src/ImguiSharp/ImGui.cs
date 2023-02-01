@@ -41,7 +41,7 @@ namespace ImguiSharp
 
         public static void Render() => Native.ImGui_Render();
 
-        public static DrawData GetDrawData() => new(Native.ImGui_GetDrawData());
+        public static DrawData GetDrawData() => DrawData.Wrap(Native.ImGui_GetDrawData());
 
         #endregion
 
@@ -110,9 +110,9 @@ namespace ImguiSharp
 
         public static DrawList GetWindowDrawList() => DrawList.Wrap(Native.ImGui_GetWindowDrawList());
 
-        public static Position GetWindowPosition() => new(Native.ImGui_GetWindowPos());
+        public static Position GetWindowPosition() => Position.Wrap(Native.ImGui_GetWindowPos());
 
-        public static Size GetWindowSize() => new(Native.ImGui_GetWindowSize());
+        public static Size GetWindowSize() => Size.Wrap(Native.ImGui_GetWindowSize());
 
         public static float GetWindowWidth() => Native.ImGui_GetWindowWidth();
 
@@ -133,7 +133,7 @@ namespace ImguiSharp
         {
             if (SizeCallbacks.TryGetValue((nuint)data->UserData, out var callback))
             {
-                data->DesiredSize = callback(new(data->Pos), new(data->CurrentSize), new(data->DesiredSize)).ToNative();
+                data->DesiredSize = callback(Position.Wrap(data->Pos), Size.Wrap(data->CurrentSize), Size.Wrap(data->DesiredSize)).ToNative();
             }
         }
 
@@ -180,13 +180,13 @@ namespace ImguiSharp
 
         #region Content region
 
-        public static Size GetContentRegionAvailable() => new(Native.ImGui_GetContentRegionAvail());
+        public static Size GetContentRegionAvailable() => Size.Wrap(Native.ImGui_GetContentRegionAvail());
 
-        public static Position GetContentRegionMax() => new(Native.ImGui_GetContentRegionMax());
+        public static Position GetContentRegionMax() => Position.Wrap(Native.ImGui_GetContentRegionMax());
 
-        public static Position GetWindowContentRegionMin() => new(Native.ImGui_GetWindowContentRegionMin());
+        public static Position GetWindowContentRegionMin() => Position.Wrap(Native.ImGui_GetWindowContentRegionMin());
 
-        public static Position GetWindowContentRegionMax() => new(Native.ImGui_GetWindowContentRegionMax());
+        public static Position GetWindowContentRegionMax() => Position.Wrap(Native.ImGui_GetWindowContentRegionMax());
 
         #endregion
 
@@ -268,7 +268,7 @@ namespace ImguiSharp
 
         public static float GetFontSize() => Native.ImGui_GetFontSize();
 
-        public static TextureCoordinate GetFontWhitePixelTextureCoordinate() => new(Native.ImGui_GetFontTexUvWhitePixel());
+        public static TextureCoordinate GetFontWhitePixelTextureCoordinate() => TextureCoordinate.Wrap(Native.ImGui_GetFontTexUvWhitePixel());
 
         public static uint GetColor(StyleColor color) => Native.ImGui_GetColorU32((Native.ImGuiCol)color);
 
@@ -278,7 +278,7 @@ namespace ImguiSharp
 
         public static uint GetColor(uint color) => Native.ImGui_GetColorU32uint(color);
 
-        public static Color GetStyleColor(StyleColor color) => new(Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
+        public static Color GetStyleColor(StyleColor color) => Color.Wrap(*Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
 
         #endregion
 
@@ -308,7 +308,7 @@ namespace ImguiSharp
 
         public static void EndGroup() => Native.ImGui_EndGroup();
 
-        public static Position GetCursorPosition() => new(Native.ImGui_GetCursorPos());
+        public static Position GetCursorPosition() => Position.Wrap(Native.ImGui_GetCursorPos());
 
         public static float GetCursorPosX() => Native.ImGui_GetCursorPosX();
 
@@ -320,9 +320,9 @@ namespace ImguiSharp
 
         public static void SetCursorPosY(float localY) => Native.ImGui_SetCursorPosY(localY);
 
-        public static Position GetCursorStartPosition() => new(Native.ImGui_GetCursorStartPos());
+        public static Position GetCursorStartPosition() => Position.Wrap(Native.ImGui_GetCursorStartPos());
 
-        public static Position GetCursorScreenPosition() => new(Native.ImGui_GetCursorScreenPos());
+        public static Position GetCursorScreenPosition() => Position.Wrap(Native.ImGui_GetCursorScreenPos());
 
         public static void SetCursorScreenPosition(Position position) => Native.ImGui_SetCursorScreenPos(position.ToNative());
 
@@ -348,9 +348,9 @@ namespace ImguiSharp
 
         public static void PopID() => Native.ImGui_PopID();
 
-        public static Id GetID(string id) => Native.StringToUtf8Func(id, ptr => new Id(Native.ImGui_GetID(ptr)));
+        public static Id GetID(string id) => Native.StringToUtf8Func(id, ptr => Id.Wrap(Native.ImGui_GetID(ptr)));
 
-        public static Id GetIDPtr(nuint id) => new(Native.ImGui_GetIDPtr((void*)id));
+        public static Id GetIDPtr(nuint id) => Id.Wrap(Native.ImGui_GetIDPtr((void*)id));
 
         #endregion
 
@@ -1361,13 +1361,13 @@ namespace ImguiSharp
 
         public static bool IsAnyMouseDown() => Native.ImGui_IsAnyMouseDown();
 
-        public static Position GetMousePosition() => new(Native.ImGui_GetMousePos());
+        public static Position GetMousePosition() => Position.Wrap(Native.ImGui_GetMousePos());
 
-        public static Position GetMousePositionOnOpeningCurrentPopup() => new(Native.ImGui_GetMousePosOnOpeningCurrentPopup());
+        public static Position GetMousePositionOnOpeningCurrentPopup() => Position.Wrap(Native.ImGui_GetMousePosOnOpeningCurrentPopup());
 
         public static bool IsMouseDragging(MouseButton button, float lockThreshold = -1.0f) => Native.ImGui_IsMouseDragging((Native.ImGuiMouseButton)button, lockThreshold);
 
-        public static Size GetMouseDragDelta(MouseButton button = default, float lockThreshold = -1.0f) => new(Native.ImGui_GetMouseDragDelta((Native.ImGuiMouseButton)button, lockThreshold));
+        public static Size GetMouseDragDelta(MouseButton button = default, float lockThreshold = -1.0f) => Size.Wrap(Native.ImGui_GetMouseDragDelta((Native.ImGuiMouseButton)button, lockThreshold));
 
         public static void ResetMouseDragDelta() => Native.ImGui_ResetMouseDragDelta();
 

@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct Payload : INativeWrapper<Payload, Native.ImGuiPayload>
+    public readonly unsafe struct Payload : INativeReferenceWrapper<Payload, Native.ImGuiPayload>
     {
         private readonly Native.ImGuiPayload* _payload;
 

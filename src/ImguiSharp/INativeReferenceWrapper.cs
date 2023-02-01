@@ -1,8 +1,8 @@
-﻿#pragma warning disable CA1000
+﻿#pragma warning disable CA1000 // Do not declare static members on generic types
 
 namespace ImguiSharp
 {
-    public unsafe interface INativeWrapper<TManaged, TNative>
+    public unsafe interface INativeReferenceWrapper<TManaged, TNative>
         where TManaged : struct
         where TNative : unmanaged
     {

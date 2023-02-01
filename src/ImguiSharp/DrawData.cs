@@ -2,7 +2,7 @@
 
 namespace ImguiSharp
 {
-    public readonly unsafe struct DrawData : IReadOnlyList<DrawList>
+    public readonly unsafe struct DrawData : INativeReferenceWrapper<DrawData, Native.ImDrawData>, IReadOnlyList<DrawList>
     {
         private readonly Native.ImDrawData* _data;
 
@@ -16,18 +16,20 @@ namespace ImguiSharp
 
         public DrawList this[int index] => index >= 0 && index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[index]) : throw new InvalidOperationException();
 
-        public Position DisplayPosition => new(_data->DisplayPos);
+        public Position DisplayPosition => Position.Wrap(_data->DisplayPos);
 
-        public Size DisplaySize => new(_data->DisplaySize);
+        public Size DisplaySize => Size.Wrap(_data->DisplaySize);
 
         public (float X, float Y) FramebufferScale => (_data->FramebufferScale.X, _data->FramebufferScale.Y);
 
-        internal DrawData(Native.ImDrawData* data)
+        private DrawData(Native.ImDrawData* data)
         {
             _data = data;
         }
 
-        internal Native.ImDrawData* ToNative() => _data;
+        public static DrawData Wrap(Native.ImDrawData* native) => new(native);
+
+        public Native.ImDrawData* ToNative() => _data;
 
         public IEnumerator<DrawList> GetEnumerator() => new DrawListEnumerator(_data);
 

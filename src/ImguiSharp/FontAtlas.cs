@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public readonly unsafe struct FontAtlas : INativeWrapper<FontAtlas, Native.ImFontAtlas>
+    public readonly unsafe struct FontAtlas : INativeReferenceWrapper<FontAtlas, Native.ImFontAtlas>
     {
         private readonly Native.ImFontAtlas* _fontAtlas;
 
@@ -10,7 +10,7 @@
             set => _fontAtlas->Flags = (Native.ImFontAtlasFlags)value;
         }
 
-        public TextureId TextureId => new(_fontAtlas->TexID);
+        public TextureId TextureId => TextureId.Wrap(_fontAtlas->TexID);
 
         public int TextureDesiredWidth
         {
@@ -153,7 +153,7 @@
 
         public Native.ImFontAtlas* ToNative() => _fontAtlas;
 
-        public readonly unsafe struct CustomRect : INativeWrapper<CustomRect, Native.ImFontAtlasCustomRect>
+        public readonly unsafe struct CustomRect : INativeReferenceWrapper<CustomRect, Native.ImFontAtlasCustomRect>
         {
             private readonly Native.ImFontAtlasCustomRect* _customRect;
 

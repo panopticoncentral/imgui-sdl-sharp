@@ -12,19 +12,19 @@ namespace ImGuiSharp.Renderer.Sdl
 
         private struct Data
         {
-            public SdlSharp.Graphics.Renderer _sdlRenderer;
+            public SdlSharp.Graphics.Renderer _renderer;
             public Dictionary<TextureId, Texture> _textures;
             public TextureId _fontTextureId;
 
             public Data(SdlSharp.Graphics.Renderer sdlRenderer)
             {
                 _fontTextureId = default;
-                _sdlRenderer = sdlRenderer;
+                _renderer = sdlRenderer;
                 _textures = new Dictionary<TextureId, Texture>();
             }
         };
 
-        private static Data GetBackendData() =>
+        private static Data BackendData =>
             Imgui.GetCurrentContext() != null
                 ? DataDictionary[Imgui.GetIo().BackendRendererUserData]
                 : throw new InvalidOperationException();
@@ -50,7 +50,7 @@ namespace ImGuiSharp.Renderer.Sdl
 
         public static void Shutdown()
         {
-            var bd = GetBackendData();
+            var bd = BackendData;
             var io = Imgui.GetIo();
 
             DestroyDeviceObjects();
@@ -60,19 +60,41 @@ namespace ImGuiSharp.Renderer.Sdl
             _ = DataDictionary.Remove((nuint)bd.GetHashCode());
         }
 
+        public static TextureId RegisterTexture(Texture texture)
+        {
+            var bd = BackendData;
+
+            var id = new TextureId(texture.Id);
+            bd._textures[id] = texture;
+            return id;
+        }
+
+        public static Texture? UnregisterTexture(TextureId id)
+        {
+            var bd = BackendData;
+
+            if (bd._textures.TryGetValue(id, out var texture))
+            {
+                _ = bd._textures.Remove(id);
+                return texture;
+            }
+
+            return null;
+        }
+
         private static void SetupRenderState()
         {
-            var bd = GetBackendData();
+            var bd = BackendData;
 
-            bd._sdlRenderer.Viewport = null;
-            bd._sdlRenderer.ClippingRectangle = null;
+            bd._renderer.Viewport = null;
+            bd._renderer.ClippingRectangle = null;
         }
 
         public static void NewFrame()
         {
-            var bd = GetBackendData();
+            var bd = BackendData;
 
-            if (bd._fontTexture == null)
+            if (bd._fontTextureId == default)
             {
                 _ = CreateDeviceObjects();
             }
@@ -80,9 +102,9 @@ namespace ImGuiSharp.Renderer.Sdl
 
         public static void RenderDrawData(DrawData drawData)
         {
-            var bd = GetBackendData();
+            var bd = BackendData;
 
-            var (existingScaleX, existingScaleY) = bd._sdlRenderer.Scale;
+            var (existingScaleX, existingScaleY) = bd._renderer.Scale;
             var renderScaleX = (existingScaleX == 1.0f) ? drawData.FramebufferScale.X : 1.0f;
             var renderScaleY = (existingScaleY == 1.0f) ? drawData.FramebufferScale.Y : 1.0f;
 
@@ -93,11 +115,13 @@ namespace ImGuiSharp.Renderer.Sdl
                 return;
             }
 
-            var old = (bd._sdlRenderer.ClippingEnabled, bd._sdlRenderer.Viewport, bd._sdlRenderer.ClippingRectangle);
+            var old = (bd._renderer.ClippingEnabled, bd._renderer.Viewport, bd._renderer.ClippingRectangle);
 
             var clipOffset = drawData.DisplayPosition;
             var clipScaleX = renderScaleX;
             var clipScaleY = renderScaleY;
+
+            var rawDescriptor = new RawGeometryDescriptor<DrawVertex, DrawIndex>(nameof(DrawVertex.Xy), nameof(DrawVertex.Color), nameof(DrawVertex.Uv));
 
             SetupRenderState();
             foreach (var cmdList in drawData)
@@ -143,50 +167,42 @@ namespace ImGuiSharp.Renderer.Sdl
                                 continue;
                             }
 
-                            bd._sdlRenderer.ClippingRectangle = new(new((int)clipMin.X, (int)clipMin.Y), new((int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y)));
-
-#if false
-                            const float* xy = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, pos));
-                            const float* uv = (const float*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, uv));
-                            const SDL_Color* color = (const SDL_Color*)(const void*)((const char*)(vtx_buffer + pcmd->VtxOffset) + IM_OFFSETOF(ImDrawVert, col)); // SDL 2.0.19+
-
-                            // Bind texture, Draw
-                            SDL_Texture* tex = (SDL_Texture*)pcmd->GetTexID();
-                            SDL_RenderGeometryRaw(bd->SDLRenderer, tex,
-                                xy, (int)sizeof(ImDrawVert),
-                                color, (int)sizeof(ImDrawVert),
-                                uv, (int)sizeof(ImDrawVert),
-                                cmd_list->VtxBuffer.Size - pcmd->VtxOffset,
-                                idx_buffer + pcmd->IdxOffset, pcmd->ElemCount, sizeof(ImDrawIdx));
-#endif
+                            bd._renderer.ClippingRectangle = new(new((int)clipMin.X, (int)clipMin.Y), new((int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y)));
+                            bd._renderer.DrawGeometry(
+                                cmd.TextureId == default ? null : bd._textures[cmd.TextureId],
+                                new Span<DrawVertex>(cmdList.Vertices.ToNative() + cmd.VertexOffset,
+                                (int)(cmdList.Vertices.Count - cmd.VertexOffset)),
+                                new Span<DrawIndex>(cmdList.Indexes.ToNative() + cmd.IndexOffset,
+                                (int)cmd.ElementCount),
+                                rawDescriptor);
                             break;
                     }
                 }
             }
 
-            bd._sdlRenderer.Viewport = old.Viewport;
-            bd._sdlRenderer.ClippingRectangle = old.ClippingEnabled ? old.ClippingRectangle : null;
+            bd._renderer.Viewport = old.Viewport;
+            bd._renderer.ClippingRectangle = old.ClippingEnabled ? old.ClippingRectangle : null;
         }
 
         private static bool CreateFontsTexture()
         {
             var io = Imgui.GetIo();
-            var bd = GetBackendData();
+            var bd = BackendData;
 
             io.Fonts.GetTextureDataAsRgba32(out var pixels, out var width, out var height, out var _);
             SdlSharp.Graphics.Size size = new(width, height);
 
-            bd._fontTexture = bd._sdlRenderer.CreateTexture(EnumeratedPixelFormat.Abgr8888, TextureAccess.Static, size);
-            if (bd._fontTexture == null)
+            var texture = bd._renderer.CreateTexture(EnumeratedPixelFormat.Abgr8888, TextureAccess.Static, size);
+            if (texture == null)
             {
                 Log.Error("error creating texture");
                 return false;
             }
-            bd._fontTexture.Update(null, pixels, 4 * size.Width);
-            bd._fontTexture.BlendMode = BlendMode.Blend;
-            bd._fontTexture.ScaleMode = ScaleMode.Linear;
+            texture.Update(null, pixels, 4 * size.Width);
+            texture.BlendMode = BlendMode.Blend;
+            texture.ScaleMode = ScaleMode.Linear;
 
-            io.Fonts.SetTextureId(new(bd._fontTexture.Id));
+            io.Fonts.SetTextureId(RegisterTexture(texture));
 
             return true;
         }
@@ -194,12 +210,13 @@ namespace ImGuiSharp.Renderer.Sdl
         private static void DestroyFontsTexture()
         {
             var io = Imgui.GetIo();
-            var bd = GetBackendData();
-            if (bd._fontTexture != null)
+            var bd = BackendData;
+            if (bd._fontTextureId != default)
             {
-                io.Fonts.SetTextureId(new(0));
-                bd._fontTexture.Dispose();
-                bd._fontTexture = null;
+                io.Fonts.SetTextureId(default);
+                var texture = UnregisterTexture(bd._fontTextureId);
+                texture?.Dispose();
+                bd._fontTextureId = default;
             }
         }
 
