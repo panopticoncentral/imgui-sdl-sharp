@@ -139,8 +139,8 @@ namespace ImGuiSharp.Renderer.Sdl
                             break;
 
                         case DrawCommandKind.Vertex:
-                            Position clipMin = new((cmd.ClipRectangle.X1 - clipOffset.X) * clipScaleX, (cmd.ClipRectangle.Y1 - clipOffset.Y) * clipScaleY);
-                            Position clipMax = new((cmd.ClipRectangle.X2 - clipOffset.X) * clipScaleX, (cmd.ClipRectangle.Y2 - clipOffset.Y) * clipScaleY);
+                            var clipMin = (cmd.ClipRectangle.Min - clipOffset).Scale(clipScaleX, clipScaleY);
+                            var clipMax = (cmd.ClipRectangle.Max - clipOffset).Scale(clipScaleX, clipScaleY);
 
                             if (clipMin.X < 0.0f)
                             {

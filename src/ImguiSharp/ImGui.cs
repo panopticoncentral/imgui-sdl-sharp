@@ -1186,29 +1186,29 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Disabling [BETA API]
+        #region Disabling [BETA API]
 
-        //public static void ImGui_BeginDisabled(bool disabled = true);
+        public static void BeginDisabled(bool disabled = true) => Native.ImGui_BeginDisabled(disabled);
 
-        //public static void ImGui_EndDisabled();
-
-        #endregion
-
-        #region * Clipping
-
-        //public static void ImGui_PushClipRect(ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect);
-
-        //public static void ImGui_PopClipRect();
+        public static void EndDisabled() => Native.ImGui_EndDisabled();
 
         #endregion
 
-        #region * Focus, Activation
+        #region Clipping
 
-        //public static void ImGui_SetItemDefaultFocus();
+        public static void PushClipRect(Rectangle rect, bool intersectWithCurrentClipRect) => Native.ImGui_PushClipRect(rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRect);
 
-        //public static void ImGui_SetKeyboardFocusHere();
+        public static void PopClipRect() => Native.ImGui_PopClipRect();
 
-        //public static void ImGui_SetKeyboardFocusHereEx(int offset = default);
+        #endregion
+
+        #region Focus, Activation
+
+        public static void SetItemDefaultFocus() => Native.ImGui_SetItemDefaultFocus();
+
+        public static void SetKeyboardFocusHere() => Native.ImGui_SetKeyboardFocusHere();
+
+        public static void SetKeyboardFocusHere(int offset) => Native.ImGui_SetKeyboardFocusHereEx(offset);
 
         #endregion
 
@@ -1260,11 +1260,11 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Background/Foreground Draw Lists
+        #region Background/Foreground Draw Lists
 
-        //public static ImDrawList* ImGui_GetBackgroundDrawList();
+        public static DrawList GetBackgroundDrawList => DrawList.Wrap(Native.ImGui_GetBackgroundDrawList());
 
-        //public static ImDrawList* ImGui_GetForegroundDrawList();
+        public static DrawList GetForegroundDrawList => DrawList.Wrap(Native.ImGui_GetForegroundDrawList());
 
         #endregion
 
@@ -1272,7 +1272,7 @@ namespace ImguiSharp
 
         public static bool IsRectVisibleBySize(Size size) => Native.ImGui_IsRectVisibleBySize(size.ToNative());
 
-        public static bool IsRectVisible(Position rectMinimum, Position rectMaximum) => Native.ImGui_IsRectVisible(rectMinimum.ToNative(), rectMaximum.ToNative());
+        public static bool IsRectVisible(Rectangle rect) => Native.ImGui_IsRectVisible(rect.Min.ToNative(), rect.Max.ToNative());
 
         public static double GetTime() => Native.ImGui_GetTime();
 
@@ -1352,9 +1352,9 @@ namespace ImguiSharp
 
         public static int GetMouseClickedCount(MouseButton button) => Native.ImGui_GetMouseClickedCount((Native.ImGuiMouseButton)button);
 
-        public static bool IsMouseHovering(Position min, Position max) => Native.ImGui_IsMouseHoveringRect(min.ToNative(), max.ToNative());
+        public static bool IsMouseHovering(Rectangle rect) => Native.ImGui_IsMouseHoveringRect(rect.Min.ToNative(), rect.Max.ToNative());
 
-        public static bool IsMouseHovering(Position min, Position max, bool clip) => Native.ImGui_IsMouseHoveringRectEx(min.ToNative(), max.ToNative(), clip);
+        public static bool IsMouseHovering(Rectangle rect, bool clip) => Native.ImGui_IsMouseHoveringRectEx(rect.Min.ToNative(), rect.Max.ToNative(), clip);
 
         public static bool IsMousePosValid(Position? mousePosition = default)
         {
