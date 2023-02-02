@@ -1298,33 +1298,43 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Color Utilities
+        #region Color Utilities
 
-        //public static ImVec4 ImGui_ColorConvertU32ToFloat4(uint @in);
+        public static Color ColorConvert(uint i) => Color.Wrap(Native.ImGui_ColorConvertU32ToFloat4(i));
 
-        //public static uint ImGui_ColorConvertFloat4ToU32(ImVec4 @in);
+        public static uint ColorConvert(Color c) => Native.ImGui_ColorConvertFloat4ToU32(c.ToNative());
 
-        //public static void ImGui_ColorConvertRGBtoHSV(float r, float g, float b, float* out_h, float* out_s, float* out_v);
+        public static (float H, float S, float V) ColorConvertRgbToHsv(float r, float g, float b)
+        {
+            float h, s, v;
+            Native.ImGui_ColorConvertRGBtoHSV(r, g, b, &h, &s, &v);
+            return (h, s, v);
+        }
 
-        //public static void ImGui_ColorConvertHSVtoRGB(float h, float s, float v, float* out_r, float* out_g, float* out_b);
+        public static (float R, float G, float B) ColorConvertHsvToRgb(float h, float s, float v)
+        {
+            float r, g, b;
+            Native.ImGui_ColorConvertHSVtoRGB(h, s, v, &r, &g, &b);
+            return (r, g, b);
+        }
 
         #endregion
 
-        #region * Inputs Utilities: Keyboard/Mouse/Gamepad
+        #region Inputs Utilities: Keyboard/Mouse/Gamepad
 
-        //public static bool ImGui_IsKeyDown(ImGuiKey key);
+        public static bool IsKeyDown(Key key) => Native.ImGui_IsKeyDown((Native.ImGuiKey)key);
 
-        //public static bool ImGui_IsKeyPressed(ImGuiKey key);
+        public static bool IsKeyPressed(Key key) => Native.ImGui_IsKeyPressed((Native.ImGuiKey)key);
 
-        //public static bool ImGui_IsKeyPressedEx(ImGuiKey key, bool repeat = true);
+        public static bool IsKeyPressed(Key key, bool repeat) => Native.ImGui_IsKeyPressedEx((Native.ImGuiKey)key, repeat);
 
-        //public static bool ImGui_IsKeyReleased(ImGuiKey key);
+        public static bool IsKeyReleased(Key key) => Native.ImGui_IsKeyReleased((Native.ImGuiKey)key);
 
-        //public static int ImGui_GetKeyPressedAmount(ImGuiKey key, float repeat_delay, float rate);
+        public static int GetKeyPressedAmount(Key key, float repeatDelay, float rate) => Native.ImGui_GetKeyPressedAmount((Native.ImGuiKey)key, repeatDelay, rate);
 
-        //public static byte* ImGui_GetKeyName(ImGuiKey key);
+        public static string? GetKeyName(Key key) => Native.Utf8ToString(Native.ImGui_GetKeyName((Native.ImGuiKey)key));
 
-        //public static void ImGui_SetNextFrameWantCaptureKeyboard(bool want_capture_keyboard);
+        public static void SetNextFrameWantCaptureKeyboard(bool wantCaptureKeyboard) => Native.ImGui_SetNextFrameWantCaptureKeyboard(wantCaptureKeyboard);
 
         #endregion
 
