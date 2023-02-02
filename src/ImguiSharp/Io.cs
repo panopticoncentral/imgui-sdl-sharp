@@ -185,7 +185,7 @@
             get => Native.Utf8ToString(_io->BackendPlatformName);
             set
             {
-                if (_io->BackendPlatformName != null)
+                if (value != null && _io->BackendPlatformName != null)
                 {
                     throw new InvalidOperationException();
                 }
@@ -202,7 +202,7 @@
             get => Native.Utf8ToString(_io->BackendRendererName);
             set
             {
-                if (_io->BackendRendererName != null)
+                if (value != null && _io->BackendRendererName != null)
                 {
                     throw new InvalidOperationException();
                 }

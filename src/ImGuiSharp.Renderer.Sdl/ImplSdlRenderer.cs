@@ -121,7 +121,7 @@ namespace ImGuiSharp.Renderer.Sdl
             var clipScaleX = renderScaleX;
             var clipScaleY = renderScaleY;
 
-            var rawDescriptor = new RawGeometryDescriptor<DrawVertex, DrawIndex>(nameof(DrawVertex.Xy), nameof(DrawVertex.Color), nameof(DrawVertex.Uv));
+            var rawDescriptor = new RawGeometryDescriptor<DrawVertex, DrawIndex>("_xy", "_color", "_uv");
 
             SetupRenderState();
             foreach (var cmdList in drawData)

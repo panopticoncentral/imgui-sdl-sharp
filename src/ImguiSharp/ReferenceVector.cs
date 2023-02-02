@@ -50,7 +50,7 @@ namespace ImguiSharp
                     _index++;
                 }
 
-                return _index == _this.Count;
+                return _index != _this.Count;
             }
             public void Reset() => _index = -1;
         }

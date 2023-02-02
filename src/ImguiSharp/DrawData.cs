@@ -61,7 +61,7 @@ namespace ImguiSharp
                     _index++;
                 }
 
-                return _index == _data->CmdListsCount;
+                return _index != _data->CmdListsCount;
             }
             public void Reset() => _index = -1;
         }
