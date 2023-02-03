@@ -916,29 +916,23 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Widgets: Selectables
+        #region Widgets: Selectables
 
-        //public static bool Selectable(byte* label) => Native.ImGui_Selectable();
+        public static bool Selectable(string label) => Native.StringToUtf8Func(label, Native.ImGui_Selectable));
 
-        //public static bool SelectableEx(byte* label, bool selected = false, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableEx();
+        public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableEx(ptr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
-        //public static bool SelectableBoolPtr(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default) => Native.ImGui_SelectableBoolPtr();
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableBoolPtr(ptr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
 
-        //public static bool SelectableBoolPtrEx(byte* label, bool* p_selected, ImGuiSelectableFlags flags = default, ImVec2 size = default) => Native.ImGui_SelectableBoolPtrEx();
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableBoolPtrEx(ptr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative());
 
         #endregion
 
-        #region * Widgets: List Boxes
+        #region Widgets: List Boxes
 
-        //public static bool BeginListBox(byte* label, ImVec2 size = default) => Native.ImGui_BeginListBox();
+        public static bool BeginListBox(string label, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginListBox(ptr, size.ToNative()));
 
-        //public static void EndListBox() => Native.ImGui_EndListBox();
-
-        //public static bool ListBox(byte* label, int* current_item, byte** items, int items_count, int height_in_items = -1) => Native.ImGui_ListBox();
-
-        //public static bool ListBoxCallback(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count) => Native.ImGui_ListBoxCallback();
-
-        //public static bool ListBoxCallbackEx(byte* label, int* current_item, delegate* unmanaged[Cdecl]<void*, int, byte**, bool> items_getter, void* data, int items_count, int height_in_items = -1) => Native.ImGui_ListBoxCallbackEx();
+        public static void EndListBox() => Native.ImGui_EndListBox();
 
         #endregion
 
@@ -964,49 +958,47 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Widgets: Menus
+        #region Widgets: Menus
 
-        //public static bool BeginMenuBar() => Native.ImGui_BeginMenuBar();
+        public static bool BeginMenuBar() => Native.ImGui_BeginMenuBar();
 
-        //public static void EndMenuBar() => Native.ImGui_EndMenuBar();
+        public static void EndMenuBar() => Native.ImGui_EndMenuBar();
 
-        //public static bool BeginMainMenuBar() => Native.ImGui_BeginMainMenuBar();
+        public static bool BeginMainMenuBar() => Native.ImGui_BeginMainMenuBar();
 
-        //public static void EndMainMenuBar() => Native.ImGui_EndMainMenuBar();
+        public static void EndMainMenuBar() => Native.ImGui_EndMainMenuBar();
 
-        //public static bool BeginMenu(byte* label) => Native.ImGui_BeginMenu();
+        public static bool BeginMenu(string label) => Native.StringToUtf8Func(label, Native.ImGui_BeginMenu);
 
-        //public static bool BeginMenuEx(byte* label, bool enabled = true) => Native.ImGui_BeginMenuEx();
+        public static bool BeginMenu(string label, bool enabled) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginMenuEx(ptr, enabled));
 
-        //public static void EndMenu() => Native.ImGui_EndMenu();
+        public static void EndMenu() => Native.ImGui_EndMenu();
 
-        //public static bool MenuItem(byte* label) => Native.ImGui_MenuItem();
+        public static bool MenuItem(string label) => Native.StringToUtf8Func(label, Native.ImGui_MenuItem);
 
-        //public static bool MenuItemEx(byte* label, byte* shortcut = default, bool selected = false, bool enabled = true) => Native.ImGui_MenuItemEx();
+        public static bool MenuItem(string label, string? shortcut = default, bool selected = false, bool enabled = true) => Native.StringToUtf8Func(label, shortcut, (labelPtr, shortcutPtr) => Native.ImGui_MenuItemEx(labelPtr, shortcutPtr, selected, enabled));
 
-        //public static bool MenuItemBoolPtr(byte* label, byte* shortcut, bool* p_selected, bool enabled = true) => Native.ImGui_MenuItemBoolPtr();
-
-        #endregion
-
-        #region * Tooltips
-
-        //public static void BeginTooltip() => Native.ImGui_BeginTooltip();
-
-        //public static void EndTooltip() => Native.ImGui_EndTooltip();
-
-        //public static void SetTooltip(byte* fmt, __arglist) => Native.ImGui_SetTooltip();
-
-        //public static void SetTooltipV(byte* fmt, nuint /* va_list */ args) => Native.ImGui_SetTooltipV();
+        public static bool MenuItem(string label, string? shortcut, State<bool> selected, bool enabled = true) => Native.StringToUtf8Func(label, shortcut, (labelPtr, shortcutPtr) => Native.ImGui_MenuItemBoolPtr(labelPtr, shortcutPtr, selected.ToNative(), enabled));
 
         #endregion
 
-        #region * Popups: begin/end functions
+        #region Tooltips
 
-        //public static bool ImGui_BeginPopup(byte* str_id, ImGuiWindowFlags flags = default);
+        public static void BeginTooltip() => Native.ImGui_BeginTooltip();
 
-        //public static bool ImGui_BeginPopupModal(byte* name, bool* p_open = default, ImGuiWindowFlags flags = default);
+        public static void EndTooltip() => Native.ImGui_EndTooltip();
 
-        //public static void ImGui_EndPopup();
+        public static void SetTooltip(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_SetTooltip(ptr, __arglist()));
+
+        #endregion
+
+        #region Popups: begin/end functions
+
+        public static bool BeginPopup(string id, WindowOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginPopup(ptr, (Native.ImGuiWindowFlags)options));
+
+        public static bool BeginPopupModal(string name, State<bool>? open = default, WindowOptions options = default) => Native.StringToUtf8Func(name, ptr => Native.ImGui_BeginPopupModal(ptr, open == null ? null : open.ToNative(), (Native.ImGuiWindowFlags)options));
+
+        public static void EndPopup() => Native.ImGui_EndPopup();
 
         #endregion
 
