@@ -1849,7 +1849,6 @@ namespace ImguiSharp
 
         public enum ImGuiTableFlags
         {
-
             ImGuiTableFlags_None = 0,
             ImGuiTableFlags_Resizable = 1 << 0,
             ImGuiTableFlags_Reorderable = 1 << 1,
@@ -1893,7 +1892,6 @@ namespace ImguiSharp
             ImGuiTableFlags_SortMulti = 1 << 26,
             ImGuiTableFlags_SortTristate = 1 << 27,
 
-
             ImGuiTableFlags_SizingMask_ = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingStretchSame,
         }
 
@@ -1919,12 +1917,10 @@ namespace ImguiSharp
             ImGuiTableColumnFlags_IndentEnable = 1 << 16,
             ImGuiTableColumnFlags_IndentDisable = 1 << 17,
 
-
             ImGuiTableColumnFlags_IsEnabled = 1 << 24,
             ImGuiTableColumnFlags_IsVisible = 1 << 25,
             ImGuiTableColumnFlags_IsSorted = 1 << 26,
             ImGuiTableColumnFlags_IsHovered = 1 << 27,
-
 
             ImGuiTableColumnFlags_WidthMask_ = ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_WidthFixed,
             ImGuiTableColumnFlags_IndentMask_ = ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_IndentDisable,
