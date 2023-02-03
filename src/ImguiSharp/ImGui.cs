@@ -1002,89 +1002,89 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Popups: open/close functions
+        #region Popups: open/close functions
 
-        //public static void ImGui_OpenPopup(byte* str_id, ImGuiPopupFlags popup_flags = default);
+        public static void OpenPopup(string id, PopupOptions options = default) => Native.StringToUtf8Action(id, ptr => Native.ImGui_OpenPopup(ptr, (Native.ImGuiPopupFlags)options));
 
-        //public static void ImGui_OpenPopupID(ImGuiID id, ImGuiPopupFlags popup_flags = default);
+        public static void OpenPopup(Id id, PopupOptions options = default) => Native.ImGui_OpenPopupID(id.ToNative(), (Native.ImGuiPopupFlags)options);
 
-        //public static void ImGui_OpenPopupOnItemClick(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+        public static void OpenPopupOnItemClick(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Action(id, ptr => Native.ImGui_OpenPopupOnItemClick(ptr, (Native.ImGuiPopupFlags)options));
 
-        //public static void ImGui_CloseCurrentPopup();
+        public static void CloseCurrentPopup() => Native.ImGui_CloseCurrentPopup();
 
         #endregion
 
         #region * Popups: open+begin combined functions helpers
 
-        //public static bool ImGui_BeginPopupContextItem();
+        public static bool BeginPopupContextItem() => Native.ImGui_BeginPopupContextItem();
 
-        //public static bool ImGui_BeginPopupContextItemEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+        public static bool BeginPopupContextItem(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.ImGui_BeginPopupContextItemEx();
 
-        //public static bool ImGui_BeginPopupContextWindow();
+        public static bool BeginPopupContextWindow() => Native.ImGui_BeginPopupContextWindow();
 
-        //public static bool ImGui_BeginPopupContextWindowEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+        public static bool BeginPopupContextWindow(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.ImGui_BeginPopupContextWindowEx();
 
-        //public static bool ImGui_BeginPopupContextVoid();
+        public static bool BeginPopupContextVoid() => Native.ImGui_BeginPopupContextVoid();
 
-        //public static bool ImGui_BeginPopupContextVoidEx(byte* str_id = default, ImGuiPopupFlags popup_flags = (ImGuiPopupFlags)1);
+        public static bool BeginPopupContextVoid(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.ImGui_BeginPopupContextVoidEx();
 
         #endregion
 
         #region * Popups: query functions
 
-        //public static bool ImGui_IsPopupOpen(byte* str_id, ImGuiPopupFlags flags = default);
+        public static bool IsPopupOpen(string id, PopupOptions flags = default) => Native.ImGui_IsPopupOpen();
 
         #endregion
 
         #region * Tables
 
-        //public static bool ImGui_BeginTable(byte* str_id, int column, ImGuiTableFlags flags = default);
+        //public static bool BeginTable(string id, int column, ImGuiTableFlags flags = default) => Native.ImGui_BeginTable();
 
-        //public static bool ImGui_BeginTableEx(byte* str_id, int column, ImGuiTableFlags flags = default, ImVec2 outer_size = default, float inner_width = default);
+        //public static bool BeginTableEx(string id, int column, ImGuiTableFlags flags = default, ImVec2 outer_size = default, float inner_width = default) => Native.ImGui_BeginTableEx();
 
-        //public static void ImGui_EndTable();
+        //public static void EndTable() => Native.ImGui_EndTable();
 
-        //public static void ImGui_TableNextRow();
+        //public static void TableNextRow() => Native.ImGui_TableNextRow();
 
-        //public static void ImGui_TableNextRowEx(ImGuiTableRowFlags row_flags = default, float min_row_height = default);
+        //public static void TableNextRowEx(ImGuiTableRowFlags row_flags = default, float min_row_height = default) => Native.ImGui_TableNextRowEx();
 
-        //public static bool ImGui_TableNextColumn();
+        //public static bool TableNextColumn() => Native.ImGui_TableNextColumn();
 
-        //public static bool ImGui_TableSetColumnIndex(int column_n);
+        //public static bool TableSetColumnIndex(int column_n) => Native.ImGui_TableSetColumnIndex();
 
         #endregion
 
         #region * Tables: Headers & Columns declaration
 
-        //public static void ImGui_TableSetupColumn(byte* label, ImGuiTableColumnFlags flags = default);
+        //public static void TableSetupColumn(string label, ImGuiTableColumnFlags flags = default) => Native.ImGui_TableSetupColumn();
 
-        //public static void ImGui_TableSetupColumnEx(byte* label, ImGuiTableColumnFlags flags = default, float init_width_or_weight = default, ImGuiID user_id = default);
+        //public static void TableSetupColumnEx(string label, ImGuiTableColumnFlags flags = default, float init_width_or_weight = default, ImGuiID user_id = default) => Native.ImGui_TableSetupColumnEx();
 
-        //public static void ImGui_TableSetupScrollFreeze(int cols, int rows);
+        //public static void TableSetupScrollFreeze(int cols, int rows) => Native.ImGui_TableSetupScrollFreeze();
 
-        //public static void ImGui_TableHeadersRow();
+        //public static void TableHeadersRow() => Native.ImGui_TableHeadersRow();
 
-        //public static void ImGui_TableHeader(byte* label);
+        //public static void TableHeader(string label) => Native.ImGui_TableHeader();
 
         #endregion
 
         #region * Tables: Sorting & Miscellaneous functions
 
-        //public static ImGuiTableSortSpecs* ImGui_TableGetSortSpecs();
+        //public static ImGuiTableSortSpecs* TableGetSortSpecs() => Native.ImGui_TableGetSortSpecs();
 
-        //public static int ImGui_TableGetColumnCount();
+        //public static int TableGetColumnCount() => Native.ImGui_TableGetColumnCount();
 
-        //public static int ImGui_TableGetColumnIndex();
+        //public static int TableGetColumnIndex() => Native.ImGui_TableGetColumnIndex();
 
-        //public static int ImGui_TableGetRowIndex();
+        //public static int TableGetRowIndex() => Native.ImGui_TableGetRowIndex();
 
-        //public static byte* ImGui_TableGetColumnName(int column_n = -1);
+        //public static string TableGetColumnName(int column_n = -1) => Native.ImGui_TableGetColumnName();
 
-        //public static ImGuiTableColumnFlags ImGui_TableGetColumnFlags(int column_n = -1);
+        //public static ImGuiTableColumnFlags TableGetColumnFlags(int column_n = -1) => Native.ImGui_TableGetColumnFlags();
 
-        //public static void ImGui_TableSetColumnEnabled(int column_n, bool v);
+        //public static void TableSetColumnEnabled(int column_n, bool v) => Native.ImGui_TableSetColumnEnabled();
 
-        //public static void ImGui_TableSetBgColor(ImGuiTableBgTarget target, uint color, int column_n = -1);
+        //public static void TableSetBgColor(ImGuiTableBgTarget target, uint color, int column_n = -1) => Native.ImGui_TableSetBgColor();
 
         #endregion
 
