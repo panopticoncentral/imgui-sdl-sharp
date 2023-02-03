@@ -1422,23 +1422,21 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Debug Utilities
+        #region Debug Utilities
 
-        //public static void ImGui_DebugTextEncoding(byte* text);
+        public static void DebugTextEncoding(string text) => Native.StringToUtf8Action(text, Native.ImGui_DebugTextEncoding);
 
-        //public static bool ImGui_DebugCheckVersionAndDataLayout(byte* version_str, nuint sz_io, nuint sz_style, nuint sz_vec2, nuint sz_vec4, nuint sz_drawvert, nuint sz_drawidx);
+        // Not checking version since we elide structures
 
         #endregion
 
-        #region * Memory Allocators
+        #region Memory Allocators
 
-        //public static void ImGui_SetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*> alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void> free_func, void* user_data = default);
+        // No point in setting the allocators from managed space
 
-        //public static void ImGui_GetAllocatorFunctions(delegate* unmanaged[Cdecl]<nuint, void*, void*>* p_alloc_func, delegate* unmanaged[Cdecl]<void*, void*, void>* p_free_func, void** p_user_data);
+        public static nuint MemAlloc(nuint size) => (nuint)Native.ImGui_MemAlloc(size);
 
-        //public static void* ImGui_MemAlloc(nuint size);
-
-        //public static void ImGui_MemFree(void* ptr);
+        public static void MemFree(nuint block) => Native.ImGui_MemFree((void*)block);
 
         #endregion
 

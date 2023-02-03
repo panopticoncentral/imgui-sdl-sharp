@@ -40,6 +40,8 @@ namespace ImguiSharp
         public const string IMGUI_VERSION = "1.89.2";
         public const int IMGUI_VERSION_NUM = 18920;
 
+        public static void IMGUI_CHECKVERSION() => StringToUtf8Action(IMGUI_VERSION, ptr => ImGui_DebugCheckVersionAndDataLayout(ptr, (nuint)sizeof(ImGuiIO), (nuint)sizeof(ImGuiStyle), (nuint)sizeof(ImVec2), (nuint)sizeof(ImVec4), (nuint)sizeof(ImDrawVert), (nuint)sizeof(ImDrawIdx)));
+
         /// <summary>
         /// Converts a UTF8 string to a string.
         /// </summary>

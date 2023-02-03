@@ -11,11 +11,6 @@ using var window = Window.Create("Dear ImGui SDL2+SDL_Renderer C# example", new(
 
 using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | RendererOptions.Accelerated);
 
-#if false
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-#endif
-
 Imgui.CreateContext();
 var io = Imgui.GetIo();
 
