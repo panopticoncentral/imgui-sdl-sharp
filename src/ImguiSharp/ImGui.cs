@@ -1134,21 +1134,19 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Logging/Capture
+        #region Logging/Capture
 
-        //public static void ImGui_LogToTTY(int auto_open_depth = -1);
+        public static void LogToTty(int autoOpenDepth = -1) => Native.ImGui_LogToTTY(autoOpenDepth);
 
-        //public static void ImGui_LogToFile(int auto_open_depth = -1, byte* filename = default);
+        public static void LogToFile(int autoOpenDepth = -1, string? filename = null) => Native.StringToUtf8Action(filename, ptr => Native.ImGui_LogToFile(autoOpenDepth, ptr));
 
-        //public static void ImGui_LogToClipboard(int auto_open_depth = -1);
+        public static void LogToClipboard(int autoOpenDepth = -1) => Native.ImGui_LogToClipboard(autoOpenDepth);
 
-        //public static void ImGui_LogFinish();
+        public static void LogFinish() => Native.ImGui_LogFinish();
 
-        //public static void ImGui_LogButtons();
+        public static void LogButtons() => Native.ImGui_LogButtons();
 
-        //public static void ImGui_LogText(byte* fmt, __arglist);
-
-        //public static void ImGui_LogTextV(byte* fmt, nuint /* va_list */ args);
+        public static void LogText(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_LogText(ptr, __arglist()));
 
         #endregion
 
@@ -1212,45 +1210,45 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Item/Widgets Utilities and Query Functions
+        #region Item/Widgets Utilities and Query Functions
 
-        //public static bool ImGui_IsItemHovered(ImGuiHoveredFlags flags = default);
+        public static bool IsItemHovered(HoveredOptions options = default) => Native.ImGui_IsItemHovered((Native.ImGuiHoveredFlags)options);
 
-        //public static bool ImGui_IsItemActive();
+        public static bool IsItemActive() => Native.ImGui_IsItemActive();
 
-        //public static bool ImGui_IsItemFocused();
+        public static bool IsItemFocused() => Native.ImGui_IsItemFocused();
 
-        //public static bool ImGui_IsItemClicked();
+        public static bool IsItemClicked() => Native.ImGui_IsItemClicked();
 
-        //public static bool ImGui_IsItemClickedEx(ImGuiMouseButton mouse_button = default);
+        public static bool IsItemClicked(MouseButton mouseButton) => Native.ImGui_IsItemClickedEx((Native.ImGuiMouseButton)mouseButton);
 
-        //public static bool ImGui_IsItemVisible();
+        public static bool IsItemVisible() => Native.ImGui_IsItemVisible();
 
-        //public static bool ImGui_IsItemEdited();
+        public static bool IsItemEdited() => Native.ImGui_IsItemEdited();
 
-        //public static bool ImGui_IsItemActivated();
+        public static bool IsItemActivated() => Native.ImGui_IsItemActivated();
 
-        //public static bool ImGui_IsItemDeactivated();
+        public static bool IsItemDeactivated() => Native.ImGui_IsItemDeactivated();
 
-        //public static bool ImGui_IsItemDeactivatedAfterEdit();
+        public static bool IsItemDeactivatedAfterEdit() => Native.ImGui_IsItemDeactivatedAfterEdit();
 
-        //public static bool ImGui_IsItemToggledOpen();
+        public static bool IsItemToggledOpen() => Native.ImGui_IsItemToggledOpen();
 
-        //public static bool ImGui_IsAnyItemHovered();
+        public static bool IsAnyItemHovered() => Native.ImGui_IsAnyItemHovered();
 
-        //public static bool ImGui_IsAnyItemActive();
+        public static bool IsAnyItemActive() => Native.ImGui_IsAnyItemActive();
 
-        //public static bool ImGui_IsAnyItemFocused();
+        public static bool IsAnyItemFocused() => Native.ImGui_IsAnyItemFocused();
 
-        //public static ImGuiID ImGui_GetItemID();
+        public static Id GetItemId() => Id.Wrap(Native.ImGui_GetItemID());
 
-        //public static ImVec2 ImGui_GetItemRectMin();
+        public static Position GetItemRectMin() => Position.Wrap(Native.ImGui_GetItemRectMin());
 
-        //public static ImVec2 ImGui_GetItemRectMax();
+        public static Position GetItemRectMax() => Position.Wrap(Native.ImGui_GetItemRectMax());
 
-        //public static ImVec2 ImGui_GetItemRectSize();
+        public static Size GetItemRectSize() => Size.Wrap(Native.ImGui_GetItemRectSize());
 
-        //public static void ImGui_SetItemAllowOverlap();
+        public static void SetItemAllowOverlap() => Native.ImGui_SetItemAllowOverlap();
 
         #endregion
 
@@ -1290,11 +1288,13 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Text Utilities
+        #region Text Utilities
 
-        //public static ImVec2 ImGui_CalcTextSize(byte* text);
+        public static Size CalcTextSize(string text) => Size.Wrap(Native.StringToUtf8Func(text, Native.ImGui_CalcTextSize));
 
-        //public static ImVec2 ImGui_CalcTextSizeEx(byte* text, byte* text_end = default, bool hide_text_after_double_hash = false, float wrap_width = -1.0f);
+        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash) => Size.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash)));
+
+        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash, float wrapWidth) => Size.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash, wrapWidth)));
 
         #endregion
 
@@ -1391,23 +1391,34 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Clipboard Utilities
+        #region Clipboard Utilities
 
-        //public static byte* ImGui_GetClipboardText();
+        public static string? GetClipboardText => Native.Utf8ToString(Native.ImGui_GetClipboardText());
 
-        //public static void ImGui_SetClipboardText(byte* text);
+        public static void SetClipboardText(string? text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_SetClipboardText(ptr));
 
         #endregion
 
-        #region * Settings/.Ini Utilities
+        #region Settings/.Ini Utilities
 
-        //public static void ImGui_LoadIniSettingsFromDisk(byte* ini_filename);
+        public static void LoadIniSettingsFromDisk(string iniFilename) => Native.StringToUtf8Action(iniFilename, Native.ImGui_LoadIniSettingsFromDisk);
 
-        //public static void ImGui_LoadIniSettingsFromMemory(byte* ini_data, nuint ini_size = default);
+        public static void LoadIniSettingsFromMemory(Span<byte> iniData)
+        {
+            fixed (byte* ptr = iniData)
+            {
+                Native.ImGui_LoadIniSettingsFromMemory(ptr, (nuint)iniData.Length);
+            }
+        }
 
-        //public static void ImGui_SaveIniSettingsToDisk(byte* ini_filename);
+        public static void SaveIniSettingsToDisk(string iniFilename) => Native.StringToUtf8Action(iniFilename, Native.ImGui_SaveIniSettingsToDisk);
 
-        //public static byte* ImGui_SaveIniSettingsToMemory(nuint* out_ini_size = default);
+        public static Span<byte> SaveIniSettingsToMemory()
+        {
+            nuint size = 0;
+            var ptr = Native.ImGui_SaveIniSettingsToMemory(&size);
+            return new(ptr, (int)size);
+        }
 
         #endregion
 
