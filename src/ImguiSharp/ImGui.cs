@@ -1096,41 +1096,41 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Legacy Columns API (prefer using Tables!)
+        #region Legacy Columns API (prefer using Tables!)
 
-        //public static void ImGui_Columns();
+        public static void Columns() => Native.ImGui_Columns();
 
-        //public static void ImGui_ColumnsEx(int count = 1, byte* id = default, bool border = true);
+        public static void Columns(int count = 1, string? id = null, bool order = true) => Native.StringToUtf8Action(id, ptr => Native.ImGui_ColumnsEx(count, ptr, order));
 
-        //public static void ImGui_NextColumn();
+        public static void NextColumn() => Native.ImGui_NextColumn();
 
-        //public static int ImGui_GetColumnIndex();
+        public static int GetColumnIndex() => Native.ImGui_GetColumnIndex();
 
-        //public static float ImGui_GetColumnWidth(int column_index = -1);
+        public static float GetColumnWidth(int columnIndex = -1) => Native.ImGui_GetColumnWidth(columnIndex);
 
-        //public static void ImGui_SetColumnWidth(int column_index, float width);
+        public static void SetColumnWidth(int columnIndex, float width) => Native.ImGui_SetColumnWidth(columnIndex, width);
 
-        //public static float ImGui_GetColumnOffset(int column_index = -1);
+        public static float GetColumnOffset(int columnIndex = -1) => Native.ImGui_GetColumnOffset(columnIndex);
 
-        //public static void ImGui_SetColumnOffset(int column_index, float offset_x);
+        public static void SetColumnOffset(int columnIndex, float offsetX) => Native.ImGui_SetColumnOffset(columnIndex, offsetX);
 
-        //public static int ImGui_GetColumnsCount();
+        public static int GetColumnsCount() => Native.ImGui_GetColumnsCount();
 
         #endregion
 
-        #region * Tab Bars, Tabs
+        #region Tab Bars, Tabs
 
-        //public static bool ImGui_BeginTabBar(byte* str_id, ImGuiTabBarFlags flags = default);
+        public static bool BeginTabBar(string id, TabBarOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginTabBar(ptr, (Native.ImGuiTabBarFlags)options));
 
-        //public static void ImGui_EndTabBar();
+        public static void EndTabBar() => Native.ImGui_EndTabBar();
 
-        //public static bool ImGui_BeginTabItem(byte* label, bool* p_open = default, ImGuiTabItemFlags flags = default);
+        public static bool BeginTabItem(string label, State<bool>? open, TabItemOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginTabItem(ptr, open == null ? null : open.ToNative(), (Native.ImGuiTabItemFlags)options));
 
-        //public static void ImGui_EndTabItem();
+        public static void EndTabItem() => Native.ImGui_EndTabItem();
 
-        //public static bool ImGui_TabItemButton(byte* label, ImGuiTabItemFlags flags = default);
+        public static bool TabItemButton(string label, TabItemOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_TabItemButton(ptr, (Native.ImGuiTabItemFlags)options));
 
-        //public static void ImGui_SetTabItemClosed(byte* tab_or_docked_window_label);
+        public static void SetTabItemClosed(string tabOrDockedWindowLabel) => Native.StringToUtf8Action(tabOrDockedWindowLabel, Native.ImGui_SetTabItemClosed);
 
         #endregion
 
