@@ -860,21 +860,21 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Widgets: Color Editor/Picker
+        #region Widgets: Color Editor/Picker
 
-        //public static bool ColorEdit3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit3();
+        public static bool ColorEdit3(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        //public static bool ColorEdit4(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorEdit4();
+        public static bool ColorEdit4(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit4(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        //public static bool ColorPicker3(byte* label, float* col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorPicker3();
+        public static bool ColorPicker3(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        //public static bool ColorPicker4(byte* label, float* col, ImGuiColorEditFlags flags = default, float* ref_col = default) => Native.ImGui_ColorPicker4();
+        public static bool ColorPicker4(string label, StateVector<float> col, ColorEditOptions options = default, Span<float> referenceColor = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker4(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options, );
 
-        //public static bool ColorButton(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default) => Native.ImGui_ColorButton();
+        public static bool ColorButton(string descriptionId, Color col, ColorEditOptions options = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButton(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        //public static bool ColorButtonEx(byte* desc_id, ImVec4 col, ImGuiColorEditFlags flags = default, ImVec2 size = default) => Native.ImGui_ColorButtonEx();
+        public static bool ColorButton(string descriptionId, Color col, ColorEditOptions options = default, Size size = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButtonEx(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options, size.ToNative()));
 
-        //public static void SetColorEditOptions(ImGuiColorEditFlags flags) => Native.ImGui_SetColorEditOptions();
+        public static void SetColorEditOptions(ColorEditOptions options) => Native.ImGui_SetColorEditOptions((Native.ImGuiColorEditFlags)options);
 
         #endregion
 
