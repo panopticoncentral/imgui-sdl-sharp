@@ -42,6 +42,11 @@ namespace ImguiSharp
 
         public static void IMGUI_CHECKVERSION() => StringToUtf8Action(IMGUI_VERSION, ptr => ImGui_DebugCheckVersionAndDataLayout(ptr, (nuint)sizeof(ImGuiIO), (nuint)sizeof(ImGuiStyle), (nuint)sizeof(ImVec2), (nuint)sizeof(ImVec4), (nuint)sizeof(ImDrawVert), (nuint)sizeof(ImDrawIdx)));
 
+        public static TNative* Null<TManaged, TNative>(TManaged? v)
+            where TManaged : unmanaged, INativeReferenceWrapper<TManaged, TNative>
+            where TNative : unmanaged
+            => v == null ? null : v.Value.ToNative();
+
         /// <summary>
         /// Converts a UTF8 string to a string.
         /// </summary>

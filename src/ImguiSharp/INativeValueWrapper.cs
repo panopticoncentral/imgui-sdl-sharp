@@ -3,7 +3,7 @@
 namespace ImguiSharp
 {
     public interface INativeValueWrapper<TManaged, TNative>
-        where TManaged : struct
+        where TManaged : struct, INativeValueWrapper<TManaged, TNative>
         where TNative : unmanaged
     {
         static abstract TManaged Wrap(TNative native);

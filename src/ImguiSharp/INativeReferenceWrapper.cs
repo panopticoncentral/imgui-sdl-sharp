@@ -3,7 +3,7 @@
 namespace ImguiSharp
 {
     public unsafe interface INativeReferenceWrapper<TManaged, TNative>
-        where TManaged : struct
+        where TManaged : struct, INativeReferenceWrapper<TManaged, TNative>
         where TNative : unmanaged
     {
         static abstract TManaged Wrap(TNative* native);
