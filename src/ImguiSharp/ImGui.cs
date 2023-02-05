@@ -867,7 +867,7 @@ namespace ImguiSharp
 
         public static bool BeginMenu(string label) => Native.StringToUtf8Func(label, Native.ImGui_BeginMenu);
 
-        public static bool BeginMenu(string label, bool enabled) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginMenuEx(ptr, enabled));
+        public static bool BeginMenu(string label, bool enabled) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginMenuEx(labelPtr, enabled));
 
         public static void EndMenu() => Native.ImGui_EndMenu();
 
@@ -885,15 +885,15 @@ namespace ImguiSharp
 
         public static void EndTooltip() => Native.ImGui_EndTooltip();
 
-        public static void SetTooltip(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_SetTooltip(ptr, __arglist()));
+        public static void SetTooltip(string text) => Native.StringToUtf8Action(text, textPtr => Native.ImGui_SetTooltip(textPtr, __arglist()));
 
         #endregion
 
         #region Popups: begin/end functions
 
-        public static bool BeginPopup(string id, WindowOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginPopup(ptr, (Native.ImGuiWindowFlags)options));
+        public static bool BeginPopup(string id, WindowOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginPopup(idPtr, (Native.ImGuiWindowFlags)options));
 
-        public static bool BeginPopupModal(string name, State<bool>? open = default, WindowOptions options = default) => Native.StringToUtf8Func(name, ptr => Native.ImGui_BeginPopupModal(ptr, open == null ? null : open.ToNative(), (Native.ImGuiWindowFlags)options));
+        public static bool BeginPopupModal(string name, State<bool>? open = default, WindowOptions options = default) => Native.StringToUtf8Func(name, namePtr => Native.ImGui_BeginPopupModal(namePtr, open.ToNative(), (Native.ImGuiWindowFlags)options));
 
         public static void EndPopup() => Native.ImGui_EndPopup();
 
@@ -901,11 +901,11 @@ namespace ImguiSharp
 
         #region Popups: open/close functions
 
-        public static void OpenPopup(string id, PopupOptions options = default) => Native.StringToUtf8Action(id, ptr => Native.ImGui_OpenPopup(ptr, (Native.ImGuiPopupFlags)options));
+        public static void OpenPopup(string id, PopupOptions options = default) => Native.StringToUtf8Action(id, idPtr => Native.ImGui_OpenPopup(idPtr, (Native.ImGuiPopupFlags)options));
 
         public static void OpenPopup(Id id, PopupOptions options = default) => Native.ImGui_OpenPopupID(id.ToNative(), (Native.ImGuiPopupFlags)options);
 
-        public static void OpenPopupOnItemClick(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Action(id, ptr => Native.ImGui_OpenPopupOnItemClick(ptr, (Native.ImGuiPopupFlags)options));
+        public static void OpenPopupOnItemClick(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Action(id, idPtr => Native.ImGui_OpenPopupOnItemClick(idPtr, (Native.ImGuiPopupFlags)options));
 
         public static void CloseCurrentPopup() => Native.ImGui_CloseCurrentPopup();
 
@@ -915,29 +915,29 @@ namespace ImguiSharp
 
         public static bool BeginPopupContextItem() => Native.ImGui_BeginPopupContextItem();
 
-        public static bool BeginPopupContextItem(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginPopupContextItemEx(ptr, (Native.ImGuiPopupFlags)options));
+        public static bool BeginPopupContextItem(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginPopupContextItemEx(idPtr, (Native.ImGuiPopupFlags)options));
 
         public static bool BeginPopupContextWindow() => Native.ImGui_BeginPopupContextWindow();
 
-        public static bool BeginPopupContextWindow(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginPopupContextWindowEx(ptr, (Native.ImGuiPopupFlags)options));
+        public static bool BeginPopupContextWindow(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginPopupContextWindowEx(idPtr, (Native.ImGuiPopupFlags)options));
 
         public static bool BeginPopupContextVoid() => Native.ImGui_BeginPopupContextVoid();
 
-        public static bool BeginPopupContextVoid(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginPopupContextVoidEx(ptr, (Native.ImGuiPopupFlags)options));
+        public static bool BeginPopupContextVoid(string? id = null, PopupOptions options = PopupOptions.MouseButtonRight) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginPopupContextVoidEx(idPtr, (Native.ImGuiPopupFlags)options));
 
         #endregion
 
         #region Popups: query functions
 
-        public static bool IsPopupOpen(string id, PopupOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_IsPopupOpen(ptr, (Native.ImGuiPopupFlags)options));
+        public static bool IsPopupOpen(string id, PopupOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_IsPopupOpen(idPtr, (Native.ImGuiPopupFlags)options));
 
         #endregion
 
         #region Tables
 
-        public static bool BeginTable(string id, int column, TableOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginTable(ptr, column, (Native.ImGuiTableFlags)options));
+        public static bool BeginTable(string id, int column, TableOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTable(idPtr, column, (Native.ImGuiTableFlags)options));
 
-        public static bool BeginTable(string id, int column, TableOptions options = default, Size outerSize = default, float innerWidth = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginTableEx(ptr, column, (Native.ImGuiTableFlags)options, outerSize.ToNative(), innerWidth));
+        public static bool BeginTable(string id, int column, TableOptions options = default, Size outerSize = default, float innerWidth = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTableEx(idPtr, column, (Native.ImGuiTableFlags)options, outerSize.ToNative(), innerWidth));
 
         public static void EndTable() => Native.ImGui_EndTable();
 
@@ -953,9 +953,9 @@ namespace ImguiSharp
 
         #region Tables: Headers & Columns declaration
 
-        public static void TableSetupColumn(string label, TableColumnOptions options = default) => Native.StringToUtf8Action(label, ptr => Native.ImGui_TableSetupColumn(ptr, (Native.ImGuiTableColumnFlags)options));
+        public static void TableSetupColumn(string label, TableColumnOptions options = default) => Native.StringToUtf8Action(label, labelPtr => Native.ImGui_TableSetupColumn(labelPtr, (Native.ImGuiTableColumnFlags)options));
 
-        public static void TableSetupColumn(string label, TableColumnOptions options = default, float initWidthOrWeight = default, Id userId = default) => Native.StringToUtf8Action(label, ptr => Native.ImGui_TableSetupColumnEx(ptr, (Native.ImGuiTableColumnFlags)options, initWidthOrWeight, userId.ToNative()));
+        public static void TableSetupColumn(string label, TableColumnOptions options = default, float initWidthOrWeight = default, Id userId = default) => Native.StringToUtf8Action(label, labelPtr => Native.ImGui_TableSetupColumnEx(labelPtr, (Native.ImGuiTableColumnFlags)options, initWidthOrWeight, userId.ToNative()));
 
         public static void TableSetupScrollFreeze(int cols, int rows) => Native.ImGui_TableSetupScrollFreeze(cols, rows);
 
@@ -989,7 +989,7 @@ namespace ImguiSharp
 
         public static void Columns() => Native.ImGui_Columns();
 
-        public static void Columns(int count = 1, string? id = null, bool order = true) => Native.StringToUtf8Action(id, ptr => Native.ImGui_ColumnsEx(count, ptr, order));
+        public static void Columns(int count = 1, string? id = null, bool order = true) => Native.StringToUtf8Action(id, idPtr => Native.ImGui_ColumnsEx(count, idPtr, order));
 
         public static void NextColumn() => Native.ImGui_NextColumn();
 
@@ -1009,15 +1009,15 @@ namespace ImguiSharp
 
         #region Tab Bars, Tabs
 
-        public static bool BeginTabBar(string id, TabBarOptions options = default) => Native.StringToUtf8Func(id, ptr => Native.ImGui_BeginTabBar(ptr, (Native.ImGuiTabBarFlags)options));
+        public static bool BeginTabBar(string id, TabBarOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTabBar(idPtr, (Native.ImGuiTabBarFlags)options));
 
         public static void EndTabBar() => Native.ImGui_EndTabBar();
 
-        public static bool BeginTabItem(string label, State<bool>? open, TabItemOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginTabItem(ptr, open == null ? null : open.ToNative(), (Native.ImGuiTabItemFlags)options));
+        public static bool BeginTabItem(string label, State<bool>? open, TabItemOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginTabItem(labelPtr, open.ToNative(), (Native.ImGuiTabItemFlags)options));
 
         public static void EndTabItem() => Native.ImGui_EndTabItem();
 
-        public static bool TabItemButton(string label, TabItemOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_TabItemButton(ptr, (Native.ImGuiTabItemFlags)options));
+        public static bool TabItemButton(string label, TabItemOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_TabItemButton(labelPtr, (Native.ImGuiTabItemFlags)options));
 
         public static void SetTabItemClosed(string tabOrDockedWindowLabel) => Native.StringToUtf8Action(tabOrDockedWindowLabel, Native.ImGui_SetTabItemClosed);
 
@@ -1027,7 +1027,7 @@ namespace ImguiSharp
 
         public static void LogToTty(int autoOpenDepth = -1) => Native.ImGui_LogToTTY(autoOpenDepth);
 
-        public static void LogToFile(int autoOpenDepth = -1, string? filename = null) => Native.StringToUtf8Action(filename, ptr => Native.ImGui_LogToFile(autoOpenDepth, ptr));
+        public static void LogToFile(int autoOpenDepth = -1, string? filename = null) => Native.StringToUtf8Action(filename, filenamePtr => Native.ImGui_LogToFile(autoOpenDepth, filenamePtr));
 
         public static void LogToClipboard(int autoOpenDepth = -1) => Native.ImGui_LogToClipboard(autoOpenDepth);
 
@@ -1035,7 +1035,7 @@ namespace ImguiSharp
 
         public static void LogButtons() => Native.ImGui_LogButtons();
 
-        public static void LogText(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_LogText(ptr, __arglist()));
+        public static void LogText(string text) => Native.StringToUtf8Action(text, textPtr => Native.ImGui_LogText(textPtr, __arglist()));
 
         #endregion
 
@@ -1056,20 +1056,11 @@ namespace ImguiSharp
 
         public static bool BeginDragDropTarget() => Native.ImGui_BeginDragDropTarget();
 
-        public static Payload? AcceptDragDropPayload(string type, DragDropOptions options = default) =>
-            Native.StringToUtf8Func(type, typePtr =>
-            {
-                var payload = Native.ImGui_AcceptDragDropPayload(typePtr, (Native.ImGuiDragDropFlags)options);
-                return payload == null ? null : Payload.Wrap(payload);
-            });
+        public static Payload? AcceptDragDropPayload(string type, DragDropOptions options = default) => Native.StringToUtf8Func(type, typePtr => Payload.Wrap(Native.ImGui_AcceptDragDropPayload(typePtr, (Native.ImGuiDragDropFlags)options)));
 
         public static void EndDragDropTarget() => Native.ImGui_EndDragDropTarget();
 
-        public static Payload? GetDragDropPayload()
-        {
-            var payload = Native.ImGui_GetDragDropPayload();
-            return payload == null ? null : Payload.Wrap(payload);
-        }
+        public static Payload? GetDragDropPayload() => Payload.Wrap(Native.ImGui_GetDragDropPayload());
 
         #endregion
 
@@ -1149,9 +1140,9 @@ namespace ImguiSharp
 
         #region Background/Foreground Draw Lists
 
-        public static DrawList? GetBackgroundDrawList => DrawList.Wrap(Native.ImGui_GetBackgroundDrawList());
+        public static DrawList GetBackgroundDrawList => DrawList.Wrap(Native.ImGui_GetBackgroundDrawList())!.Value;
 
-        public static DrawList? GetForegroundDrawList => DrawList.Wrap(Native.ImGui_GetForegroundDrawList());
+        public static DrawList GetForegroundDrawList => DrawList.Wrap(Native.ImGui_GetForegroundDrawList())!.Value;
 
         #endregion
 
@@ -1181,7 +1172,7 @@ namespace ImguiSharp
 
         public static Size CalcTextSize(string text) => Size.Wrap(Native.StringToUtf8Func(text, Native.ImGui_CalcTextSize));
 
-        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash) => Size.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash)));
+        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash) => Size.Wrap(Native.StringToUtf8Func(text, textPtr => Native.ImGui_CalcTextSizeEx(textPtr, null, hideTextAfterDoubleHash)));
 
         public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash, float wrapWidth) => Size.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash, wrapWidth)));
 
@@ -1284,7 +1275,7 @@ namespace ImguiSharp
 
         public static string? GetClipboardText => Native.Utf8ToString(Native.ImGui_GetClipboardText());
 
-        public static void SetClipboardText(string? text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_SetClipboardText(ptr));
+        public static void SetClipboardText(string? text) => Native.StringToUtf8Action(text, Native.ImGui_SetClipboardText);
 
         #endregion
 
