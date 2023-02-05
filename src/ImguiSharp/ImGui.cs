@@ -780,41 +780,33 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Widgets: Trees
+        #region Widgets: Trees
 
-        //public static bool TreeNode(byte* label) => Native.ImGui_TreeNode();
+        public static bool TreeNode(string label) => Native.StringToUtf8Func(label, Native.ImGui_TreeNode);
 
-        //public static bool TreeNodeStr(byte* str_id, byte* fmt, __arglist) => Native.ImGui_TreeNodeStr();
+        public static bool TreeNode(string id, string format) => Native.StringToUtf8Func(id, format, (idPtr, formatPtr) => Native.ImGui_TreeNodeStr(idPtr, formatPtr, __arglist()));
 
-        //public static bool TreeNodePtr(void* ptr_id, byte* fmt, __arglist) => Native.ImGui_TreeNodePtr();
+        public static bool TreeNode(nuint id, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodePtr((void*)id, formatPtr, __arglist()));
 
-        //public static bool TreeNodeV(byte* str_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeV();
+        public static bool TreeNode(string label, TreeNodeOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_TreeNodeEx(labelPtr, (Native.ImGuiTreeNodeFlags)options));
 
-        //public static bool TreeNodeVPtr(void* ptr_id, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeVPtr();
+        public static bool TreeNode(string id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(id, format, (idPtr, formatPtr) => Native.ImGui_TreeNodeExStr(idPtr, (Native.ImGuiTreeNodeFlags)options, formatPtr, __arglist()));
 
-        //public static bool TreeNodeEx(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_TreeNodeEx();
+        public static bool TreeNode(nuint id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodeExPtr((void*)id, (Native.ImGuiTreeNodeFlags)options, formatPtr, __arglist()));
 
-        //public static bool TreeNodeExStr(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExStr();
+        public static void TreePush(string id) => Native.StringToUtf8Action(id, Native.ImGui_TreePush);
 
-        //public static bool TreeNodeExPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist) => Native.ImGui_TreeNodeExPtr();
+        public static void TreePush(nuint id) => Native.ImGui_TreePushPtr((void*)id);
 
-        //public static bool TreeNodeExV(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExV();
+        public static void TreePop() => Native.ImGui_TreePop();
 
-        //public static bool TreeNodeExVPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args) => Native.ImGui_TreeNodeExVPtr();
+        public static float GetTreeNodeToLabelSpacing() => Native.ImGui_GetTreeNodeToLabelSpacing();
 
-        //public static void TreePush(byte* str_id) => Native.ImGui_TreePush();
+        public static bool CollapsingHeader(string label, TreeNodeOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_CollapsingHeader(labelPtr, (Native.ImGuiTreeNodeFlags)options));
 
-        //public static void TreePushPtr(void* ptr_id) => Native.ImGui_TreePushPtr();
+        public static bool CollapsingHeader(string label, State<bool>? visible, TreeNodeOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_CollapsingHeaderBoolPtr(labelPtr, visible.ToNative(), (Native.ImGuiTreeNodeFlags)options));
 
-        //public static void TreePop() => Native.ImGui_TreePop();
-
-        //public static float GetTreeNodeToLabelSpacing() => Native.ImGui_GetTreeNodeToLabelSpacing();
-
-        //public static bool CollapsingHeader(byte* label, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeader();
-
-        //public static bool CollapsingHeaderBoolPtr(byte* label, bool* p_visible, ImGuiTreeNodeFlags flags = default) => Native.ImGui_CollapsingHeaderBoolPtr();
-
-        //public static void SetNextItemOpen(bool is_open, ImGuiCond cond = default) => Native.ImGui_SetNextItemOpen();
+        public static void SetNextItemOpen(bool isOpen, Condition cond = default) => Native.ImGui_SetNextItemOpen(isOpen, (Native.ImGuiCond)cond);
 
         #endregion
 
