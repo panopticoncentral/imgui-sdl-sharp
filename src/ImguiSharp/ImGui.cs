@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,6 +9,9 @@ namespace ImguiSharp
     {
         private static Dictionary<nuint, Func<Position, Size, Size, Size>>? s_sizeCallbacks;
         private static Dictionary<nuint, Func<Position, Size, Size, Size>> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, Func<Position, Size, Size, Size>>();
+
+        private static Dictionary<nuint, Func<int, float>>? s_plotCallbacks;
+        private static Dictionary<nuint, Func<int, float>> PlotCallbacks => s_plotCallbacks ??= new Dictionary<nuint, Func<int, float>>();
 
         #region Context creation and access
 
@@ -31,6 +35,7 @@ namespace ImguiSharp
         {
             Native.ImGui_NewFrame();
             s_sizeCallbacks?.Clear();
+            s_plotCallbacks?.Clear();
         }
 
         public static void EndFrame() => Native.ImGui_EndFrame();
@@ -817,41 +822,88 @@ namespace ImguiSharp
 
         public static bool Selectable(string label) => Native.StringToUtf8Func(label, Native.ImGui_Selectable);
 
-        public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableEx(ptr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
+        public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableEx(labelPtr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
-        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableBoolPtr(ptr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtr(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
 
-        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_SelectableBoolPtrEx(ptr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtrEx(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
         #endregion
 
         #region Widgets: List Boxes
 
-        public static bool BeginListBox(string label, Size size = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_BeginListBox(ptr, size.ToNative()));
+        public static bool BeginListBox(string label, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginListBox(labelPtr, size.ToNative()));
 
         public static void EndListBox() => Native.ImGui_EndListBox();
 
         #endregion
 
-        #region * Widgets: Data Plotting
+        #region Widgets: Data Plotting
 
-        //public static void PlotLines(byte* label, float* values, int values_count) => Native.ImGui_PlotLines();
+        public static void PlotLines(string label, Span<float> values)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            fixed (float* valuesPtr = values)
+            {
+                Native.ImGui_PlotLines(labelPtr, valuesPtr, values.Length);
+            }
+        }
 
-        //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        //public static void ImGui_PlotLinesEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        public static void PlotLines(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            fixed (float* valuesPtr = values)
+            fixed (byte* overlayTextPtr = Native.StringToUtf8(overlayText))
+            {
+                Native.ImGui_PlotLinesEx(labelPtr, valuesPtr, values.Length, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative(), default);
+            }
+        }
 
-        //public static void PlotLinesCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotLinesCallback();
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static float NativePlotCallback(void* data, int index) => PlotCallbacks.TryGetValue((nuint)data, out var callback) ? callback(index) : 0;
 
-        //public static void PlotLinesCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotLinesCallbackEx();
+        public static void PlotLines(string label, Func<int, float> getter, int valuesCount) => Native.StringToUtf8Action(label, labelPtr =>
+        {
+            PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
+            Native.ImGui_PlotLinesCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
+        });
 
-        //public static void PlotHistogram(byte* label, float* values, int values_count) => Native.ImGui_PlotHistogram();
+        public static void PlotLines(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        {
+            PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
+            Native.ImGui_PlotLinesCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
+        });
 
-        //[DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        //public static void ImGui_PlotHistogramEx(byte* label, float* values, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default, int stride = sizeof(float));
+        public static void PlotHistogram(string label, Span<float> values)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            fixed (float* valuesPtr = values)
+            {
+                Native.ImGui_PlotHistogram(labelPtr, valuesPtr, values.Length);
+            }
+        }
 
-        //public static void PlotHistogramCallback(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count) => Native.ImGui_PlotHistogramCallback();
+        public static void PlotHistogram(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            fixed (float* valuesPtr = values)
+            fixed (byte* overlayTextPtr = Native.StringToUtf8(overlayText))
+            {
+                Native.ImGui_PlotHistogramEx(labelPtr, valuesPtr, values.Length, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative(), default);
+            }
+        }
 
-        //public static void PlotHistogramCallbackEx(byte* label, delegate* unmanaged[Cdecl]<void*, int, float> values_getter, void* data, int values_count, int values_offset = default, byte* overlay_text = default, float scale_min = float.MaxValue, float scale_max = float.MaxValue, ImVec2 graph_size = default) => Native.ImGui_PlotHistogramCallbackEx();
+        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount) => Native.StringToUtf8Action(label, labelPtr =>
+        {
+            PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
+            Native.ImGui_PlotHistogramCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
+        });
+
+        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        {
+            PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
+            Native.ImGui_PlotHistogramCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
+        });
 
         #endregion
 
