@@ -9,7 +9,7 @@
             _storage = storage;
         }
 
-        public static Storage Wrap(Native.ImGuiStorage* native) => new(native);
+        public static Storage? Wrap(Native.ImGuiStorage* native) => native == null ? null : new(native);
 
         public Native.ImGuiStorage* ToNative() => _storage;
     }

@@ -6,7 +6,7 @@ namespace ImguiSharp
         where TManaged : struct, INativeReferenceWrapper<TManaged, TNative>
         where TNative : unmanaged
     {
-        static abstract TManaged Wrap(TNative* native);
+        static abstract TManaged? Wrap(TNative* native);
         TNative* ToNative();
     }
 }

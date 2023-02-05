@@ -8,7 +8,7 @@ namespace ImguiSharp
     {
         private readonly TNative* _vector;
 
-        public TManaged this[int index] => index >= 0 && index < Count ? TManaged.Wrap(_vector + index) : throw new InvalidOperationException();
+        public TManaged this[int index] => index >= 0 && index < Count ? TManaged.Wrap(_vector + index)!.Value : throw new InvalidOperationException();
 
         public int Count { get; }
 
@@ -29,7 +29,7 @@ namespace ImguiSharp
             private readonly ReferenceVector<TNative, TManaged> _this;
             private int _index;
 
-            public TManaged Current => _index >= 0 && _index < _this.Count ? TManaged.Wrap(_this._vector + _index) : throw new InvalidOperationException();
+            public TManaged Current => _index >= 0 && _index < _this.Count ? TManaged.Wrap(_this._vector + _index)!.Value : throw new InvalidOperationException();
 
             object IEnumerator.Current => Current!;
 

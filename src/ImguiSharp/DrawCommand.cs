@@ -28,7 +28,7 @@
 
         public void DoCallback(DrawList drawList) => _cmd->UserCallback(drawList.ToNative(), _cmd);
 
-        public static DrawCommand Wrap(Native.ImDrawCmd* native) => new(native);
+        public static DrawCommand? Wrap(Native.ImDrawCmd* native) => native == null ? null : new(native);
 
         public Native.ImDrawCmd* ToNative() => _cmd;
     }

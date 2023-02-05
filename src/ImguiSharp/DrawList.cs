@@ -17,7 +17,7 @@
             _list = list;
         }
 
-        public static DrawList Wrap(Native.ImDrawList* native) => new(native);
+        public static DrawList? Wrap(Native.ImDrawList* native) => native == null ? null : new(native);
 
         public Native.ImDrawList* ToNative() => _list;
     }

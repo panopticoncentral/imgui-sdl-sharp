@@ -14,7 +14,7 @@ namespace ImguiSharp
 
         public int Count => _data->CmdListsCount;
 
-        public DrawList this[int index] => index >= 0 && index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[index]) : throw new InvalidOperationException();
+        public DrawList this[int index] => index >= 0 && index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[index])!.Value : throw new InvalidOperationException();
 
         public Position DisplayPosition => Position.Wrap(_data->DisplayPos);
 
@@ -27,7 +27,7 @@ namespace ImguiSharp
             _data = data;
         }
 
-        public static DrawData Wrap(Native.ImDrawData* native) => new(native);
+        public static DrawData? Wrap(Native.ImDrawData* native) => native == null ? null : new(native);
 
         public Native.ImDrawData* ToNative() => _data;
 
@@ -40,7 +40,7 @@ namespace ImguiSharp
             private readonly Native.ImDrawData* _data;
             private int _index;
 
-            public DrawList Current => _index >= 0 && _index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[_index]) : throw new InvalidOperationException();
+            public DrawList Current => _index >= 0 && _index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[_index])!.Value : throw new InvalidOperationException();
 
             object IEnumerator.Current => Current;
 

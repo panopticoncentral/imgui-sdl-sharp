@@ -104,7 +104,11 @@ while (application.DispatchEvents())
 
     renderer.DrawColor = new((byte)(clearColor.Red * 255), (byte)(clearColor.Green * 255), (byte)(clearColor.Blue * 255), (byte)(clearColor.Alpha * 255));
     renderer.Clear();
-    ImplSdlRenderer.RenderDrawData(Imgui.GetDrawData());
+    var drawData = Imgui.GetDrawData();
+    if (drawData != null)
+    {
+        ImplSdlRenderer.RenderDrawData(drawData.Value);
+    }
     renderer.Present();
 }
 

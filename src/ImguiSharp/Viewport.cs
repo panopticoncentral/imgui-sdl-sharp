@@ -49,7 +49,7 @@
             _viewport = viewport;
         }
 
-        public static Viewport Wrap(Native.ImGuiViewport* native) => new(native);
+        public static Viewport? Wrap(Native.ImGuiViewport* native) => native == null ? null : new(native);
 
         public Native.ImGuiViewport* ToNative() => _viewport;
     }

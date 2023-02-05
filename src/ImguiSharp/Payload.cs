@@ -9,7 +9,7 @@
             _payload = payload;
         }
 
-        public static Payload Wrap(Native.ImGuiPayload* native) => new(native);
+        public static Payload? Wrap(Native.ImGuiPayload* native) => native == null ? null : new(native);
 
         public Native.ImGuiPayload* ToNative() => _payload;
     }

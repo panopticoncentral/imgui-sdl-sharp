@@ -33,18 +33,18 @@
             _fontAtlas = fontAtlas;
         }
 
-        public static FontAtlas Wrap(Native.ImFontAtlas* native) => new(native);
+        public static FontAtlas? Wrap(Native.ImFontAtlas* native) => native == null ? null : new(native);
 
-        public Font AddFont(FontConfig fontConfig) => Font.Wrap(Native.ImFontAtlas_AddFont(_fontAtlas, fontConfig.ToNative()));
+        public Font AddFont(FontConfig fontConfig) => Font.Wrap(Native.ImFontAtlas_AddFont(_fontAtlas, fontConfig.ToNative()))!.Value;
 
-        public Font AddFontDefault(FontConfig? fontConfig = default) => Font.Wrap(Native.ImFontAtlas_AddFontDefault(_fontAtlas, fontConfig == null ? null : fontConfig.Value.ToNative()));
+        public Font AddFontDefault(FontConfig? fontConfig = default) => Font.Wrap(Native.ImFontAtlas_AddFontDefault(_fontAtlas, fontConfig == null ? null : fontConfig.Value.ToNative()))!.Value;
 
         public Font AddFontFromFileTtf(string filename, float sizePixels, FontConfig? fontConfig = default, Span<char> glyphRanges = default)
         {
             fixed (byte* filenamePtr = Native.StringToUtf8(filename))
             fixed (char* glyphRangesPtr = glyphRanges)
             {
-                return Font.Wrap(Native.ImFontAtlas_AddFontFromFileTTF(_fontAtlas, filenamePtr, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr));
+                return Font.Wrap(Native.ImFontAtlas_AddFontFromFileTTF(_fontAtlas, filenamePtr, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr))!.Value;
             }
         }
 
@@ -53,7 +53,7 @@
             fixed (byte* fontDataPtr = fontData)
             fixed (char* glyphRangesPtr = glyphRanges)
             {
-                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryTTF(_fontAtlas, fontDataPtr, fontData.Length, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr));
+                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryTTF(_fontAtlas, fontDataPtr, fontData.Length, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr))!.Value;
             }
         }
 
@@ -62,7 +62,7 @@
             fixed (byte* compressedFontDataPtr = compressedFontData)
             fixed (char* glyphRangesPtr = glyphRanges)
             {
-                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryCompressedTTF(_fontAtlas, compressedFontDataPtr, compressedFontData.Length, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr));
+                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryCompressedTTF(_fontAtlas, compressedFontDataPtr, compressedFontData.Length, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr))!.Value;
             }
         }
 
@@ -71,7 +71,7 @@
             fixed (byte* compressedFontDataBase85Ptr = compressedFontDataBase85)
             fixed (char* glyphRangesPtr = glyphRanges)
             {
-                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(_fontAtlas, compressedFontDataBase85Ptr, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr));
+                return Font.Wrap(Native.ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(_fontAtlas, compressedFontDataBase85Ptr, sizePixels, fontConfig == null ? null : fontConfig.Value.ToNative(), glyphRangesPtr))!.Value;
             }
         }
 
@@ -149,7 +149,7 @@
         public int AddCustomRectFontGlyph(Font font, char id, int width, int height, float advanceX, Position offset = default) =>
             Native.ImFontAtlas_AddCustomRectFontGlyph(_fontAtlas, font.ToNative(), id, width, height, advanceX, offset.ToNative());
 
-        public CustomRect GetCustomRectByIndex(int index) => CustomRect.Wrap(Native.ImFontAtlas_GetCustomRectByIndex(_fontAtlas, index));
+        public CustomRect GetCustomRectByIndex(int index) => CustomRect.Wrap(Native.ImFontAtlas_GetCustomRectByIndex(_fontAtlas, index))!.Value;
 
         public Native.ImFontAtlas* ToNative() => _fontAtlas;
 
@@ -162,9 +162,14 @@
                 _customRect = customRect;
             }
 
-            public static CustomRect Wrap(Native.ImFontAtlasCustomRect* native) => new(native);
+            public static CustomRect? Wrap(Native.ImFontAtlasCustomRect* native) => native == null ? null : new(native);
 
             public Native.ImFontAtlasCustomRect* ToNative() => _customRect;
         }
+    }
+
+    public static unsafe class FontAtlasExtensions
+    {
+        public static Native.ImFontAtlas* ToNative(this FontAtlas? v) => v == null ? null : v.Value.ToNative();
     }
 }

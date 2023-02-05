@@ -9,7 +9,7 @@
             _native = native;
         }
 
-        public static TableSortSpecifications Wrap(Native.ImGuiTableSortSpecs* native) => new(native);
+        public static TableSortSpecifications? Wrap(Native.ImGuiTableSortSpecs* native) => native == null ? null : new(native);
 
         public Native.ImGuiTableSortSpecs* ToNative() => _native;
     }

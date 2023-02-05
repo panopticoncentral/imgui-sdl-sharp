@@ -9,7 +9,7 @@
             _fontConfig = fontConfig;
         }
 
-        public static FontConfig Wrap(Native.ImFontConfig* native) => new(native);
+        public static FontConfig? Wrap(Native.ImFontConfig* native) => native == null ? null : new(native);
 
         public Native.ImFontConfig* ToNative() => _fontConfig;
     }

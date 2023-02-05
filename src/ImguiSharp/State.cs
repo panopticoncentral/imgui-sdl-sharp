@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public sealed unsafe class State<T> : IDisposable
+    public readonly unsafe struct State<T> : IDisposable
         where T : unmanaged
     {
         private readonly T* _value;
@@ -22,5 +22,10 @@
         public static implicit operator T(State<T> v) => v.Value;
 
         internal T* ToNative() => _value;
+    }
+
+    public static unsafe class StateExtensions
+    {
+        public static T* ToNative<T>(this State<T>? v) where T : unmanaged => v == null ? null : v.ToNative();
     }
 }

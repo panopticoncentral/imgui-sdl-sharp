@@ -102,7 +102,7 @@
             set => _io->UserData = (void*)value;
         }
 
-        public FontAtlas Fonts => FontAtlas.Wrap(_io->Fonts);
+        public FontAtlas Fonts => FontAtlas.Wrap(_io->Fonts)!.Value;
 
         public float FontGlobalScale
         {
@@ -344,7 +344,7 @@
             _io = io;
         }
 
-        public static Io Wrap(Native.ImGuiIO* native) => new(native);
+        public static Io? Wrap(Native.ImGuiIO* native) => native == null ? null : new(native);
 
         public void AddKeyEvent(Key key, bool down) => Native.ImGuiIO_AddKeyEvent(_io, (Native.ImGuiKey)key, down);
 

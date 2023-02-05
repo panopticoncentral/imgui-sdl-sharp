@@ -9,8 +9,13 @@
             _context = context;
         }
 
-        public static Context Wrap(Native.ImGuiContext* native) => new(native);
+        public static Context? Wrap(Native.ImGuiContext* native) => native == null ? null : new(native);
 
         public Native.ImGuiContext* ToNative() => _context;
+    }
+
+    public static unsafe class ContextExtensions
+    {
+        public static Native.ImGuiContext* ToNative(this Context? v) => v == null ? null : v.Value.ToNative();
     }
 }

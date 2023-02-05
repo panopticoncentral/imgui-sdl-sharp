@@ -9,8 +9,13 @@
             _style = style;
         }
 
-        public static Style Wrap(Native.ImGuiStyle* native) => new(native);
+        public static Style? Wrap(Native.ImGuiStyle* native) => native == null ? null : new(native);
 
         public Native.ImGuiStyle* ToNative() => _style;
+    }
+
+    public static unsafe class StyleExtensions
+    {
+        public static Native.ImGuiStyle* ToNative(this Style? v) => v == null ? null : v.Value.ToNative();
     }
 }
