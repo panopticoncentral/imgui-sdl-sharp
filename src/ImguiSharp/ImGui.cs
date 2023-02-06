@@ -719,27 +719,33 @@ namespace ImguiSharp
 
         public static bool InputFloat(string label, State<float> v, float step = default, float stepFast = default, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloatEx(labelPtr, v.ToNative(), step, stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputFloat2(string label, StateVector<float> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputFloat2(ptr, v.ToNative()));
+        public static bool InputFloat(string label, StateVector<float> v) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_InputFloat2(labelPtr, v.ToNative()),
+            3 => Native.ImGui_InputFloat3(labelPtr, v.ToNative()),
+            4 => Native.ImGui_InputFloat4(labelPtr, v.ToNative()),
+            _ => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length),
+        });
 
-        public static bool InputFloat2(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloat2Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options));
-
-        public static bool InputFloat3(string label, StateVector<float> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputFloat3(ptr, v.ToNative()));
-
-        public static bool InputFloat3(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloat3Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options));
-
-        public static bool InputFloat4(string label, StateVector<float> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputFloat4(ptr, v.ToNative()));
-
-        public static bool InputFloat4(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloat4Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options));
+        public static bool InputFloat2(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+        {
+            2 => Native.ImGui_InputFloat2Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            3 => Native.ImGui_InputFloat3Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            4 => Native.ImGui_InputFloat4Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            _ => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, null, null, formatPtr, (Native.ImGuiInputTextFlags)options),
+        });
 
         public static bool InputInt(string label, State<int> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt(ptr, v.ToNative()));
 
         public static bool InputInt(string label, State<int> v, int step = 1, int stepFast = 100, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputIntEx(ptr, v.ToNative(), step, stepFast, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputInt2(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt2(ptr, v.ToNative(), (Native.ImGuiInputTextFlags)options));
-
-        public static bool InputInt3(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt3(ptr, v.ToNative(), (Native.ImGuiInputTextFlags)options));
-
-        public static bool InputInt4(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt4(ptr, v.ToNative(), (Native.ImGuiInputTextFlags)options));
+        public static bool InputInt(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_InputInt2(labelPtr, v.ToNative(), (Native.ImGuiInputTextFlags)options),
+            3 => Native.ImGui_InputInt3(labelPtr, v.ToNative(), (Native.ImGuiInputTextFlags)options),
+            4 => Native.ImGui_InputInt4(labelPtr, v.ToNative(), (Native.ImGuiInputTextFlags)options),
+            _ => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length, null, null, null, (Native.ImGuiInputTextFlags)options),
+        });
 
         public static bool InputDouble(string label, State<double> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputDouble(ptr, v.ToNative()));
 
@@ -757,14 +763,23 @@ namespace ImguiSharp
 
         #region Widgets: Color Editor/Picker
 
-        public static bool ColorEdit3(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
+        public static bool ColorEdit(string label, StateVector<float> color, ColorEditOptions options = default) =>
+            color.Length switch
+            {
+                3 => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options)),
+                4 => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit4(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options)),
+                _ => throw new InvalidOperationException()
+            };
 
-        public static bool ColorEdit4(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit4(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
+        public static bool ColorPicker(string label, StateVector<float> color, ColorEditOptions options = default) => color.Length != 3 ? throw new InvalidOperationException() : Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        public static bool ColorPicker3(string label, StateVector<float> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
-
-        public static bool ColorPicker4(string label, StateVector<float> col, ColorEditOptions options = default, Span<float> referenceColor = default)
+        public static bool ColorPicker(string label, StateVector<float> color, ColorEditOptions options = default, Span<float> referenceColor = default)
         {
+            if (color.Length != 4)
+            {
+                throw new InvalidOperationException();
+            }
+
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* referencePtr = referenceColor)
             {
