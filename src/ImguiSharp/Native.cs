@@ -893,19 +893,19 @@ namespace ImguiSharp
         public static extern bool ImGui_InputText(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextEx(byte* label, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData*, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputTextMultiline(byte* label, char* buf, nuint buf_size);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextMultilineEx(byte* label, char* buf, nuint buf_size, ImVec2 size = default, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData*, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputTextWithHint(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default);
+        public static extern bool ImGui_InputTextWithHintEx(byte* label, byte* hint, char* buf, nuint buf_size, ImGuiInputTextFlags flags = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData*, int> callback = default, void* user_data = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_InputFloat(byte* label, float* v);

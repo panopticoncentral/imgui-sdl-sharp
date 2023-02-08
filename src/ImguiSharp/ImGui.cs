@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -12,6 +11,9 @@ namespace ImguiSharp
 
         private static Dictionary<nuint, Func<int, float>>? s_plotCallbacks;
         private static Dictionary<nuint, Func<int, float>> PlotCallbacks => s_plotCallbacks ??= new Dictionary<nuint, Func<int, float>>();
+
+        private static Dictionary<nuint, InputTextCallbacks>? s_inputTextCallbacks;
+        private static Dictionary<nuint, InputTextCallbacks> InputTextCallbacks => s_inputTextCallbacks ??= new Dictionary<nuint, InputTextCallbacks>();
 
         #region Context creation and access
 
@@ -703,43 +705,97 @@ namespace ImguiSharp
 
         #region * Widgets: Input with Keyboard
 
-        //public static bool InputText(string label, char* buf, nuint buf_size, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputText(ptr));
+        private static Native.ImGuiInputTextFlags CallbackOptions(InputTextCallbacks callbacks) =>
+            (callbacks.Filter == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCharFilter)
+            | (callbacks.History == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackHistory)
+            | (callbacks.Completion == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCompletion)
+            | (callbacks.Always == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackAlways)
+            | (callbacks.Resize == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackResize)
+            | (callbacks.Edit == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackEdit);
 
-        //public static bool InputText(string label, char* buf, nuint buf_size, InputTextOptions options = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextEx(ptr));
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static int InputTextCallback(Native.ImGuiInputTextCallbackData* data)
+        {
+            var callbacks = InputTextCallbacks[(nuint)data->UserData]!;
+            switch (data->EventFlag)
+            {
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCompletion:
+                    break;
 
-        //public static bool InputTextMultiline(string label, char* buf, nuint buf_size) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextMultiline(ptr));
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackHistory:
+                    break;
+
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackAlways:
+                    break;
+
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCharFilter:
+                    var c = callbacks.Filter!(data->EventChar);
+                    data->EventChar = c ?? '\0';
+                    break;
+
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackResize:
+                    break;
+
+                case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackEdit:
+                    break;
+            }
+
+            return 0;
+        }
+
+        public static bool InputText(string label, StateVector<char> buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputText(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+
+        public static bool InputText(string label, StateVector<char> buffer, InputTextOptions options, InputTextCallbacks callbacks)
+        {
+            InputTextCallbacks[(nuint)callbacks.GetHashCode()] = callbacks;
+            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+        }
+
+        public static bool InputTextMultiline(string label, StateVector<char> buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Length));
 
         //public static bool InputTextMultiline(string label, char* buf, nuint buf_size, ImVec2 size = default, InputTextOptions options = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextMultilineEx(ptr));
 
-        //public static bool InputTextWithHint(string label, byte* hint, char* buf, nuint buf_size, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextWithHint(ptr));
+        public static bool InputTextWithHint(string label, string hint, StateVector<char> buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHint(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
 
         //public static bool InputTextWithHint(string label, byte* hint, char* buf, nuint buf_size, InputTextOptions options = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextWithHintEx(ptr));
 
-        public static bool InputFloat(string label, State<float> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputFloat(ptr, v.ToNative()));
+        public static bool Input(string label, State<sbyte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative()));
 
-        public static bool InputFloat(string label, State<float> v, float step = default, float stepFast = default, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloatEx(labelPtr, v.ToNative(), step, stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+        public static bool Input(string label, State<sbyte> data, sbyte step = default, sbyte stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputFloat(string label, StateVector<float> v) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
-        {
-            2 => Native.ImGui_InputFloat2(labelPtr, v.ToNative()),
-            3 => Native.ImGui_InputFloat3(labelPtr, v.ToNative()),
-            4 => Native.ImGui_InputFloat4(labelPtr, v.ToNative()),
-            _ => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length),
-        });
+        public static bool Input(string label, StateVector<sbyte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative(), data.Length));
 
-        public static bool InputFloat2(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
-        {
-            2 => Native.ImGui_InputFloat2Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
-            3 => Native.ImGui_InputFloat3Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
-            4 => Native.ImGui_InputFloat4Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
-            _ => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, null, null, formatPtr, (Native.ImGuiInputTextFlags)options),
-        });
+        public static bool Input(string label, StateVector<sbyte> data, sbyte step = default, sbyte stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputInt(string label, State<int> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt(ptr, v.ToNative()));
+        public static bool Input(string label, State<byte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, data.ToNative()));
 
-        public static bool InputInt(string label, State<int> v, int step = 1, int stepFast = 100, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputIntEx(ptr, v.ToNative(), step, stepFast, (Native.ImGuiInputTextFlags)options));
+        public static bool Input(string label, State<byte> data, byte step = default, byte stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputInt(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        public static bool Input(string label, StateVector<byte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, data.ToNative(), data.Length));
+
+        public static bool Input(string label, StateVector<byte> data, byte step = default, byte stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U8, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, State<short> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, data.ToNative()));
+
+        public static bool Input(string label, State<short> data, short step = default, short stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<short> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, data.ToNative(), data.Length));
+
+        public static bool Input(string label, StateVector<short> data, short step = default, short stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S16, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, State<ushort> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, data.ToNative()));
+
+        public static bool Input(string label, State<ushort> data, ushort step = default, ushort stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<ushort> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, data.ToNative(), data.Length));
+
+        public static bool Input(string label, StateVector<ushort> data, ushort step = default, ushort stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U16, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, State<int> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputInt(ptr, v.ToNative()));
+
+        public static bool Input(string label, State<int> v, int step = 1, int stepFast = 100, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputIntEx(ptr, v.ToNative(), step, stepFast, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<int> v, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
         {
             2 => Native.ImGui_InputInt2(labelPtr, v.ToNative(), (Native.ImGuiInputTextFlags)options),
             3 => Native.ImGui_InputInt3(labelPtr, v.ToNative(), (Native.ImGuiInputTextFlags)options),
@@ -747,17 +803,53 @@ namespace ImguiSharp
             _ => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S32, v.ToNative(), v.Length, null, null, null, (Native.ImGuiInputTextFlags)options),
         });
 
-        public static bool InputDouble(string label, State<double> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputDouble(ptr, v.ToNative()));
+        public static bool Input(string label, State<uint> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, data.ToNative()));
 
-        public static bool InputDouble(string label, State<double> v, double step = 0.0, double stepFast = 0.0, string format = "%.6f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputDoubleEx(labelPtr, v.ToNative(), step, stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+        public static bool Input(string label, State<uint> data, uint step = default, uint stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        //public static bool InputScalar(string label, ImGuiDataType data_type, void* p_data) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputScalar(ptr));
+        public static bool Input(string label, StateVector<uint> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, data.ToNative(), data.Length));
 
-        //public static bool InputScalar(string label, ImGuiDataType data_type, void* p_data, void* p_step = default, void* p_step_fast = default, byte* format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputScalarEx(ptr));
+        public static bool Input(string label, StateVector<uint> data, uint step = default, uint stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U32, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
-        //public static bool InputScalarN(string label, ImGuiDataType data_type, void* p_data, int components) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputScalarN(ptr));
+        public static bool Input(string label, State<long> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, data.ToNative()));
 
-        //public static bool InputScalarN(string label, ImGuiDataType data_type, void* p_data, int components, void* p_step = default, void* p_step_fast = default, byte* format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputScalarNEx(ptr));
+        public static bool Input(string label, State<long> data, long step = default, long stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<long> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, data.ToNative(), data.Length));
+
+        public static bool Input(string label, StateVector<long> data, long step = default, long stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_S64, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, State<ulong> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, data.ToNative()));
+
+        public static bool Input(string label, State<ulong> data, ulong step = default, ulong stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, data.ToNative(), (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<ulong> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, data.ToNative(), data.Length));
+
+        public static bool Input(string label, StateVector<ulong> data, ulong step = default, ulong stepFast = default, string? format = default, InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_U64, data.ToNative(), data.Length, (void*)step, (void*)stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, State<float> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputFloat(ptr, v.ToNative()));
+
+        public static bool Input(string label, State<float> v, float step = default, float stepFast = default, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputFloatEx(labelPtr, v.ToNative(), step, stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
+
+        public static bool Input(string label, StateVector<float> v) => Native.StringToUtf8Func(label, labelPtr => v.Length switch
+        {
+            2 => Native.ImGui_InputFloat2(labelPtr, v.ToNative()),
+            3 => Native.ImGui_InputFloat3(labelPtr, v.ToNative()),
+            4 => Native.ImGui_InputFloat4(labelPtr, v.ToNative()),
+            _ => Native.ImGui_InputScalarN(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length),
+        });
+
+        public static bool Input(string label, StateVector<float> v, string format = "%.3f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => v.Length switch
+        {
+            2 => Native.ImGui_InputFloat2Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            3 => Native.ImGui_InputFloat3Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            4 => Native.ImGui_InputFloat4Ex(labelPtr, v.ToNative(), formatPtr, (Native.ImGuiInputTextFlags)options),
+            _ => Native.ImGui_InputScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Float, v.ToNative(), v.Length, null, null, formatPtr, (Native.ImGuiInputTextFlags)options),
+        });
+
+        public static bool Input(string label, State<double> v) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputDouble(ptr, v.ToNative()));
+
+        public static bool Input(string label, State<double> v, double step = 0.0, double stepFast = 0.0, string format = "%.6f", InputTextOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_InputDoubleEx(labelPtr, v.ToNative(), step, stepFast, formatPtr, (Native.ImGuiInputTextFlags)options));
 
         #endregion
 
