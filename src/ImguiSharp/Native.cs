@@ -2398,7 +2398,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region ImGuiStyle
+        #region * ImGuiStyle
 
         public struct ImGuiStyle
         {
@@ -2450,7 +2450,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region ImGuiIO
+        #region * ImGuiIO
 
         public struct ImGuiKeyData
         {
@@ -2582,7 +2582,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Misc data structures
+        #region * Misc data structures
 
         public struct ImGuiInputTextCallbackData
         {
@@ -2661,7 +2661,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Helpers
+        #region * Helpers
 
         public const char IM_UNICODE_CODEPOINT_INVALID = (char)0xFFFD;
         public const char IM_UNICODE_CODEPOINT_MAX = (char)0xFFFF;
@@ -2757,7 +2757,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Drawing API
+        #region * Drawing API
 
         public const int IM_DRAWLIST_TEX_LINES_WIDTH_MAX = 63;
 
@@ -3054,7 +3054,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Font API
+        #region * Font API
 
         public struct ImFontConfig
         {
@@ -3312,7 +3312,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Viewports
+        #region * Viewports
 
         public enum ImGuiViewportFlags
         {
@@ -3341,7 +3341,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region Platform Dependent Interfaces
+        #region * Platform Dependent Interfaces
 
         public struct ImGuiPlatformImeData
         {

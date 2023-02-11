@@ -703,7 +703,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Widgets: Input with Keyboard
+        #region Widgets: Input with Keyboard
 
         private static Native.ImGuiInputTextFlags CallbackOptions(InputTextCallbacks callbacks) =>
             (callbacks.Filter == null ? 0 : Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCharFilter)
