@@ -12,8 +12,8 @@ namespace ImguiSharp
         private static Dictionary<nuint, Func<int, float>>? s_plotCallbacks;
         private static Dictionary<nuint, Func<int, float>> PlotCallbacks => s_plotCallbacks ??= new Dictionary<nuint, Func<int, float>>();
 
-        private static Dictionary<nuint, InputTextCallbacks>? s_inputTextCallbacks;
-        private static Dictionary<nuint, InputTextCallbacks> InputTextCallbacks => s_inputTextCallbacks ??= new Dictionary<nuint, InputTextCallbacks>();
+        private static Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)>? s_inputTextCallbacks;
+        private static Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)> InputTextCallbacks => s_inputTextCallbacks ??= new Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)>();
 
         #region Context creation and access
 
@@ -716,16 +716,19 @@ namespace ImguiSharp
         [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
         private static int InputTextCallback(Native.ImGuiInputTextCallbackData* data)
         {
-            var callbacks = InputTextCallbacks[(nuint)data->UserData]!;
+            var (buffer, callbacks) = InputTextCallbacks[(nuint)data->UserData]!;
             switch (data->EventFlag)
             {
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCompletion:
+                    callbacks.Completion!((Key)data->EventKey, InputTextState.Wrap(data)!.Value);
                     break;
 
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackHistory:
+                    callbacks.History!((Key)data->EventKey, InputTextState.Wrap(data)!.Value);
                     break;
 
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackAlways:
+                    callbacks.Always!(InputTextState.Wrap(data)!.Value);
                     break;
 
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackCharFilter:
@@ -734,30 +737,43 @@ namespace ImguiSharp
                     break;
 
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackResize:
+                    callbacks.Resize!(buffer, data->BufSize);
+                    data->Buf = buffer.ToNative();
                     break;
 
                 case Native.ImGuiInputTextFlags.ImGuiInputTextFlags_CallbackEdit:
+                    callbacks.Edit!(InputTextState.Wrap(data)!.Value);
                     break;
             }
 
             return 0;
         }
 
-        public static bool InputText(string label, StateVector<char> buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputText(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+        public static bool InputText(string label, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputText(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputText(string label, StateVector<char> buffer, InputTextOptions options, InputTextCallbacks callbacks)
+        public static bool InputText(string label, StateText buffer, InputTextOptions options, InputTextCallbacks callbacks)
         {
-            InputTextCallbacks[(nuint)callbacks.GetHashCode()] = callbacks;
+            InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
             return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
         }
 
-        public static bool InputTextMultiline(string label, StateVector<char> buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Length));
+        public static bool InputTextMultiline(string label, StateText buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Length));
 
-        //public static bool InputTextMultiline(string label, char* buf, nuint buf_size, ImVec2 size = default, InputTextOptions options = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextMultilineEx(ptr));
+        public static bool InputTextMultiline(string label, StateText buffer, Size size, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputTextWithHint(string label, string hint, StateVector<char> buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHint(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+        public static bool InputTextMultiline(string label, StateText buffer, Size size, InputTextOptions options, InputTextCallbacks callbacks)
+        {
+            InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
+            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+        }
 
-        //public static bool InputTextWithHint(string label, byte* hint, char* buf, nuint buf_size, InputTextOptions options = default, delegate* unmanaged[Cdecl]<ImGuiInputTextCallbackData, int> callback = default, void* user_data = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_InputTextWithHintEx(ptr));
+        public static bool InputText(string label, string hint, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHint(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+
+        public static bool InputText(string label, string hint, StateText buffer, InputTextOptions options, InputTextCallbacks callbacks)
+        {
+            InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
+            return Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHintEx(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+        }
 
         public static bool Input(string label, State<sbyte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative()));
 
@@ -875,7 +891,7 @@ namespace ImguiSharp
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* referencePtr = referenceColor)
             {
-                return Native.ImGui_ColorPicker4(labelPtr, col.ToNative(), (Native.ImGuiColorEditFlags)options, referencePtr);
+                return Native.ImGui_ColorPicker4(labelPtr, color.ToNative(), (Native.ImGuiColorEditFlags)options, referencePtr);
             }
         }
 

@@ -26,6 +26,6 @@
 
     public static unsafe class StateExtensions
     {
-        public static T* ToNative<T>(this State<T>? v) where T : unmanaged => v == null ? null : v.ToNative();
+        public static T* ToNative<T>(this State<T>? v) where T : unmanaged => v == null ? null : v.Value.ToNative();
     }
 }

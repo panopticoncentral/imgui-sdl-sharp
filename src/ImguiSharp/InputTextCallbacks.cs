@@ -4,14 +4,14 @@
     {
         public Func<char, char?>? Filter { get; init; }
 
-        public Func<StateVector<char>, int, StateVector<char>>? Resize { get; init; }
+        public Action<StateText, int>? Resize { get; init; }
 
-        public Func<Key, InputTextState, bool>? Completion { get; init; }
+        public Action<Key, InputTextState>? Completion { get; init; }
 
-        public Func<Key, InputTextState, bool>? History { get; init; }
+        public Action<Key, InputTextState>? History { get; init; }
 
-        public Func<InputTextState, bool>? Edit { get; init; }
+        public Action<InputTextState>? Edit { get; init; }
 
-        public Func<InputTextState, bool>? Always { get; init; }
+        public Action<InputTextState>? Always { get; init; }
     }
 }
