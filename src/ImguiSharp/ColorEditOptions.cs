@@ -30,7 +30,7 @@
 
         DefaultOptions = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_DefaultOptions_,
 
-        DisplayMask  = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_DisplayMask_,
+        DisplayMask = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_DisplayMask_,
         DataTypeMask = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_DataTypeMask_,
         PickerMask = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_PickerMask_,
         InputMask = Native.ImGuiColorEditFlags.ImGuiColorEditFlags_InputMask_,

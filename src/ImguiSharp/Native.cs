@@ -2398,7 +2398,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * ImGuiStyle
+        #region ImGuiStyle
 
         public struct ImGuiStyle
         {
