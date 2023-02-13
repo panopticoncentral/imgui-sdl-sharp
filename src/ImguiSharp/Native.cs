@@ -2450,7 +2450,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * ImGuiIO
+        #region ImGuiIO
 
         public struct ImGuiKeyData
         {
@@ -2661,7 +2661,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Helpers
+        #region Helpers
 
         public const char IM_UNICODE_CODEPOINT_INVALID = (char)0xFFFD;
         public const char IM_UNICODE_CODEPOINT_MAX = (char)0xFFFF;
@@ -2674,7 +2674,7 @@ namespace ImguiSharp
         {
             private readonly int _size;
             private readonly int _capacity;
-            private readonly nuint _data;
+            private readonly void* _data;
         }
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
