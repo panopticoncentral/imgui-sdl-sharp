@@ -3312,7 +3312,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Viewports
+        #region Viewports
 
         public enum ImGuiViewportFlags
         {
