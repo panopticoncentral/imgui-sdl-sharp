@@ -1,7 +1,16 @@
-﻿namespace ImguiSharp
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+namespace ImguiSharp
 {
     public readonly unsafe struct Io : INativeReferenceWrapper<Io, Native.ImGuiIO>
     {
+        private static byte* s_clipboardTextData;
+        private static Func<string?>? s_getClipboardTextCallback;
+        private static Action<string?>? s_setClipboardTextCallback;
+
+        private static Action<Viewport?, PlatformImeData?>? s_setPlatformImeDataCallback;
+
         private readonly Native.ImGuiIO* _io;
 
         public ConfigOptions ConfigOptions
@@ -232,14 +241,49 @@
             set => _io->BackendLanguageUserData = (void*)value;
         }
 
-        public delegate* unmanaged[Cdecl]<void*, byte*> GetClipboardText
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static byte* GetClipboardTextCallback(void* unused)
         {
-            set => _io->GetClipboardTextFn = value;
+            if (s_clipboardTextData != null)
+            {
+                Native.ImGui_MemFree(s_clipboardTextData);
+                s_clipboardTextData = null;
+            }
+
+            if (s_getClipboardTextCallback != null)
+            {
+                var s = s_getClipboardTextCallback();
+                var utf8 = Native.StringToUtf8(s);
+
+                if (utf8.Length > 0)
+                {
+                    s_clipboardTextData = (byte*)Native.ImGui_MemAlloc((nuint)utf8.Length);
+                    utf8.CopyTo(new Span<byte>(s_clipboardTextData, utf8.Length));
+                }
+            }
+ 
+            return s_clipboardTextData;
         }
 
-        public delegate* unmanaged[Cdecl]<void*, byte*, void> SetClipboardText
+        public Func<string?>? GetClipboardText
         {
-            set => _io->SetClipboardTextFn = value;
+            set
+            {
+                s_getClipboardTextCallback = value;
+                _io->GetClipboardTextFn = value == null ? null : &GetClipboardTextCallback;
+            }
+        }
+
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static void SetClipboardTextCallback(void* unused, byte* text) => s_setClipboardTextCallback?.Invoke(Native.Utf8ToString(text));
+
+        public Action<string?>? SetClipboardText
+        {
+            set
+            {
+                s_setClipboardTextCallback = value;
+                _io->SetClipboardTextFn = value == null ? null : &SetClipboardTextCallback;
+            }
         }
 
         public nuint ClipboardUserData
@@ -248,9 +292,16 @@
             set => _io->ClipboardUserData = (void*)value;
         }
 
-        public delegate* unmanaged[Cdecl]<Native.ImGuiViewport*, Native.ImGuiPlatformImeData*, void> SetPlatformImeData
+        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+        private static void SetPlatformImeDataCallback(Native.ImGuiViewport* viewport, Native.ImGuiPlatformImeData* data) => s_setPlatformImeDataCallback?.Invoke(Viewport.Wrap(viewport), PlatformImeData.Wrap(data));
+
+        public Action<Viewport?, PlatformImeData?>? SetPlatformImeData
         {
-            set => _io->SetPlatformImeDataFn = value;
+            set
+            {
+                s_setPlatformImeDataCallback = value;
+                _io->SetPlatformImeDataFn = value == null ? null : &SetPlatformImeDataCallback;
+            }
         }
 
         public bool WantCaptureMouse

@@ -3341,7 +3341,7 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Platform Dependent Interfaces
+        #region Platform Dependent Interfaces
 
         public struct ImGuiPlatformImeData
         {

@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
-using SdlSharp;
+﻿using SdlSharp;
 using SdlSharp.Graphics;
 using SdlSharp.Input;
 
@@ -20,7 +17,6 @@ namespace ImguiSharp.Platform.Sdl
             public int _mouseButtonsDown;
             public Cursor[] _mouseCursors;
             public int _pendingMouseLeaveFrame;
-            public byte* _clipboardTextData;
 
             public Data(Window window, Renderer renderer)
             {
@@ -32,30 +28,9 @@ namespace ImguiSharp.Platform.Sdl
 
         private static Data? GetBackendData() => Imgui.GetCurrentContext() != null ? DataDictionary[Imgui.GetIo().BackendPlatformUserData] : null;
 
-        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-        private static byte* GetClipboardText(void* unused)
-        {
-            var bd = GetBackendData();
-            if (bd == null)
-            {
-                return null;
-            }
+        private static string? GetClipboardText() => Clipboard.Text;
 
-            if (bd._clipboardTextData != null)
-            {
-                SdlSharp.Native.SDL_free(bd._clipboardTextData);
-            }
-
-            var utf8Clipboard = Native.StringToUtf8(Clipboard.Text);
-            var buffer = (byte*)SdlSharp.Native.SDL_malloc((nuint)utf8Clipboard.Length);
-            utf8Clipboard.CopyTo(new Span<byte>(buffer, utf8Clipboard.Length));
-            bd._clipboardTextData = buffer;
-
-            return bd._clipboardTextData;
-        }
-
-        [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-        private static void SetClipboardText(void* unused, byte* text) => _ = SdlSharp.Native.SDL_SetClipboardText(text);
+        private static void SetClipboardText(string? value) => Clipboard.Text = value;
 
         private static Key KeycodeToImGuiKey(Keycode keycode)
         {
@@ -196,8 +171,8 @@ namespace ImguiSharp.Platform.Sdl
             io.BackendOptions |= BackendOptions.HasMouseCursors;
             io.BackendOptions |= BackendOptions.HasSetMousePos;
 
-            io.SetClipboardText = &SetClipboardText;
-            io.GetClipboardText = &GetClipboardText;
+            io.SetClipboardText = SetClipboardText;
+            io.GetClipboardText = GetClipboardText;
             io.ClipboardUserData = 0;
 
             bd._mouseCursors[(int)MouseCursor.Arrow] = Cursor.Create(SystemCursor.Arrow);
@@ -351,11 +326,6 @@ namespace ImguiSharp.Platform.Sdl
             }
 
             var io = Imgui.GetIo();
-
-            if (bd._clipboardTextData != null)
-            {
-                SdlSharp.Native.SDL_free(bd._clipboardTextData);
-            }
 
             for (MouseCursor cursor = 0; cursor < MouseCursor.Count; cursor++)
             {
