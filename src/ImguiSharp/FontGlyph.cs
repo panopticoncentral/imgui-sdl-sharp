@@ -77,7 +77,7 @@
             _glyph = glyph;
         }
 
-        public static FontGlyph? Wrap(Native.ImFontGlyph* native) => new(native);
+        public static FontGlyph? Wrap(Native.ImFontGlyph* native) => native == null ? null : new(native);
 
         public Native.ImFontGlyph* ToNative() => _glyph;
     }

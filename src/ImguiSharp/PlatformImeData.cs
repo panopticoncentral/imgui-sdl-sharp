@@ -27,7 +27,7 @@
             _native = native;
         }
 
-        public static PlatformImeData? Wrap(Native.ImGuiPlatformImeData* native) => new(native);
+        public static PlatformImeData? Wrap(Native.ImGuiPlatformImeData* native) => native == null ? null : new(native);
 
         public unsafe Native.ImGuiPlatformImeData* ToNative() => _native;
     }

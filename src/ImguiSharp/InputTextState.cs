@@ -9,7 +9,7 @@
             _data = data;
         }
 
-        public static InputTextState? Wrap(Native.ImGuiInputTextCallbackData* native) => new(native);
+        public static InputTextState? Wrap(Native.ImGuiInputTextCallbackData* native) => native == null ? null : new(native);
 
         public Native.ImGuiInputTextCallbackData* ToNative() => _data;
     }

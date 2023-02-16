@@ -144,28 +144,14 @@
 
         public Span<char> GetGlyphRangesVietnamese() => ConvertGlyphRange(Native.ImFontAtlas_GetGlyphRangesVietnamese(_fontAtlas));
 
-        public int AddCustomRectRegular(int width, int height) => Native.ImFontAtlas_AddCustomRectRegular(_fontAtlas, width, height);
+        public int AddCustomRectangleRegular(int width, int height) => Native.ImFontAtlas_AddCustomRectRegular(_fontAtlas, width, height);
 
-        public int AddCustomRectFontGlyph(Font font, char id, int width, int height, float advanceX, Position offset = default) =>
+        public int AddCustomRectangleFontGlyph(Font font, char id, int width, int height, float advanceX, Position offset = default) =>
             Native.ImFontAtlas_AddCustomRectFontGlyph(_fontAtlas, font.ToNative(), id, width, height, advanceX, offset.ToNative());
 
-        public CustomRect GetCustomRectByIndex(int index) => CustomRect.Wrap(Native.ImFontAtlas_GetCustomRectByIndex(_fontAtlas, index))!.Value;
+        public FontAtlasCustomRectangle GetCustomRectangleByIndex(int index) => FontAtlasCustomRectangle.Wrap(Native.ImFontAtlas_GetCustomRectByIndex(_fontAtlas, index))!.Value;
 
         public Native.ImFontAtlas* ToNative() => _fontAtlas;
-
-        public readonly unsafe struct CustomRect : INativeReferenceWrapper<CustomRect, Native.ImFontAtlasCustomRect>
-        {
-            private readonly Native.ImFontAtlasCustomRect* _customRect;
-
-            private CustomRect(Native.ImFontAtlasCustomRect* customRect)
-            {
-                _customRect = customRect;
-            }
-
-            public static CustomRect? Wrap(Native.ImFontAtlasCustomRect* native) => native == null ? null : new(native);
-
-            public Native.ImFontAtlasCustomRect* ToNative() => _customRect;
-        }
     }
 
     public static unsafe class FontAtlasExtensions

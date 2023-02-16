@@ -33,12 +33,26 @@
             }
         }
 
-        //public void BuildRanges(ImVector_ImWchar* out_ranges) => Native.ImFontGlyphRangesBuilder_BuildRanges(_builder);
+        public char[] BuildRanges()
+        {
+            Native.ImVector_ImWchar vector;
+            Native.ImFontGlyphRangesBuilder_BuildRanges(_builder, &vector);
+            var array = vector.Size == 0 ? Array.Empty<char>() : new Span<char>(vector.Data, vector.Size).ToArray();
+            if (vector.Data != null)
+            {
+                Native.ImGui_MemFree(vector.Data);
+            }
+            return array;
+        }
 
         public void Dispose()
         {
             if (_builder != null)
             {
+                if (_builder->UsedChars.Data != null)
+                {
+                    Native.ImGui_MemFree(_builder->UsedChars.Data);
+                }
                 Native.ImGui_MemFree(_builder);
                 _builder = null;
             }
