@@ -30,21 +30,77 @@
             set => _fontConfig->SizePixels = value;
         }
 
-#if false
-            public int OversampleH;
-            public int OversampleV;
-            public bool PixelSnapH;
-            public ImVec2 GlyphExtraSpacing;
-            public ImVec2 GlyphOffset;
-            public char* GlyphRanges;
-            public float GlyphMinAdvanceX;
-            public float GlyphMaxAdvanceX;
-            public bool MergeMode;
-            public uint FontBuilderFlags;
-            public float RasterizerMultiply;
-            public char EllipsisChar;
+        public int OversampleHorizontal
+        {
+            get => _fontConfig->OversampleH;
+            set => _fontConfig->OversampleH = value;
+        }
 
-#endif
+        public int OversampleVertical
+        {
+            get => _fontConfig->OversampleV;
+            set => _fontConfig->OversampleV = value;
+        }
+
+        public bool PixelSnapHeight
+        {
+            get => _fontConfig->PixelSnapH;
+            set => _fontConfig->PixelSnapH = value;
+        }
+
+        public Size GlyphExtraSpacing
+        {
+            get => Size.Wrap(_fontConfig->GlyphExtraSpacing);
+            set => _fontConfig->GlyphExtraSpacing = value.ToNative();
+        }
+
+        public Position GlyphOffset
+        {
+            get => Position.Wrap(_fontConfig->GlyphOffset);
+            set => _fontConfig->GlyphOffset = value.ToNative();
+        }
+
+        public char* GlyphRanges
+        {
+            get => _fontConfig->GlyphRanges;
+            set => _fontConfig->GlyphRanges = value;
+        }
+
+        public float GlyphMinimumAdvanceX
+        {
+            get => _fontConfig->GlyphMinAdvanceX;
+            set => _fontConfig->GlyphMinAdvanceX = value;
+        }
+
+        public float GlyphMaximumAdvanceX
+        {
+            get => _fontConfig->GlyphMaxAdvanceX;
+            set => _fontConfig->GlyphMaxAdvanceX = value;
+        }
+
+        public bool MergeMode
+        {
+            get => _fontConfig->MergeMode;
+            set => _fontConfig->MergeMode = value;
+        }
+
+        public uint FontBuilderFlags
+        {
+            get => _fontConfig->FontBuilderFlags;
+            set => _fontConfig->FontBuilderFlags = value;
+        }
+
+        public float RasterizerMultiply
+        {
+            get => _fontConfig->RasterizerMultiply;
+            set => _fontConfig->RasterizerMultiply = value;
+        }
+
+        public char EllipsisChar
+        {
+            get => _fontConfig->EllipsisChar;
+            set => _fontConfig->EllipsisChar = value;
+        }
 
         private FontConfig(Native.ImFontConfig* fontConfig)
         {
