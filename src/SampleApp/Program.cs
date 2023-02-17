@@ -38,7 +38,10 @@ ImplSdlRenderer.Init(renderer);
 
 var showDemoWindow = new State<bool>(true);
 var showAnotherWindow = new State<bool>(false);
-var clearColor = new ImguiSharp.Color(0.45f, 0.55f, 0.60f, 1.00f);
+var clearColor = new StateVector<float>(3);
+clearColor[0] = 0.45f;
+clearColor[1] = 0.55f;
+clearColor[2] = 0.60f;
 var f = new State<float>(0.0f);
 var counter = 0;
 
@@ -62,16 +65,14 @@ while (application.DispatchEvents())
     }
 
     {
-        Imgui.Begin("Hello, world!");
+        _ = Imgui.Begin("Hello, world!");
 
         Imgui.Text("This is some useful text.");
-        Imgui.Checkbox("Demo Window", showDemoWindow);      // Edit bools storing our window open/close state
-        Imgui.Checkbox("Another Window", showAnotherWindow);
+        _ = Imgui.Checkbox("Demo Window", showDemoWindow);
+        _ = Imgui.Checkbox("Another Window", showAnotherWindow);
 
-        Imgui.Slider("float", f, 0.0f, 1.0f);
-#if false
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-#endif
+        _ = Imgui.Slider("float", f, 0.0f, 1.0f);
+        _ = Imgui.ColorEdit("clear color", clearColor);
 
         if (Imgui.Button("Button"))
         {
@@ -85,21 +86,20 @@ while (application.DispatchEvents())
         Imgui.End();
     }
 
-#if false
-    // 3. Show another simple window.
-    if (show_another_window)
+    if (showAnotherWindow)
+    {
+        _ = Imgui.Begin("Another Window", showAnotherWindow);
+        Imgui.Text("Hello from another window!");
+        if (Imgui.Button("Close Me"))
         {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
+            showAnotherWindow.Value = false;
         }
+        Imgui.End();
+    }
 
-#endif
     Imgui.Render();
 
-    renderer.DrawColor = new((byte)(clearColor.Red * 255), (byte)(clearColor.Green * 255), (byte)(clearColor.Blue * 255), (byte)(clearColor.Alpha * 255));
+    renderer.DrawColor = new((byte)(clearColor[0] * 255), (byte)(clearColor[1] * 255), (byte)(clearColor[2] * 255), 255);
     renderer.Clear();
     var drawData = Imgui.GetDrawData();
     if (drawData != null)
