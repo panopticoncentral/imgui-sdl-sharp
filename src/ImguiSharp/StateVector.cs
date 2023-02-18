@@ -23,10 +23,23 @@ namespace ImguiSharp
             }
         }
 
-        public StateVector(int length)
+        public StateVector(int length, IReadOnlyList<T>? values = default)
         {
             _value = (T*)Native.ImGui_MemAlloc((nuint)(sizeof(T) * length));
             Length = length;
+
+            if (values != null)
+            {
+                if (values.Count > length)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                for (var index = 0; index < values.Count; index++)
+                {
+                    _value[index] = values[index];
+                }
+            }
         }
 
         public void Dispose() => Native.ImGui_MemFree(_value);

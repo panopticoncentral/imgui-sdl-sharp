@@ -11,421 +11,290 @@ using var window = Window.Create("Dear ImGui SDL2+SDL_Renderer C# example", new(
 
 using var renderer = Renderer.Create(window, -1, RendererOptions.PresentVSync | RendererOptions.Accelerated);
 
-Imgui.CreateContext();
-var io = Imgui.GetIo();
-//io.ConfigOptions |= ConfigOptions.NavEnableKeyboard;     // Enable Keyboard Controls
-//io.ConfigOptions |= ConfigOptions.NavEnableGamepad;      // Enable Gamepad Controls
+var showAppMainMenuBar = new State<bool>(false);
+var showAppDocuments = new State<bool>(false);
+var showAppConsole = new State<bool>(false);
+var showAppLog = new State<bool>(false);
+var showAppLayout = new State<bool>(false);
+var showAppPropertyEditor = new State<bool>(false);
+var showAppLongText = new State<bool>(false);
+var showAppAutoResize = new State<bool>(false);
+var showAppConstrainedResize = new State<bool>(false);
+var showAppSimpleOverlay = new State<bool>(false);
+var showAppFullscreen = new State<bool>(false);
+var showAppWindowTitles = new State<bool>(false);
+var showAppCustomRendering = new State<bool>(false);
 
-// Setup Dear ImGui style
-Imgui.StyleColorsDark();
-//Imgui.StyleColorsLight();
+var showAppMetrics = new State<bool>(false);
+var showAppDebugLog = new State<bool>(false);
+var showAppStackTool = new State<bool>(false);
+var showAppAbout = new State<bool>(false);
+var showAppStyleEditor = new State<bool>(false);
 
-ImplSdl2.Init(window, renderer);
-ImplSdlRenderer.Init(renderer);
+var noTitlebar = new State<bool>(false);
+var noScrollbar = new State<bool>(false);
+var noMenu = new State<bool>(false);
+var noMove = new State<bool>(false);
+var noResize = new State<bool>(false);
+var noCollapse = new State<bool>(false);
+var noClose = new State<bool>(false);
+var noNav = new State<bool>(false);
+var noBackground = new State<bool>(false);
+var noBringToFront = new State<bool>(false);
+var unsavedDocument = new State<bool>(false);
 
-// Load Fonts
-// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui.PushFont()/PopFont() to select them.
-// - AddFontFromFileTtf() will return the Font so you can store it if you need to select the font among multiple.
-// - If the file cannot be loaded, the function will return null. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling FontAtlas.Build()/GetTextureDataAsXXXX(), which NewFrame below will call.
-// - Read 'docs/FONTS.md' for more instructions and details.
-//io.Fonts.AddFontDefault();
-//io.Fonts.AddFontFromFileTtf("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-//io.Fonts.AddFontFromFileTtf("../../misc/fonts/DroidSans.ttf", 16.0f);
-//io.Fonts.AddFontFromFileTtf("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-//io.Fonts.AddFontFromFileTtf("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-//var font = io.Fonts.AddFontFromFileTtf("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, null, io.Fonts.GetGlyphRangesJapanese());
-
-var showDemoWindow = new State<bool>(true);
-var showManagedDemoWindow = new State<bool>(true);
-var showAnotherWindow = new State<bool>(false);
-var clearColor = new StateVector<float>(3);
-clearColor[0] = 0.45f;
-clearColor[1] = 0.55f;
-clearColor[2] = 0.60f;
-var f = new State<float>(0.0f);
-var counter = 0;
-
-Window.Closed += (sender, args) =>
+void ShowDemoWindow(State<bool>? open = default)
 {
-    if (((Window)sender!).Id == window.Id)
+    //    if (show_app_main_menu_bar)       ShowExampleAppMainMenuBar();
+    //    if (show_app_documents)           ShowExampleAppDocuments(&show_app_documents);
+    //    if (show_app_console)             ShowExampleAppConsole(&show_app_console);
+    //    if (show_app_log)                 ShowExampleAppLog(&show_app_log);
+    //    if (show_app_layout)              ShowExampleAppLayout(&show_app_layout);
+    //    if (show_app_property_editor)     ShowExampleAppPropertyEditor(&show_app_property_editor);
+    //    if (show_app_long_text)           ShowExampleAppLongText(&show_app_long_text);
+    //    if (show_app_auto_resize)         ShowExampleAppAutoResize(&show_app_auto_resize);
+    //    if (show_app_constrained_resize)  ShowExampleAppConstrainedResize(&show_app_constrained_resize);
+    //    if (show_app_simple_overlay)      ShowExampleAppSimpleOverlay(&show_app_simple_overlay);
+    //    if (show_app_fullscreen)          ShowExampleAppFullscreen(&show_app_fullscreen);
+    //    if (show_app_window_titles)       ShowExampleAppWindowTitles(&show_app_window_titles);
+    //    if (show_app_custom_rendering)    ShowExampleAppCustomRendering(&show_app_custom_rendering);
+    //
+    //    if (show_app_metrics)
+    //        ImGui::ShowMetricsWindow(&show_app_metrics);
+    //    if (show_app_debug_log)
+    //        ImGui::ShowDebugLogWindow(&show_app_debug_log);
+    //    if (show_app_stack_tool)
+    //        ImGui::ShowStackToolWindow(&show_app_stack_tool);
+    //    if (show_app_about)
+    //        ImGui::ShowAboutWindow(&show_app_about);
+    //    if (show_app_style_editor)
+    //    {
+    //        ImGui::Begin("Dear ImGui Style Editor", &show_app_style_editor);
+    //        ImGui::ShowStyleEditor();
+    //        ImGui::End();
+    //    }
+    //
+    var windowOptions = ImguiSharp.WindowOptions.None
+        | (noTitlebar ? ImguiSharp.WindowOptions.NoTitleBar : 0)
+        | (noScrollbar ? ImguiSharp.WindowOptions.NoScrollbar : 0)
+        | (!noMenu ? ImguiSharp.WindowOptions.MenuBar : 0)
+        | (noMove ? ImguiSharp.WindowOptions.NoMove : 0)
+        | (noResize ? ImguiSharp.WindowOptions.NoResize : 0)
+        | (noCollapse ? ImguiSharp.WindowOptions.NoCollapse : 0)
+        | (noNav ? ImguiSharp.WindowOptions.NoNav : 0)
+        | (noBackground ? ImguiSharp.WindowOptions.NoBackground : 0)
+        | (noBringToFront ? ImguiSharp.WindowOptions.NoBringToFrontOnFocus : 0)
+        | (unsavedDocument ? ImguiSharp.WindowOptions.UnsavedDocument : 0);
+
+    if (noClose)
     {
-        application.Quit();
+        open = null;
     }
-};
 
-while (application.DispatchEvents())
-{
-    ImplSdlRenderer.NewFrame();
-    ImplSdl2.NewFrame();
-    Imgui.NewFrame();
+    var mainViewport = Imgui.GetMainViewport();
+    Imgui.SetNextWindowPosition(mainViewport.WorkPosition + new Position(650, 20), Condition.FirstUseEver);
+    Imgui.SetNextWindowSize(new(550, 680), Condition.FirstUseEver);
 
-    if (showDemoWindow)
+    if (!Imgui.Begin("Dear ImGui Managed Demo", open, windowOptions))
     {
-        Imgui.ShowDemoWindow(showDemoWindow);
-    }
-
-    if (showManagedDemoWindow)
-    {
-        ShowDemoWindow(showManagedDemoWindow);
-    }
-
-    {
-        _ = Imgui.Begin("Hello, world!");
-
-        Imgui.Text("This is some useful text.");
-        _ = Imgui.Checkbox("Demo Window", showDemoWindow);
-        _ = Imgui.Checkbox("Managed Demo Window", showManagedDemoWindow);
-        _ = Imgui.Checkbox("Another Window", showAnotherWindow);
-
-        _ = Imgui.Slider("float", f, 0.0f, 1.0f);
-        _ = Imgui.ColorEdit("clear color", clearColor);
-
-        if (Imgui.Button("Button"))
-        {
-            counter++;
-        }
-        Imgui.SameLine();
-        Imgui.Text($"counter = {counter}");
-
-        Imgui.Text($"Application average {1000.0f / Imgui.GetIo().Framerate:F3} ms/frame ({Imgui.GetIo().Framerate:F1} FPS)");
-
         Imgui.End();
+        return;
     }
 
-    if (showAnotherWindow)
+    Imgui.PushItemWidth(Imgui.GetFontSize() * -12);
+
+    if (Imgui.BeginMenuBar())
     {
-        _ = Imgui.Begin("Another Window", showAnotherWindow);
-        Imgui.Text("Hello from another window!");
-        if (Imgui.Button("Close Me"))
+        if (Imgui.BeginMenu("Menu"))
         {
-            showAnotherWindow.Value = false;
+            ShowExampleMenuFile();
+            Imgui.EndMenu();
         }
-        Imgui.End();
+        //        if (ImGui::BeginMenu("Examples"))
+        //        {
+        //            IMGUI_DEMO_MARKER("Menu/Examples");
+        //            ImGui::MenuItem("Main menu bar", NULL, &show_app_main_menu_bar);
+        //            ImGui::MenuItem("Console", NULL, &show_app_console);
+        //            ImGui::MenuItem("Log", NULL, &show_app_log);
+        //            ImGui::MenuItem("Simple layout", NULL, &show_app_layout);
+        //            ImGui::MenuItem("Property editor", NULL, &show_app_property_editor);
+        //            ImGui::MenuItem("Long text display", NULL, &show_app_long_text);
+        //            ImGui::MenuItem("Auto-resizing window", NULL, &show_app_auto_resize);
+        //            ImGui::MenuItem("Constrained-resizing window", NULL, &show_app_constrained_resize);
+        //            ImGui::MenuItem("Simple overlay", NULL, &show_app_simple_overlay);
+        //            ImGui::MenuItem("Fullscreen window", NULL, &show_app_fullscreen);
+        //            ImGui::MenuItem("Manipulating window titles", NULL, &show_app_window_titles);
+        //            ImGui::MenuItem("Custom rendering", NULL, &show_app_custom_rendering);
+        //            ImGui::MenuItem("Documents", NULL, &show_app_documents);
+        //            ImGui::EndMenu();
+        //        }
+        //        //if (ImGui::MenuItem("MenuItem")) {} // You can also use MenuItem() inside a menu bar!
+        //        if (ImGui::BeginMenu("Tools"))
+        //        {
+        //            IMGUI_DEMO_MARKER("Menu/Tools");
+        //#ifndef IMGUI_DISABLE_DEBUG_TOOLS
+        //            const bool has_debug_tools = true;
+        //#else
+        //            const bool has_debug_tools = false;
+        //#endif
+        //            ImGui::MenuItem("Metrics/Debugger", NULL, &show_app_metrics, has_debug_tools);
+        //            ImGui::MenuItem("Debug Log", NULL, &show_app_debug_log, has_debug_tools);
+        //            ImGui::MenuItem("Stack Tool", NULL, &show_app_stack_tool, has_debug_tools);
+        //            ImGui::MenuItem("Style Editor", NULL, &show_app_style_editor);
+        //            ImGui::MenuItem("About Dear ImGui", NULL, &show_app_about);
+        //            ImGui::EndMenu();
+        //        }
+        Imgui.EndMenuBar();
     }
 
-    Imgui.Render();
-
-    renderer.DrawColor = new((byte)(clearColor[0] * 255), (byte)(clearColor[1] * 255), (byte)(clearColor[2] * 255), 255);
-    renderer.Clear();
-    var drawData = Imgui.GetDrawData();
-    if (drawData != null)
-    {
-        ImplSdlRenderer.RenderDrawData(drawData.Value);
-    }
-    renderer.Present();
-}
-
-ImplSdlRenderer.Shutdown();
-ImplSdl2.Shutdown();
-Imgui.DestroyContext();
-
-static void HelpMarker(string description)
-{
-    Imgui.TextDisabled("(?)");
-    if (Imgui.IsItemHovered(HoveredOptions.DelayShort))
-    {
-        Imgui.BeginTooltip();
-        Imgui.PushTextWrapPosition(Imgui.GetFontSize() * 35.0f);
-        Imgui.TextUnformatted(description);
-        Imgui.PopTextWrapPosition();
-        Imgui.EndTooltip();
-    }
-}
-
-static void ShowDemoWindow(State<bool> open)
-{
-//    // Examples Apps (accessible from the "Examples" menu)
-//    static bool show_app_main_menu_bar = false;
-//    static bool show_app_documents = false;
-//    static bool show_app_console = false;
-//    static bool show_app_log = false;
-//    static bool show_app_layout = false;
-//    static bool show_app_property_editor = false;
-//    static bool show_app_long_text = false;
-//    static bool show_app_auto_resize = false;
-//    static bool show_app_constrained_resize = false;
-//    static bool show_app_simple_overlay = false;
-//    static bool show_app_fullscreen = false;
-//    static bool show_app_window_titles = false;
-//    static bool show_app_custom_rendering = false;
-//
-//    if (show_app_main_menu_bar)       ShowExampleAppMainMenuBar();
-//    if (show_app_documents)           ShowExampleAppDocuments(&show_app_documents);
-//    if (show_app_console)             ShowExampleAppConsole(&show_app_console);
-//    if (show_app_log)                 ShowExampleAppLog(&show_app_log);
-//    if (show_app_layout)              ShowExampleAppLayout(&show_app_layout);
-//    if (show_app_property_editor)     ShowExampleAppPropertyEditor(&show_app_property_editor);
-//    if (show_app_long_text)           ShowExampleAppLongText(&show_app_long_text);
-//    if (show_app_auto_resize)         ShowExampleAppAutoResize(&show_app_auto_resize);
-//    if (show_app_constrained_resize)  ShowExampleAppConstrainedResize(&show_app_constrained_resize);
-//    if (show_app_simple_overlay)      ShowExampleAppSimpleOverlay(&show_app_simple_overlay);
-//    if (show_app_fullscreen)          ShowExampleAppFullscreen(&show_app_fullscreen);
-//    if (show_app_window_titles)       ShowExampleAppWindowTitles(&show_app_window_titles);
-//    if (show_app_custom_rendering)    ShowExampleAppCustomRendering(&show_app_custom_rendering);
-//
-//    // Dear ImGui Tools/Apps (accessible from the "Tools" menu)
-//    static bool show_app_metrics = false;
-//    static bool show_app_debug_log = false;
-//    static bool show_app_stack_tool = false;
-//    static bool show_app_about = false;
-//    static bool show_app_style_editor = false;
-//
-//    if (show_app_metrics)
-//        ImGui::ShowMetricsWindow(&show_app_metrics);
-//    if (show_app_debug_log)
-//        ImGui::ShowDebugLogWindow(&show_app_debug_log);
-//    if (show_app_stack_tool)
-//        ImGui::ShowStackToolWindow(&show_app_stack_tool);
-//    if (show_app_about)
-//        ImGui::ShowAboutWindow(&show_app_about);
-//    if (show_app_style_editor)
-//    {
-//        ImGui::Begin("Dear ImGui Style Editor", &show_app_style_editor);
-//        ImGui::ShowStyleEditor();
-//        ImGui::End();
-//    }
-//
-//    // Demonstrate the various window flags. Typically you would just use the default!
-//    static bool no_titlebar = false;
-//    static bool no_scrollbar = false;
-//    static bool no_menu = false;
-//    static bool no_move = false;
-//    static bool no_resize = false;
-//    static bool no_collapse = false;
-//    static bool no_close = false;
-//    static bool no_nav = false;
-//    static bool no_background = false;
-//    static bool no_bring_to_front = false;
-//    static bool unsaved_document = false;
-//
-//    ImGuiWindowFlags window_flags = 0;
-//    if (no_titlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
-//    if (no_scrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
-//    if (!no_menu)           window_flags |= ImGuiWindowFlags_MenuBar;
-//    if (no_move)            window_flags |= ImGuiWindowFlags_NoMove;
-//    if (no_resize)          window_flags |= ImGuiWindowFlags_NoResize;
-//    if (no_collapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
-//    if (no_nav)             window_flags |= ImGuiWindowFlags_NoNav;
-//    if (no_background)      window_flags |= ImGuiWindowFlags_NoBackground;
-//    if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-//    if (unsaved_document)   window_flags |= ImGuiWindowFlags_UnsavedDocument;
-//    if (no_close)           p_open = NULL; // Don't pass our bool* to Begin
-//
-//    // We specify a default position/size in case there's no data in the .ini file.
-//    // We only do it to make the demo applications a little more welcoming, but typically this isn't required.
-//    const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
-//    ImGui::SetNextWindowPos(ImVec2(main_viewport->WorkPos.x + 650, main_viewport->WorkPos.y + 20), ImGuiCond_FirstUseEver);
-//    ImGui::SetNextWindowSize(ImVec2(550, 680), ImGuiCond_FirstUseEver);
-//
-//    // Main body of the Demo window starts here.
-//    if (!ImGui::Begin("Dear ImGui Demo", p_open, window_flags))
-//    {
-//        // Early out if the window is collapsed, as an optimization.
-//        ImGui::End();
-//        return;
-//    }
-//
-//    // Most "big" widgets share a common width settings by default. See 'Demo->Layout->Widgets Width' for details.
-//    // e.g. Use 2/3 of the space for widgets and 1/3 for labels (right align)
-//    //ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.35f);
-//    // e.g. Leave a fixed amount of width for labels (by passing a negative value), the rest goes to widgets.
-//    ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
-//
-//    // Menu Bar
-//    if (ImGui::BeginMenuBar())
-//    {
-//        if (ImGui::BeginMenu("Menu"))
-//        {
-//            IMGUI_DEMO_MARKER("Menu/File");
-//            ShowExampleMenuFile();
-//            ImGui::EndMenu();
-//        }
-//        if (ImGui::BeginMenu("Examples"))
-//        {
-//            IMGUI_DEMO_MARKER("Menu/Examples");
-//            ImGui::MenuItem("Main menu bar", NULL, &show_app_main_menu_bar);
-//            ImGui::MenuItem("Console", NULL, &show_app_console);
-//            ImGui::MenuItem("Log", NULL, &show_app_log);
-//            ImGui::MenuItem("Simple layout", NULL, &show_app_layout);
-//            ImGui::MenuItem("Property editor", NULL, &show_app_property_editor);
-//            ImGui::MenuItem("Long text display", NULL, &show_app_long_text);
-//            ImGui::MenuItem("Auto-resizing window", NULL, &show_app_auto_resize);
-//            ImGui::MenuItem("Constrained-resizing window", NULL, &show_app_constrained_resize);
-//            ImGui::MenuItem("Simple overlay", NULL, &show_app_simple_overlay);
-//            ImGui::MenuItem("Fullscreen window", NULL, &show_app_fullscreen);
-//            ImGui::MenuItem("Manipulating window titles", NULL, &show_app_window_titles);
-//            ImGui::MenuItem("Custom rendering", NULL, &show_app_custom_rendering);
-//            ImGui::MenuItem("Documents", NULL, &show_app_documents);
-//            ImGui::EndMenu();
-//        }
-//        //if (ImGui::MenuItem("MenuItem")) {} // You can also use MenuItem() inside a menu bar!
-//        if (ImGui::BeginMenu("Tools"))
-//        {
-//            IMGUI_DEMO_MARKER("Menu/Tools");
-//#ifndef IMGUI_DISABLE_DEBUG_TOOLS
-//            const bool has_debug_tools = true;
-//#else
-//            const bool has_debug_tools = false;
-//#endif
-//            ImGui::MenuItem("Metrics/Debugger", NULL, &show_app_metrics, has_debug_tools);
-//            ImGui::MenuItem("Debug Log", NULL, &show_app_debug_log, has_debug_tools);
-//            ImGui::MenuItem("Stack Tool", NULL, &show_app_stack_tool, has_debug_tools);
-//            ImGui::MenuItem("Style Editor", NULL, &show_app_style_editor);
-//            ImGui::MenuItem("About Dear ImGui", NULL, &show_app_about);
-//            ImGui::EndMenu();
-//        }
-//        ImGui::EndMenuBar();
-//    }
-//
-//    ImGui::Text("dear imgui says hello! (%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-//    ImGui::Spacing();
-//
-//    IMGUI_DEMO_MARKER("Help");
-//    if (ImGui::CollapsingHeader("Help"))
-//    {
-//        ImGui::Text("ABOUT THIS DEMO:");
-//        ImGui::BulletText("Sections below are demonstrating many aspects of the library.");
-//        ImGui::BulletText("The \"Examples\" menu above leads to more demo contents.");
-//        ImGui::BulletText("The \"Tools\" menu above gives access to: About Box, Style Editor,\n"
-//                          "and Metrics/Debugger (general purpose Dear ImGui debugging tool).");
-//        ImGui::Separator();
-//
-//        ImGui::Text("PROGRAMMER GUIDE:");
-//        ImGui::BulletText("See the ShowDemoWindow() code in imgui_demo.cpp. <- you are here!");
-//        ImGui::BulletText("See comments in imgui.cpp.");
-//        ImGui::BulletText("See example applications in the examples/ folder.");
-//        ImGui::BulletText("Read the FAQ at http://www.dearimgui.org/faq/");
-//        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for keyboard controls.");
-//        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableGamepad' for gamepad controls.");
-//        ImGui::Separator();
-//
-//        ImGui::Text("USER GUIDE:");
-//        ImGui::ShowUserGuide();
-//    }
-//
-//    IMGUI_DEMO_MARKER("Configuration");
-//    if (ImGui::CollapsingHeader("Configuration"))
-//    {
-//        ImGuiIO& io = ImGui::GetIO();
-//
-//        if (ImGui::TreeNode("Configuration##2"))
-//        {
-//            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableKeyboard",    &io.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
-//            ImGui::SameLine(); HelpMarker("Enable keyboard controls.");
-//            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableGamepad",     &io.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
-//            ImGui::SameLine(); HelpMarker("Enable gamepad controls. Require backend to set io.BackendFlags |= ImGuiBackendFlags_HasGamepad.\n\nRead instructions in imgui.cpp for details.");
-//            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableSetMousePos", &io.ConfigFlags, ImGuiConfigFlags_NavEnableSetMousePos);
-//            ImGui::SameLine(); HelpMarker("Instruct navigation to move the mouse cursor. See comment for ImGuiConfigFlags_NavEnableSetMousePos.");
-//            ImGui::CheckboxFlags("io.ConfigFlags: NoMouse",              &io.ConfigFlags, ImGuiConfigFlags_NoMouse);
-//            if (io.ConfigFlags & ImGuiConfigFlags_NoMouse)
-//            {
-//                // The "NoMouse" option can get us stuck with a disabled mouse! Let's provide an alternative way to fix it:
-//                if (fmodf((float)ImGui::GetTime(), 0.40f) < 0.20f)
-//                {
-//                    ImGui::SameLine();
-//                    ImGui::Text("<<PRESS SPACE TO DISABLE>>");
-//                }
-//                if (ImGui::IsKeyPressed(ImGuiKey_Space))
-//                    io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-//            }
-//            ImGui::CheckboxFlags("io.ConfigFlags: NoMouseCursorChange", &io.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
-//            ImGui::SameLine(); HelpMarker("Instruct backend to not alter mouse cursor shape and visibility.");
-//            ImGui::Checkbox("io.ConfigInputTrickleEventQueue", &io.ConfigInputTrickleEventQueue);
-//            ImGui::SameLine(); HelpMarker("Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up) will be spread over multiple frames, improving interactions with low framerates.");
-//            ImGui::Checkbox("io.ConfigInputTextCursorBlink", &io.ConfigInputTextCursorBlink);
-//            ImGui::SameLine(); HelpMarker("Enable blinking cursor (optional as some users consider it to be distracting).");
-//            ImGui::Checkbox("io.ConfigInputTextEnterKeepActive", &io.ConfigInputTextEnterKeepActive);
-//            ImGui::SameLine(); HelpMarker("Pressing Enter will keep item active and select contents (single-line only).");
-//            ImGui::Checkbox("io.ConfigDragClickToInputText", &io.ConfigDragClickToInputText);
-//            ImGui::SameLine(); HelpMarker("Enable turning DragXXX widgets into text input with a simple mouse click-release (without moving).");
-//            ImGui::Checkbox("io.ConfigWindowsResizeFromEdges", &io.ConfigWindowsResizeFromEdges);
-//            ImGui::SameLine(); HelpMarker("Enable resizing of windows from their edges and from the lower-left corner.\nThis requires (io.BackendFlags & ImGuiBackendFlags_HasMouseCursors) because it needs mouse cursor feedback.");
-//            ImGui::Checkbox("io.ConfigWindowsMoveFromTitleBarOnly", &io.ConfigWindowsMoveFromTitleBarOnly);
-//            ImGui::Checkbox("io.MouseDrawCursor", &io.MouseDrawCursor);
-//            ImGui::SameLine(); HelpMarker("Instruct Dear ImGui to render a mouse cursor itself. Note that a mouse cursor rendered via your application GPU rendering path will feel more laggy than hardware cursor, but will be more in sync with your other visuals.\n\nSome desktop applications may use both kinds of cursors (e.g. enable software cursor only when resizing/dragging something).");
-//            ImGui::Text("Also see Style->Rendering for rendering options.");
-//            ImGui::TreePop();
-//            ImGui::Separator();
-//        }
-//
-//        IMGUI_DEMO_MARKER("Configuration/Backend Flags");
-//        if (ImGui::TreeNode("Backend Flags"))
-//        {
-//            HelpMarker(
-//                "Those flags are set by the backends (imgui_impl_xxx files) to specify their capabilities.\n"
-//                "Here we expose them as read-only fields to avoid breaking interactions with your backend.");
-//
-//            // Make a local copy to avoid modifying actual backend flags.
-//            // FIXME: We don't use BeginDisabled() to keep label bright, maybe we need a BeginReadonly() equivalent..
-//            ImGuiBackendFlags backend_flags = io.BackendFlags;
-//            ImGui::CheckboxFlags("io.BackendFlags: HasGamepad",           &backend_flags, ImGuiBackendFlags_HasGamepad);
-//            ImGui::CheckboxFlags("io.BackendFlags: HasMouseCursors",      &backend_flags, ImGuiBackendFlags_HasMouseCursors);
-//            ImGui::CheckboxFlags("io.BackendFlags: HasSetMousePos",       &backend_flags, ImGuiBackendFlags_HasSetMousePos);
-//            ImGui::CheckboxFlags("io.BackendFlags: RendererHasVtxOffset", &backend_flags, ImGuiBackendFlags_RendererHasVtxOffset);
-//            ImGui::TreePop();
-//            ImGui::Separator();
-//        }
-//
-//        IMGUI_DEMO_MARKER("Configuration/Style");
-//        if (ImGui::TreeNode("Style"))
-//        {
-//            HelpMarker("The same contents can be accessed in 'Tools->Style Editor' or by calling the ShowStyleEditor() function.");
-//            ImGui::ShowStyleEditor();
-//            ImGui::TreePop();
-//            ImGui::Separator();
-//        }
-//
-//        IMGUI_DEMO_MARKER("Configuration/Capture, Logging");
-//        if (ImGui::TreeNode("Capture/Logging"))
-//        {
-//            HelpMarker(
-//                "The logging API redirects all text output so you can easily capture the content of "
-//                "a window or a block. Tree nodes can be automatically expanded.\n"
-//                "Try opening any of the contents below in this window and then click one of the \"Log To\" button.");
-//            ImGui::LogButtons();
-//
-//            HelpMarker("You can also call ImGui::LogText() to output directly to the log without a visual output.");
-//            if (ImGui::Button("Copy \"Hello, world!\" to clipboard"))
-//            {
-//                ImGui::LogToClipboard();
-//                ImGui::LogText("Hello, world!");
-//                ImGui::LogFinish();
-//            }
-//            ImGui::TreePop();
-//        }
-//    }
-//
-//    IMGUI_DEMO_MARKER("Window options");
-//    if (ImGui::CollapsingHeader("Window options"))
-//    {
-//        if (ImGui::BeginTable("split", 3))
-//        {
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No titlebar", &no_titlebar);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No scrollbar", &no_scrollbar);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No menu", &no_menu);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No move", &no_move);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No resize", &no_resize);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No collapse", &no_collapse);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No close", &no_close);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No nav", &no_nav);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No background", &no_background);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("No bring to front", &no_bring_to_front);
-//            ImGui::TableNextColumn(); ImGui::Checkbox("Unsaved document", &unsaved_document);
-//            ImGui::EndTable();
-//        }
-//    }
-//
-//    // All demo contents
-//    ShowDemoWindowWidgets();
-//    ShowDemoWindowLayout();
-//    ShowDemoWindowPopups();
-//    ShowDemoWindowTables();
-//    ShowDemoWindowInputs();
-//
-//    // End of ShowDemoWindow()
-//    ImGui::PopItemWidth();
-//    ImGui::End();
+    //
+    //    ImGui::Text("dear imgui says hello! (%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
+    //    ImGui::Spacing();
+    //
+    //    IMGUI_DEMO_MARKER("Help");
+    //    if (ImGui::CollapsingHeader("Help"))
+    //    {
+    //        ImGui::Text("ABOUT THIS DEMO:");
+    //        ImGui::BulletText("Sections below are demonstrating many aspects of the library.");
+    //        ImGui::BulletText("The \"Examples\" menu above leads to more demo contents.");
+    //        ImGui::BulletText("The \"Tools\" menu above gives access to: About Box, Style Editor,\n"
+    //                          "and Metrics/Debugger (general purpose Dear ImGui debugging tool).");
+    //        ImGui::Separator();
+    //
+    //        ImGui::Text("PROGRAMMER GUIDE:");
+    //        ImGui::BulletText("See the ShowDemoWindow() code in imgui_demo.cpp. <- you are here!");
+    //        ImGui::BulletText("See comments in imgui.cpp.");
+    //        ImGui::BulletText("See example applications in the examples/ folder.");
+    //        ImGui::BulletText("Read the FAQ at http://www.dearimgui.org/faq/");
+    //        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for keyboard controls.");
+    //        ImGui::BulletText("Set 'io.ConfigFlags |= NavEnableGamepad' for gamepad controls.");
+    //        ImGui::Separator();
+    //
+    //        ImGui::Text("USER GUIDE:");
+    //        ImGui::ShowUserGuide();
+    //    }
+    //
+    //    IMGUI_DEMO_MARKER("Configuration");
+    //    if (ImGui::CollapsingHeader("Configuration"))
+    //    {
+    //        ImGuiIO& io = ImGui::GetIO();
+    //
+    //        if (ImGui::TreeNode("Configuration##2"))
+    //        {
+    //            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableKeyboard",    &io.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
+    //            ImGui::SameLine(); HelpMarker("Enable keyboard controls.");
+    //            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableGamepad",     &io.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
+    //            ImGui::SameLine(); HelpMarker("Enable gamepad controls. Require backend to set io.BackendFlags |= ImGuiBackendFlags_HasGamepad.\n\nRead instructions in imgui.cpp for details.");
+    //            ImGui::CheckboxFlags("io.ConfigFlags: NavEnableSetMousePos", &io.ConfigFlags, ImGuiConfigFlags_NavEnableSetMousePos);
+    //            ImGui::SameLine(); HelpMarker("Instruct navigation to move the mouse cursor. See comment for ImGuiConfigFlags_NavEnableSetMousePos.");
+    //            ImGui::CheckboxFlags("io.ConfigFlags: NoMouse",              &io.ConfigFlags, ImGuiConfigFlags_NoMouse);
+    //            if (io.ConfigFlags & ImGuiConfigFlags_NoMouse)
+    //            {
+    //                // The "NoMouse" option can get us stuck with a disabled mouse! Let's provide an alternative way to fix it:
+    //                if (fmodf((float)ImGui::GetTime(), 0.40f) < 0.20f)
+    //                {
+    //                    ImGui::SameLine();
+    //                    ImGui::Text("<<PRESS SPACE TO DISABLE>>");
+    //                }
+    //                if (ImGui::IsKeyPressed(ImGuiKey_Space))
+    //                    io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+    //            }
+    //            ImGui::CheckboxFlags("io.ConfigFlags: NoMouseCursorChange", &io.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
+    //            ImGui::SameLine(); HelpMarker("Instruct backend to not alter mouse cursor shape and visibility.");
+    //            ImGui::Checkbox("io.ConfigInputTrickleEventQueue", &io.ConfigInputTrickleEventQueue);
+    //            ImGui::SameLine(); HelpMarker("Enable input queue trickling: some types of events submitted during the same frame (e.g. button down + up) will be spread over multiple frames, improving interactions with low framerates.");
+    //            ImGui::Checkbox("io.ConfigInputTextCursorBlink", &io.ConfigInputTextCursorBlink);
+    //            ImGui::SameLine(); HelpMarker("Enable blinking cursor (optional as some users consider it to be distracting).");
+    //            ImGui::Checkbox("io.ConfigInputTextEnterKeepActive", &io.ConfigInputTextEnterKeepActive);
+    //            ImGui::SameLine(); HelpMarker("Pressing Enter will keep item active and select contents (single-line only).");
+    //            ImGui::Checkbox("io.ConfigDragClickToInputText", &io.ConfigDragClickToInputText);
+    //            ImGui::SameLine(); HelpMarker("Enable turning DragXXX widgets into text input with a simple mouse click-release (without moving).");
+    //            ImGui::Checkbox("io.ConfigWindowsResizeFromEdges", &io.ConfigWindowsResizeFromEdges);
+    //            ImGui::SameLine(); HelpMarker("Enable resizing of windows from their edges and from the lower-left corner.\nThis requires (io.BackendFlags & ImGuiBackendFlags_HasMouseCursors) because it needs mouse cursor feedback.");
+    //            ImGui::Checkbox("io.ConfigWindowsMoveFromTitleBarOnly", &io.ConfigWindowsMoveFromTitleBarOnly);
+    //            ImGui::Checkbox("io.MouseDrawCursor", &io.MouseDrawCursor);
+    //            ImGui::SameLine(); HelpMarker("Instruct Dear ImGui to render a mouse cursor itself. Note that a mouse cursor rendered via your application GPU rendering path will feel more laggy than hardware cursor, but will be more in sync with your other visuals.\n\nSome desktop applications may use both kinds of cursors (e.g. enable software cursor only when resizing/dragging something).");
+    //            ImGui::Text("Also see Style->Rendering for rendering options.");
+    //            ImGui::TreePop();
+    //            ImGui::Separator();
+    //        }
+    //
+    //        IMGUI_DEMO_MARKER("Configuration/Backend Flags");
+    //        if (ImGui::TreeNode("Backend Flags"))
+    //        {
+    //            HelpMarker(
+    //                "Those flags are set by the backends (imgui_impl_xxx files) to specify their capabilities.\n"
+    //                "Here we expose them as read-only fields to avoid breaking interactions with your backend.");
+    //
+    //            // Make a local copy to avoid modifying actual backend flags.
+    //            // FIXME: We don't use BeginDisabled() to keep label bright, maybe we need a BeginReadonly() equivalent..
+    //            ImGuiBackendFlags backend_flags = io.BackendFlags;
+    //            ImGui::CheckboxFlags("io.BackendFlags: HasGamepad",           &backend_flags, ImGuiBackendFlags_HasGamepad);
+    //            ImGui::CheckboxFlags("io.BackendFlags: HasMouseCursors",      &backend_flags, ImGuiBackendFlags_HasMouseCursors);
+    //            ImGui::CheckboxFlags("io.BackendFlags: HasSetMousePos",       &backend_flags, ImGuiBackendFlags_HasSetMousePos);
+    //            ImGui::CheckboxFlags("io.BackendFlags: RendererHasVtxOffset", &backend_flags, ImGuiBackendFlags_RendererHasVtxOffset);
+    //            ImGui::TreePop();
+    //            ImGui::Separator();
+    //        }
+    //
+    //        IMGUI_DEMO_MARKER("Configuration/Style");
+    //        if (ImGui::TreeNode("Style"))
+    //        {
+    //            HelpMarker("The same contents can be accessed in 'Tools->Style Editor' or by calling the ShowStyleEditor() function.");
+    //            ImGui::ShowStyleEditor();
+    //            ImGui::TreePop();
+    //            ImGui::Separator();
+    //        }
+    //
+    //        IMGUI_DEMO_MARKER("Configuration/Capture, Logging");
+    //        if (ImGui::TreeNode("Capture/Logging"))
+    //        {
+    //            HelpMarker(
+    //                "The logging API redirects all text output so you can easily capture the content of "
+    //                "a window or a block. Tree nodes can be automatically expanded.\n"
+    //                "Try opening any of the contents below in this window and then click one of the \"Log To\" button.");
+    //            ImGui::LogButtons();
+    //
+    //            HelpMarker("You can also call ImGui::LogText() to output directly to the log without a visual output.");
+    //            if (ImGui::Button("Copy \"Hello, world!\" to clipboard"))
+    //            {
+    //                ImGui::LogToClipboard();
+    //                ImGui::LogText("Hello, world!");
+    //                ImGui::LogFinish();
+    //            }
+    //            ImGui::TreePop();
+    //        }
+    //    }
+    //
+    //    IMGUI_DEMO_MARKER("Window options");
+    //    if (ImGui::CollapsingHeader("Window options"))
+    //    {
+    //        if (ImGui::BeginTable("split", 3))
+    //        {
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No titlebar", &no_titlebar);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No scrollbar", &no_scrollbar);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No menu", &no_menu);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No move", &no_move);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No resize", &no_resize);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No collapse", &no_collapse);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No close", &no_close);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No nav", &no_nav);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No background", &no_background);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("No bring to front", &no_bring_to_front);
+    //            ImGui::TableNextColumn(); ImGui::Checkbox("Unsaved document", &unsaved_document);
+    //            ImGui::EndTable();
+    //        }
+    //    }
+    //
+    //    // All demo contents
+    //    ShowDemoWindowWidgets();
+    //    ShowDemoWindowLayout();
+    //    ShowDemoWindowPopups();
+    //    ShowDemoWindowTables();
+    //    ShowDemoWindowInputs();
+    //
+    Imgui.PopItemWidth();
+    Imgui.End();
 }
 
 //static void ShowDemoWindowWidgets()
@@ -6294,88 +6163,84 @@ static void ShowDemoWindow(State<bool> open)
 //        ImGui::EndMainMenuBar();
 //    }
 //}
-//
-//// Note that shortcuts are currently provided for display only
-//// (future version will add explicit flags to BeginMenu() to request processing shortcuts)
-//static void ShowExampleMenuFile()
-//{
-//    IMGUI_DEMO_MARKER("Examples/Menu");
-//    ImGui::MenuItem("(demo menu)", NULL, false, false);
-//    if (ImGui::MenuItem("New")) {}
-//    if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-//    if (ImGui::BeginMenu("Open Recent"))
-//    {
-//        ImGui::MenuItem("fish_hat.c");
-//        ImGui::MenuItem("fish_hat.inl");
-//        ImGui::MenuItem("fish_hat.h");
-//        if (ImGui::BeginMenu("More.."))
-//        {
-//            ImGui::MenuItem("Hello");
-//            ImGui::MenuItem("Sailor");
-//            if (ImGui::BeginMenu("Recurse.."))
-//            {
-//                ShowExampleMenuFile();
-//                ImGui::EndMenu();
-//            }
-//            ImGui::EndMenu();
-//        }
-//        ImGui::EndMenu();
-//    }
-//    if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-//    if (ImGui::MenuItem("Save As..")) {}
-//
-//    ImGui::Separator();
-//    IMGUI_DEMO_MARKER("Examples/Menu/Options");
-//    if (ImGui::BeginMenu("Options"))
-//    {
-//        static bool enabled = true;
-//        ImGui::MenuItem("Enabled", "", &enabled);
-//        ImGui::BeginChild("child", ImVec2(0, 60), true);
-//        for (int i = 0; i < 10; i++)
-//            ImGui::Text("Scrolling Text %d", i);
-//        ImGui::EndChild();
-//        static float f = 0.5f;
-//        static int n = 0;
-//        ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-//        ImGui::InputFloat("Input", &f, 0.1f);
-//        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-//        ImGui::EndMenu();
-//    }
-//
-//    IMGUI_DEMO_MARKER("Examples/Menu/Colors");
-//    if (ImGui::BeginMenu("Colors"))
-//    {
-//        float sz = ImGui::GetTextLineHeight();
-//        for (int i = 0; i < ImGuiCol_COUNT; i++)
-//        {
-//            const char* name = ImGui::GetStyleColorName((ImGuiCol)i);
-//            ImVec2 p = ImGui::GetCursorScreenPos();
-//            ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + sz, p.y + sz), ImGui::GetColorU32((ImGuiCol)i));
-//            ImGui::Dummy(ImVec2(sz, sz));
-//            ImGui::SameLine();
-//            ImGui::MenuItem(name);
-//        }
-//        ImGui::EndMenu();
-//    }
-//
-//    // Here we demonstrate appending again to the "Options" menu (which we already created above)
-//    // Of course in this demo it is a little bit silly that this function calls BeginMenu("Options") twice.
-//    // In a real code-base using it would make senses to use this feature from very different code locations.
-//    if (ImGui::BeginMenu("Options")) // <-- Append!
-//    {
-//        IMGUI_DEMO_MARKER("Examples/Menu/Append to an existing menu");
-//        static bool b = true;
-//        ImGui::Checkbox("SomeOption", &b);
-//        ImGui::EndMenu();
-//    }
-//
-//    if (ImGui::BeginMenu("Disabled", false)) // Disabled
-//    {
-//        IM_ASSERT(0);
-//    }
-//    if (ImGui::MenuItem("Checked", NULL, true)) {}
-//    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
-//}
+
+var enabled = new State<bool>(true);
+var f = new State<float>(0.5f);
+var n = new State<int>(0);
+var b = new State<bool>(true);
+
+void ShowExampleMenuFile()
+{
+    _ = Imgui.MenuItem("(demo menu)", null, false, false);
+    if (Imgui.MenuItem("New")) { }
+    if (Imgui.MenuItem("Open", "Ctrl+O")) { }
+    if (Imgui.BeginMenu("Open Recent"))
+    {
+        _ = Imgui.MenuItem("fish_hat.c");
+        _ = Imgui.MenuItem("fish_hat.inl");
+        _ = Imgui.MenuItem("fish_hat.h");
+        if (Imgui.BeginMenu("More.."))
+        {
+            _ = Imgui.MenuItem("Hello");
+            _ = Imgui.MenuItem("Sailor");
+            if (Imgui.BeginMenu("Recurse.."))
+            {
+                ShowExampleMenuFile();
+                Imgui.EndMenu();
+            }
+            Imgui.EndMenu();
+        }
+        Imgui.EndMenu();
+    }
+    if (Imgui.MenuItem("Save", "Ctrl+S")) { }
+    if (Imgui.MenuItem("Save As..")) { }
+
+    Imgui.Separator();
+    if (Imgui.BeginMenu("Options"))
+    {
+        _ = Imgui.MenuItem("Enabled", "", enabled);
+        _ = Imgui.BeginChild("child", new(0, 60), true);
+        for (var i = 0; i < 10; i++)
+        {
+            Imgui.Text($"Scrolling Text {i}");
+        }
+        Imgui.EndChild();
+        _ = Imgui.Slider("Value", f, 0.0f, 1.0f);
+        _ = Imgui.Input("Input", f, 0.1f);
+        //        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+        Imgui.EndMenu();
+    }
+
+    if (Imgui.BeginMenu("Colors"))
+    {
+        var sz = Imgui.GetTextLineHeight();
+        for (var i = 0; i < (int)StyleColor.Count; i++)
+        {
+            var name = Imgui.GetStyleColorName((StyleColor)i);
+            var p = Imgui.GetCursorScreenPosition();
+            // ImGui::GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + sz, p.y + sz), ImGui::GetColorU32((ImGuiCol)i));
+            Imgui.Dummy(new(sz, sz));
+            Imgui.SameLine();
+            _ = Imgui.MenuItem(name);
+        }
+
+        Imgui.EndMenu();
+    }
+
+    if (Imgui.BeginMenu("Options"))
+    {
+        _ = Imgui.Checkbox("SomeOption", b);
+        Imgui.EndMenu();
+    }
+
+    if (Imgui.BeginMenu("Disabled", false))
+    {
+        throw new InvalidOperationException();
+    }
+
+    if (Imgui.MenuItem("Checked", null, true)) { }
+    if (Imgui.MenuItem("Quit", "Alt+F4")) { }
+}
 //
 ////-----------------------------------------------------------------------------
 //// [SECTION] Example App: Debug Console / ShowExampleAppConsole()
@@ -7892,3 +7757,122 @@ static void ShowDemoWindow(State<bool> open)
 //#endif
 //
 //#endif // #ifndef IMGUI_DISABLE
+
+Imgui.CreateContext();
+var io = Imgui.GetIo();
+//io.ConfigOptions |= ConfigOptions.NavEnableKeyboard;     // Enable Keyboard Controls
+//io.ConfigOptions |= ConfigOptions.NavEnableGamepad;      // Enable Gamepad Controls
+
+// Setup Dear ImGui style
+Imgui.StyleColorsDark();
+//Imgui.StyleColorsLight();
+
+ImplSdl2.Init(window, renderer);
+ImplSdlRenderer.Init(renderer);
+
+// Load Fonts
+// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui.PushFont()/PopFont() to select them.
+// - AddFontFromFileTtf() will return the Font so you can store it if you need to select the font among multiple.
+// - If the file cannot be loaded, the function will return null. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling FontAtlas.Build()/GetTextureDataAsXXXX(), which NewFrame below will call.
+// - Read 'docs/FONTS.md' for more instructions and details.
+//io.Fonts.AddFontDefault();
+//io.Fonts.AddFontFromFileTtf("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+//io.Fonts.AddFontFromFileTtf("../../misc/fonts/DroidSans.ttf", 16.0f);
+//io.Fonts.AddFontFromFileTtf("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+//io.Fonts.AddFontFromFileTtf("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+//var font = io.Fonts.AddFontFromFileTtf("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, null, io.Fonts.GetGlyphRangesJapanese());
+
+var showDemoWindow = new State<bool>(true);
+var showManagedDemoWindow = new State<bool>(true);
+var showAnotherWindow = new State<bool>(false);
+var clearColor = new StateVector<float>(3, new[] { 0.45f, 0.55f, 0.60f });
+var f = new State<float>(0.0f);
+var counter = 0;
+
+Window.Closed += (sender, args) =>
+{
+    if (((Window)sender!).Id == window.Id)
+    {
+        application.Quit();
+    }
+};
+
+while (application.DispatchEvents())
+{
+    ImplSdlRenderer.NewFrame();
+    ImplSdl2.NewFrame();
+    Imgui.NewFrame();
+
+    if (showDemoWindow)
+    {
+        Imgui.ShowDemoWindow(showDemoWindow);
+    }
+
+    if (showManagedDemoWindow)
+    {
+        ShowDemoWindow(showManagedDemoWindow);
+    }
+
+    {
+        _ = Imgui.Begin("Hello, world!");
+
+        Imgui.Text("This is some useful text.");
+        _ = Imgui.Checkbox("Demo Window", showDemoWindow);
+        _ = Imgui.Checkbox("Managed Demo Window", showManagedDemoWindow);
+        _ = Imgui.Checkbox("Another Window", showAnotherWindow);
+
+        _ = Imgui.Slider("float", f, 0.0f, 1.0f);
+        _ = Imgui.ColorEdit("clear color", clearColor);
+
+        if (Imgui.Button("Button"))
+        {
+            counter++;
+        }
+        Imgui.SameLine();
+        Imgui.Text($"counter = {counter}");
+
+        Imgui.Text($"Application average {1000.0f / Imgui.GetIo().Framerate:F3} ms/frame ({Imgui.GetIo().Framerate:F1} FPS)");
+
+        Imgui.End();
+    }
+
+    if (showAnotherWindow)
+    {
+        _ = Imgui.Begin("Another Window", showAnotherWindow);
+        Imgui.Text("Hello from another window!");
+        if (Imgui.Button("Close Me"))
+        {
+            showAnotherWindow.Value = false;
+        }
+        Imgui.End();
+    }
+
+    Imgui.Render();
+
+    renderer.DrawColor = new((byte)(clearColor[0] * 255), (byte)(clearColor[1] * 255), (byte)(clearColor[2] * 255), 255);
+    renderer.Clear();
+    var drawData = Imgui.GetDrawData();
+    if (drawData != null)
+    {
+        ImplSdlRenderer.RenderDrawData(drawData.Value);
+    }
+    renderer.Present();
+}
+
+ImplSdlRenderer.Shutdown();
+ImplSdl2.Shutdown();
+Imgui.DestroyContext();
+
+static void HelpMarker(string description)
+{
+    Imgui.TextDisabled("(?)");
+    if (Imgui.IsItemHovered(HoveredOptions.DelayShort))
+    {
+        Imgui.BeginTooltip();
+        Imgui.PushTextWrapPosition(Imgui.GetFontSize() * 35.0f);
+        Imgui.TextUnformatted(description);
+        Imgui.PopTextWrapPosition();
+        Imgui.EndTooltip();
+    }
+}
