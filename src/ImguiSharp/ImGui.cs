@@ -38,6 +38,7 @@ namespace ImguiSharp
             Native.ImGui_NewFrame();
             s_sizeCallbacks?.Clear();
             s_plotCallbacks?.Clear();
+            s_inputTextCallbacks?.Clear();
         }
 
         public static void EndFrame() => Native.ImGui_EndFrame();
@@ -428,6 +429,34 @@ namespace ImguiSharp
         public static bool BeginCombo(string label, string previewValue, ComboOptions options = default) => Native.StringToUtf8Func(label, previewValue, (labelPtr, previewValuePtr) => Native.ImGui_BeginCombo(labelPtr, previewValuePtr, (Native.ImGuiComboFlags)options));
 
         public static void EndCombo() => Native.ImGui_EndCombo();
+
+        public static bool Combo(string label, State<int> currentItem, IReadOnlyList<string> items, int popupMaxHeightInItems = -1)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            {
+                var itemsPtr = stackalloc byte*[items.Count];
+                for (var index = 0; index < items.Count; index++)
+                {
+                    var bytes = Native.StringToUtf8(items[index]);
+                    var buffer = (byte*)Native.ImGui_MemAlloc((nuint)bytes.Length);
+                    bytes.CopyTo(new(buffer, bytes.Length));
+                    itemsPtr[index] = buffer;
+                }
+
+                var result = Native.ImGui_ComboCharEx(labelPtr, currentItem.ToNative(), itemsPtr, items.Count, popupMaxHeightInItems);
+
+                for (var index = 0; index < items.Count; index++)
+                {
+                    Native.ImGui_MemFree(itemsPtr[index]);
+                }
+
+                return result;
+            }
+        }
+
+        public static bool Combo(string label, State<int> currentItem, string itemsSeparatedByZeros, int popupMaxHeightInItems = -1) => Native.StringToUtf8Func(label, itemsSeparatedByZeros, (labelPtr, itemsSeparatedByZerosPtr) => Native.ImGui_ComboEx(labelPtr, currentItem.ToNative(), itemsSeparatedByZerosPtr, popupMaxHeightInItems));
+
+        // Not doing callback versions due to string freeing issues.
 
         #endregion
 
@@ -950,6 +979,32 @@ namespace ImguiSharp
         public static bool BeginListBox(string label, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginListBox(labelPtr, size.ToNative()));
 
         public static void EndListBox() => Native.ImGui_EndListBox();
+
+        public static bool ListBox(string label, State<int> currentItem, IReadOnlyList<string> items, int heightInItems = -1)
+        {
+            fixed (byte* labelPtr = Native.StringToUtf8(label))
+            {
+                var itemsPtr = stackalloc byte*[items.Count];
+                for (var index = 0; index < items.Count; index++)
+                {
+                    var bytes = Native.StringToUtf8(items[index]);
+                    var buffer = (byte*)Native.ImGui_MemAlloc((nuint)bytes.Length);
+                    bytes.CopyTo(new(buffer, bytes.Length));
+                    itemsPtr[index] = buffer;
+                }
+
+                var result = Native.ImGui_ListBox(labelPtr, currentItem.ToNative(), itemsPtr, items.Count, heightInItems);
+
+                for (var index = 0; index < items.Count; index++)
+                {
+                    Native.ImGui_MemFree(itemsPtr[index]);
+                }
+
+                return result;
+            }
+        }
+
+        // Not doing callback versions due to string freeing issues.
 
         #endregion
 

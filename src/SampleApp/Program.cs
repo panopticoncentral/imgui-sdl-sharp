@@ -2,7 +2,7 @@
 using SdlSharp.Graphics;
 using ImguiSharp;
 using ImguiSharp.Platform.Sdl;
-using ImGuiSharp.Renderer.Sdl;
+using ImguiSharp.Renderer.Sdl;
 
 namespace SampleApp
 {

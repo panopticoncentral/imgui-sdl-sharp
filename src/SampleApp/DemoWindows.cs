@@ -6213,7 +6213,7 @@ namespace SampleApp
                 Imgui.EndChild();
                 _ = Imgui.Slider("Value", s_f, 0.0f, 1.0f);
                 _ = Imgui.Input("Input", s_f, 0.1f);
-                //        ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+                _ = Imgui.Combo("Combo", s_n, "Yes\0No\0Maybe\0\0");
                 Imgui.EndMenu();
             }
 
