@@ -27,6 +27,12 @@ namespace ImguiSharp
             _data = data;
         }
 
+        public void Clear() => Native.ImDrawData_Clear(_data);
+
+        public void DeIndexAllBuffers() => Native.ImDrawData_DeIndexAllBuffers(_data);
+
+        public void ScaleClipRects(Size scale) => Native.ImDrawData_ScaleClipRects(_data, scale.ToNative());
+
         public static DrawData? Wrap(Native.ImDrawData* native) => native == null ? null : new(native);
 
         public Native.ImDrawData* ToNative() => _data;
