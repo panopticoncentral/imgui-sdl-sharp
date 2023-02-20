@@ -80,17 +80,17 @@ namespace SampleApp
             //        Imgui.End();
             //    }
             //
-            var windowOptions = ImguiSharp.WindowOptions.None
-                | (s_noTitlebar ? ImguiSharp.WindowOptions.NoTitleBar : 0)
-                | (s_noScrollbar ? ImguiSharp.WindowOptions.NoScrollbar : 0)
-                | (!s_noMenu ? ImguiSharp.WindowOptions.MenuBar : 0)
-                | (s_noMove ? ImguiSharp.WindowOptions.NoMove : 0)
-                | (s_noResize ? ImguiSharp.WindowOptions.NoResize : 0)
-                | (s_noCollapse ? ImguiSharp.WindowOptions.NoCollapse : 0)
-                | (s_noNav ? ImguiSharp.WindowOptions.NoNav : 0)
-                | (s_noBackground ? ImguiSharp.WindowOptions.NoBackground : 0)
-                | (s_noBringToFront ? ImguiSharp.WindowOptions.NoBringToFrontOnFocus : 0)
-                | (s_unsavedDocument ? ImguiSharp.WindowOptions.UnsavedDocument : 0);
+            var windowOptions = WindowOptions.None
+                | (s_noTitlebar ? WindowOptions.NoTitleBar : 0)
+                | (s_noScrollbar ? WindowOptions.NoScrollbar : 0)
+                | (!s_noMenu ? WindowOptions.MenuBar : 0)
+                | (s_noMove ? WindowOptions.NoMove : 0)
+                | (s_noResize ? WindowOptions.NoResize : 0)
+                | (s_noCollapse ? WindowOptions.NoCollapse : 0)
+                | (s_noNav ? WindowOptions.NoNav : 0)
+                | (s_noBackground ? WindowOptions.NoBackground : 0)
+                | (s_noBringToFront ? WindowOptions.NoBringToFrontOnFocus : 0)
+                | (s_unsavedDocument ? WindowOptions.UnsavedDocument : 0);
 
             if (s_noClose)
             {
@@ -116,70 +116,59 @@ namespace SampleApp
                     ShowExampleMenuFile();
                     Imgui.EndMenu();
                 }
-                //        if (Imgui.BeginMenu("Examples"))
-                //        {
-                //            IMGUI_DEMO_MARKER("Menu/Examples");
-                //            Imgui.MenuItem("Main menu bar", NULL, &show_app_main_menu_bar);
-                //            Imgui.MenuItem("Console", NULL, &show_app_console);
-                //            Imgui.MenuItem("Log", NULL, &show_app_log);
-                //            Imgui.MenuItem("Simple layout", NULL, &show_app_layout);
-                //            Imgui.MenuItem("Property editor", NULL, &show_app_property_editor);
-                //            Imgui.MenuItem("Long text display", NULL, &show_app_long_text);
-                //            Imgui.MenuItem("Auto-resizing window", NULL, &show_app_auto_resize);
-                //            Imgui.MenuItem("Constrained-resizing window", NULL, &show_app_constrained_resize);
-                //            Imgui.MenuItem("Simple overlay", NULL, &show_app_simple_overlay);
-                //            Imgui.MenuItem("Fullscreen window", NULL, &show_app_fullscreen);
-                //            Imgui.MenuItem("Manipulating window titles", NULL, &show_app_window_titles);
-                //            Imgui.MenuItem("Custom rendering", NULL, &show_app_custom_rendering);
-                //            Imgui.MenuItem("Documents", NULL, &show_app_documents);
-                //            Imgui.EndMenu();
-                //        }
-                //        //if (Imgui.MenuItem("MenuItem")) {} // You can also use MenuItem() inside a menu bar!
-                //        if (Imgui.BeginMenu("Tools"))
-                //        {
-                //            IMGUI_DEMO_MARKER("Menu/Tools");
-                //#ifndef IMGUI_DISABLE_DEBUG_TOOLS
-                //            const bool has_debug_tools = true;
-                //#else
-                //            const bool has_debug_tools = false;
-                //#endif
-                //            Imgui.MenuItem("Metrics/Debugger", NULL, &show_app_metrics, has_debug_tools);
-                //            Imgui.MenuItem("Debug Log", NULL, &show_app_debug_log, has_debug_tools);
-                //            Imgui.MenuItem("Stack Tool", NULL, &show_app_stack_tool, has_debug_tools);
-                //            Imgui.MenuItem("Style Editor", NULL, &show_app_style_editor);
-                //            Imgui.MenuItem("About Dear ImGui", NULL, &show_app_about);
-                //            Imgui.EndMenu();
-                //        }
+                if (Imgui.BeginMenu("Examples"))
+                {
+                    _ = Imgui.MenuItem("Main menu bar", null, s_showAppMainMenuBar);
+                    _ = Imgui.MenuItem("Console", null, s_showAppConsole);
+                    _ = Imgui.MenuItem("Log", null, s_showAppLog);
+                    _ = Imgui.MenuItem("Simple layout", null, s_showAppLayout);
+                    _ = Imgui.MenuItem("Property editor", null, s_showAppPropertyEditor);
+                    _ = Imgui.MenuItem("Long text display", null, s_showAppLongText);
+                    _ = Imgui.MenuItem("Auto-resizing window", null, s_showAppAutoResize);
+                    _ = Imgui.MenuItem("Constrained-resizing window", null, s_showAppConstrainedResize);
+                    _ = Imgui.MenuItem("Simple overlay", null, s_showAppSimpleOverlay);
+                    _ = Imgui.MenuItem("Fullscreen window", null, s_showAppFullscreen);
+                    _ = Imgui.MenuItem("Manipulating window titles", null, s_showAppWindowTitles);
+                    _ = Imgui.MenuItem("Custom rendering", null, s_showAppCustomRendering);
+                    _ = Imgui.MenuItem("Documents", null, s_showAppDocuments);
+                    Imgui.EndMenu();
+                }
+                //if (Imgui.MenuItem("MenuItem")) {} // You can also use MenuItem() inside a menu bar!
+                if (Imgui.BeginMenu("Tools"))
+                {
+                    _ = Imgui.MenuItem("Metrics/Debugger", null, s_showAppMetrics);
+                    _ = Imgui.MenuItem("Debug Log", null, s_showAppDebugLog);
+                    _ = Imgui.MenuItem("Stack Tool", null, s_showAppStackTool);
+                    _ = Imgui.MenuItem("Style Editor", null, s_showAppStyleEditor);
+                    _ = Imgui.MenuItem("About Dear ImGui", null, s_showAppAbout);
+                    Imgui.EndMenu();
+                }
                 Imgui.EndMenuBar();
             }
 
-            //
-            //    Imgui.Text("dear imgui says hello! (%s) (%d)", IMGUI_VERSION, IMGUI_VERSION_NUM);
-            //    Imgui.Spacing();
-            //
-            //    IMGUI_DEMO_MARKER("Help");
-            //    if (Imgui.CollapsingHeader("Help"))
-            //    {
-            //        Imgui.Text("ABOUT THIS DEMO:");
-            //        Imgui.BulletText("Sections below are demonstrating many aspects of the library.");
-            //        Imgui.BulletText("The \"Examples\" menu above leads to more demo contents.");
-            //        Imgui.BulletText("The \"Tools\" menu above gives access to: About Box, Style Editor,\n"
-            //                          "and Metrics/Debugger (general purpose Dear ImGui debugging tool).");
-            //        Imgui.Separator();
-            //
-            //        Imgui.Text("PROGRAMMER GUIDE:");
-            //        Imgui.BulletText("See the ShowDemoWindow() code in imgui_demo.cpp. <- you are here!");
-            //        Imgui.BulletText("See comments in imgui.cpp.");
-            //        Imgui.BulletText("See example applications in the examples/ folder.");
-            //        Imgui.BulletText("Read the FAQ at http://www.dearimgui.org/faq/");
-            //        Imgui.BulletText("Set 'io.ConfigFlags |= NavEnableKeyboard' for keyboard controls.");
-            //        Imgui.BulletText("Set 'io.ConfigFlags |= NavEnableGamepad' for gamepad controls.");
-            //        Imgui.Separator();
-            //
-            //        Imgui.Text("USER GUIDE:");
-            //        Imgui.ShowUserGuide();
-            //    }
-            //
+            Imgui.Text($"managed dear imgui says hello! ({Imgui.GetVersion()})");
+            Imgui.Spacing();
+
+            if (Imgui.CollapsingHeader("Help"))
+            {
+                Imgui.Text("ABOUT THIS DEMO:");
+                Imgui.BulletText("Sections below are demonstrating many aspects of the library.");
+                Imgui.BulletText("The \"Examples\" menu above leads to more demo contents.");
+                Imgui.BulletText("The \"Tools\" menu above gives access to: About Box, Style Editor,\n" +
+                                 "and Metrics/Debugger (general purpose Dear ImGui debugging tool).");
+                Imgui.Separator();
+
+                Imgui.Text("PROGRAMMER GUIDE:");
+                Imgui.BulletText("See the ShowDemoWindow() code in DemoWindow.cs. <- you are here!");
+                Imgui.BulletText("Read the FAQ at http://www.dearimgui.org/faq/");
+                Imgui.BulletText("Set 'io.ConfigOptions |= ConfigOptions.NavEnableKeyboard' for keyboard controls.");
+                Imgui.BulletText("Set 'io.ConfigOptions |= ConfigOptions.NavEnableGamepad' for gamepad controls.");
+                Imgui.Separator();
+
+                Imgui.Text("USER GUIDE:");
+                ShowUserGuide();
+            }
+
             //    IMGUI_DEMO_MARKER("Configuration");
             //    if (Imgui.CollapsingHeader("Configuration"))
             //    {
@@ -6101,41 +6090,39 @@ namespace SampleApp
         //
         //    Imgui.PopItemWidth();
         //}
-        //
-        ////-----------------------------------------------------------------------------
-        //// [SECTION] User Guide / ShowUserGuide()
-        ////-----------------------------------------------------------------------------
-        //
-        //void Imgui.ShowUserGuide()
-        //{
-        //    ImGuiIO& io = Imgui.GetIO();
-        //    Imgui.BulletText("Double-click on title bar to collapse window.");
-        //    Imgui.BulletText(
-        //        "Click and drag on lower corner to resize window\n"
-        //        "(double-click to auto fit window to its contents).");
-        //    Imgui.BulletText("CTRL+Click on a slider or drag box to input value as text.");
-        //    Imgui.BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
-        //    Imgui.BulletText("CTRL+Tab to select a window.");
-        //    if (io.FontAllowUserScaling)
-        //        Imgui.BulletText("CTRL+Mouse Wheel to zoom window contents.");
-        //    Imgui.BulletText("While inputing text:\n");
-        //    Imgui.Indent();
-        //    Imgui.BulletText("CTRL+Left/Right to word jump.");
-        //    Imgui.BulletText("CTRL+A or double-click to select all.");
-        //    Imgui.BulletText("CTRL+X/C/V to use clipboard cut/copy/paste.");
-        //    Imgui.BulletText("CTRL+Z,CTRL+Y to undo/redo.");
-        //    Imgui.BulletText("ESCAPE to revert.");
-        //    Imgui.Unindent();
-        //    Imgui.BulletText("With keyboard navigation enabled:");
-        //    Imgui.Indent();
-        //    Imgui.BulletText("Arrow keys to navigate.");
-        //    Imgui.BulletText("Space to activate a widget.");
-        //    Imgui.BulletText("Return to input text into a widget.");
-        //    Imgui.BulletText("Escape to deactivate a widget, close popup, exit child window.");
-        //    Imgui.BulletText("Alt to jump to the menu layer of a window.");
-        //    Imgui.Unindent();
-        //}
-        //
+
+        private static void ShowUserGuide()
+        {
+            var io = Imgui.GetIo();
+            Imgui.BulletText("Double-click on title bar to collapse window.");
+            Imgui.BulletText(
+                "Click and drag on lower corner to resize window\n" +
+                "(double-click to auto fit window to its contents).");
+            Imgui.BulletText("CTRL+Click on a slider or drag box to input value as text.");
+            Imgui.BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+            Imgui.BulletText("CTRL+Tab to select a window.");
+            if (io.FontAllowUserScaling)
+            {
+                Imgui.BulletText("CTRL+Mouse Wheel to zoom window contents.");
+            }
+            Imgui.BulletText("While inputing text:\n");
+            Imgui.Indent();
+            Imgui.BulletText("CTRL+Left/Right to word jump.");
+            Imgui.BulletText("CTRL+A or double-click to select all.");
+            Imgui.BulletText("CTRL+X/C/V to use clipboard cut/copy/paste.");
+            Imgui.BulletText("CTRL+Z,CTRL+Y to undo/redo.");
+            Imgui.BulletText("ESCAPE to revert.");
+            Imgui.Unindent();
+            Imgui.BulletText("With keyboard navigation enabled:");
+            Imgui.Indent();
+            Imgui.BulletText("Arrow keys to navigate.");
+            Imgui.BulletText("Space to activate a widget.");
+            Imgui.BulletText("Return to input text into a widget.");
+            Imgui.BulletText("Escape to deactivate a widget, close popup, exit child window.");
+            Imgui.BulletText("Alt to jump to the menu layer of a window.");
+            Imgui.Unindent();
+        }
+
         ////-----------------------------------------------------------------------------
         //// [SECTION] Example App: Main Menu Bar / ShowExampleAppMainMenuBar()
         ////-----------------------------------------------------------------------------
@@ -6247,7 +6234,7 @@ namespace SampleApp
             if (Imgui.MenuItem("Checked", null, true)) { }
             if (Imgui.MenuItem("Quit", "Alt+F4")) { }
         }
-        //
+
         ////-----------------------------------------------------------------------------
         //// [SECTION] Example App: Debug Console / ShowExampleAppConsole()
         ////-----------------------------------------------------------------------------
