@@ -2757,11 +2757,11 @@ namespace ImguiSharp
 
         #endregion
 
-        #region * Drawing API
+        #region Drawing API
 
         public const int IM_DRAWLIST_TEX_LINES_WIDTH_MAX = 63;
 
-        public static readonly nint ImDrawCallback_ResetRenderState = -1;
+        public static readonly nuint ImDrawCallback_ResetRenderState = unchecked((nuint)(-1));
 
         public struct ImDrawCmd
         {

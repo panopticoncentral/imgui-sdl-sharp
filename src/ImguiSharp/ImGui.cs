@@ -15,6 +15,9 @@ namespace ImguiSharp
         private static Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)>? s_inputTextCallbacks;
         private static Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)> InputTextCallbacks => s_inputTextCallbacks ??= new Dictionary<nuint, (StateText Text, InputTextCallbacks Callbacks)>();
 
+        private static Dictionary<nuint, Action<DrawList, DrawCommand>>? s_drawListCallbacks;
+        internal static Dictionary<nuint, Action<DrawList, DrawCommand>> DrawListCallbacks => s_drawListCallbacks ??= new Dictionary<nuint, Action<DrawList, DrawCommand>>();
+
         #region Context creation and access
 
         public static Context CreateContext(FontAtlas? sharedFontAtlas = null) => Context.Wrap(Native.ImGui_CreateContext(sharedFontAtlas.ToNative()))!.Value;
@@ -39,6 +42,7 @@ namespace ImguiSharp
             s_sizeCallbacks?.Clear();
             s_plotCallbacks?.Clear();
             s_inputTextCallbacks?.Clear();
+            s_drawListCallbacks?.Clear();
         }
 
         public static void EndFrame() => Native.ImGui_EndFrame();

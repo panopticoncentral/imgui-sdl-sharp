@@ -7,13 +7,13 @@
         public DrawCommandKind Kind =>
             _cmd->UserCallback == null
                 ? DrawCommandKind.Vertex
-                : (nint)_cmd->UserCallback == Native.ImDrawCallback_ResetRenderState
+                : (nuint)_cmd->UserCallback == Native.ImDrawCallback_ResetRenderState
                     ? DrawCommandKind.ResetRenderState
                     : DrawCommandKind.Callback;
 
         public Rectangle ClipRectangle => Rectangle.Wrap(_cmd->ClipRect);
 
-        public TextureId TextureId => TextureId.Wrap(_cmd->TextureId);
+        public TextureId TextureId => TextureId.Wrap(Native.ImDrawCmd_GetTexID(_cmd));
 
         public uint VertexOffset => _cmd->VtxOffset;
 
@@ -26,7 +26,20 @@
             _cmd = cmd;
         }
 
-        public void DoCallback(DrawList drawList) => _cmd->UserCallback(drawList.ToNative(), _cmd);
+        public void DoCallback(DrawList drawList)
+        {
+            if ((nuint)_cmd->UserCallback == unchecked((nuint)(-2)))
+            {
+                if (Imgui.DrawListCallbacks.TryGetValue((nuint)_cmd->UserCallbackData, out var action))
+                {
+                    action(drawList, this);
+                }
+            }
+            else
+            {
+                _cmd->UserCallback(drawList.ToNative(), _cmd);
+            }
+        }
 
         public static DrawCommand? Wrap(Native.ImDrawCmd* native) => native == null ? null : new(native);
 
