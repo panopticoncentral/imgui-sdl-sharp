@@ -1161,7 +1161,9 @@ namespace ImguiSharp
 
         #region Tables
 
-        public static bool BeginTable(string id, int column, TableOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTable(idPtr, column, (Native.ImGuiTableFlags)options));
+        public static bool BeginTable(string id, int column) => BeginTable(id, column, default);
+
+        public static bool BeginTable(string id, int column, TableOptions options) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTable(idPtr, column, (Native.ImGuiTableFlags)options));
 
         public static bool BeginTable(string id, int column, TableOptions options = default, Size outerSize = default, float innerWidth = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTableEx(idPtr, column, (Native.ImGuiTableFlags)options, outerSize.ToNative(), innerWidth));
 
