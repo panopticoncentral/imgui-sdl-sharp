@@ -261,7 +261,7 @@ namespace ImguiSharp
                     utf8.CopyTo(new Span<byte>(s_clipboardTextData, utf8.Length));
                 }
             }
- 
+
             return s_clipboardTextData;
         }
 
