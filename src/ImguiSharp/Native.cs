@@ -72,7 +72,7 @@ namespace ImguiSharp
         /// </summary>
         /// <param name="s">The regular string.</param>
         /// <returns>The new UTF-8 string.</returns>
-        public static ReadOnlySpan<byte> StringToUtf8(string? s) => s == null ? null : new ReadOnlySpan<byte>(Encoding.UTF8.GetBytes(s));
+        public static ReadOnlySpan<byte> StringToUtf8(string? s) => s == null ? null : new ReadOnlySpan<byte>(Encoding.UTF8.GetBytes(s + '\0'));
 
         public delegate void Utf8Action(byte* ptr);
 

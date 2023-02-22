@@ -1,4 +1,6 @@
-﻿using ImguiSharp;
+﻿using System.Resources;
+
+using ImguiSharp;
 
 namespace SampleApp
 {
@@ -356,6 +358,23 @@ namespace SampleApp
         private static int s_clicked;
         private static readonly State<bool> s_check = new(true);
         private static readonly State<int> s_e = new(0);
+        private static int s_counter;
+        private static readonly State<int> s_itemCurrent = new(0);
+        private static readonly StateText s_str0 = new(128, "Hello, world!");
+        private static readonly StateText s_str1 = new(128);
+        private static readonly State<int> s_i0 = new(123);
+        private static readonly State<float> s_f0 = new(0.001f);
+        private static readonly State<double> s_d0 = new(999999.00000001);
+        private static readonly State<float> s_f1 = new(1.0e10f);
+        private static readonly StateVector<float> s_vec3a = new(3, new[] { 0.10f, 0.20f, 0.30f });
+        private static readonly State<int> s_i1 = new(50), s_i2 = new(42);
+        private static readonly State<float> s_f2 = new(1.00f), s_f3 = new(0.0067f);
+        private static readonly State<int> s_i3 = new(0);
+        private static readonly State<float> s_f4 = new(0.123f), s_f5 = new(0.0f);
+        private static readonly State<float> s_angle = new(0.0f);
+        private enum Element { Fire, Earth, Air, Water, Count };
+        private static readonly State<int> s_elem = new((int)Element.Fire);
+        private static readonly string[] s_elemNames = { "Fire", "Earth", "Air", "Water" };
 
         private static void ShowDemoWindowWidgets()
         {
@@ -389,138 +408,111 @@ namespace SampleApp
                 Imgui.SameLine();
                 _ = Imgui.RadioButton("radio c", s_e, 2);
 
-                //        // Color buttons, demonstrate using PushID() to add unique identifier in the ID stack, and changing style.
-                //        IMGUI_DEMO_MARKER("Widgets/Basic/Buttons (Colored)");
-                //        for (int i = 0; i < 7; i++)
-                //        {
-                //            if (i > 0)
-                //                Imgui.SameLine();
-                //            Imgui.PushID(i);
-                //            Imgui.PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(i / 7.0f, 0.6f, 0.6f));
-                //            Imgui.PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(i / 7.0f, 0.7f, 0.7f));
-                //            Imgui.PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(i / 7.0f, 0.8f, 0.8f));
-                //            Imgui.Button("Click");
-                //            Imgui.PopStyleColor(3);
-                //            Imgui.PopID();
-                //        }
-                //
-                //        // Use AlignTextToFramePadding() to align text baseline to the baseline of framed widgets elements
-                //        // (otherwise a Text+SameLine+Button sequence will have the text a little too high by default!)
-                //        // See 'Demo->Layout->Text Baseline Alignment' for details.
-                //        Imgui.AlignTextToFramePadding();
-                //        Imgui.Text("Hold to repeat:");
-                //        Imgui.SameLine();
-                //
-                //        // Arrow buttons with Repeater
-                //        IMGUI_DEMO_MARKER("Widgets/Basic/Buttons (Repeating)");
-                //        static int counter = 0;
-                //        float spacing = Imgui.GetStyle().ItemInnerSpacing.x;
-                //        Imgui.PushButtonRepeat(true);
-                //        if (Imgui.ArrowButton("##left", ImGuiDir_Left)) { counter--; }
-                //        Imgui.SameLine(0.0f, spacing);
-                //        if (Imgui.ArrowButton("##right", ImGuiDir_Right)) { counter++; }
-                //        Imgui.PopButtonRepeat();
-                //        Imgui.SameLine();
-                //        Imgui.Text("%d", counter);
-                //
-                //        Imgui.Separator();
-                //        Imgui.LabelText("label", "Value");
-                //
-                //        {
-                //            // Using the _simplified_ one-liner Combo() api here
-                //            // See "Combo" section for examples of how to use the more flexible BeginCombo()/EndCombo() api.
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/Combo");
-                //            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
-                //            static int item_current = 0;
-                //            Imgui.Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
-                //            Imgui.SameLine(); HelpMarker(
-                //                "Using the simplified one-liner Combo API here.\nRefer to the \"Combo\" section below for an explanation of how to use the more flexible and general BeginCombo/EndCombo API.");
-                //        }
-                //
-                //        {
-                //            // To wire InputText() with std::string or any other custom string type,
-                //            // see the "Text Input > Resize Callback" section of this demo, and the misc/cpp/imgui_stdlib.h file.
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/InputText");
-                //            static char str0[128] = "Hello, world!";
-                //            Imgui.InputText("input text", str0, IM_ARRAYSIZE(str0));
-                //            Imgui.SameLine(); HelpMarker(
-                //                "USER:\n"
-                //                "Hold SHIFT or use mouse to select text.\n"
-                //                "CTRL+Left/Right to word jump.\n"
-                //                "CTRL+A or Double-Click to select all.\n"
-                //                "CTRL+X,CTRL+C,CTRL+V clipboard.\n"
-                //                "CTRL+Z,CTRL+Y undo/redo.\n"
-                //                "ESCAPE to revert.\n\n"
-                //                "PROGRAMMER:\n"
-                //                "You can use the ImGuiInputTextFlags_CallbackResize facility if you need to wire InputText() "
-                //                "to a dynamic string type. See misc/cpp/imgui_stdlib.h for an example (this is not demonstrated "
-                //                "in imgui_demo.cpp).");
-                //
-                //            static char str1[128] = "";
-                //            Imgui.InputTextWithHint("input text (w/ hint)", "enter text here", str1, IM_ARRAYSIZE(str1));
-                //
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/InputInt, InputFloat");
-                //            static int i0 = 123;
-                //            Imgui.InputInt("input int", &i0);
-                //
-                //            static float f0 = 0.001f;
-                //            Imgui.InputFloat("input float", &f0, 0.01f, 1.0f, "%.3f");
-                //
-                //            static double d0 = 999999.00000001;
-                //            Imgui.InputDouble("input double", &d0, 0.01f, 1.0f, "%.8f");
-                //
-                //            static float f1 = 1.e10f;
-                //            Imgui.InputFloat("input scientific", &f1, 0.0f, 0.0f, "%e");
-                //            Imgui.SameLine(); HelpMarker(
-                //                "You can input value using the scientific notation,\n"
-                //                "  e.g. \"1e+8\" becomes \"100000000\".");
-                //
-                //            static float vec4a[4] = { 0.10f, 0.20f, 0.30f, 0.44f };
-                //            Imgui.InputFloat3("input float3", vec4a);
-                //        }
-                //
-                //        {
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/DragInt, DragFloat");
-                //            static int i1 = 50, i2 = 42;
-                //            Imgui.DragInt("drag int", &i1, 1);
-                //            Imgui.SameLine(); HelpMarker(
-                //                "Click and drag to edit value.\n"
-                //                "Hold SHIFT/ALT for faster/slower edit.\n"
-                //                "Double-click or CTRL+click to input value.");
-                //
-                //            Imgui.DragInt("drag int 0..100", &i2, 1, 0, 100, "%d%%", ImGuiSliderFlags_AlwaysClamp);
-                //
-                //            static float f1 = 1.00f, f2 = 0.0067f;
-                //            Imgui.DragFloat("drag float", &f1, 0.005f);
-                //            Imgui.DragFloat("drag small float", &f2, 0.0001f, 0.0f, 0.0f, "%.06f ns");
-                //        }
-                //
-                //        {
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/SliderInt, SliderFloat");
-                //            static int i1 = 0;
-                //            Imgui.SliderInt("slider int", &i1, -1, 3);
-                //            Imgui.SameLine(); HelpMarker("CTRL+click to input value.");
-                //
-                //            static float f1 = 0.123f, f2 = 0.0f;
-                //            Imgui.SliderFloat("slider float", &f1, 0.0f, 1.0f, "ratio = %.3f");
-                //            Imgui.SliderFloat("slider float (log)", &f2, -10.0f, 10.0f, "%.4f", ImGuiSliderFlags_Logarithmic);
-                //
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/SliderAngle");
-                //            static float angle = 0.0f;
-                //            Imgui.SliderAngle("slider angle", &angle);
-                //
-                //            // Using the format string to display a name instead of an integer.
-                //            // Here we completely omit '%d' from the format string, so it'll only display a name.
-                //            // This technique can also be used with DragInt().
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/Slider (enum)");
-                //            enum Element { Element_Fire, Element_Earth, Element_Air, Element_Water, Element_COUNT };
-                //            static int elem = Element_Fire;
-                //            const char* elems_names[Element_COUNT] = { "Fire", "Earth", "Air", "Water" };
-                //            const char* elem_name = (elem >= 0 && elem < Element_COUNT) ? elems_names[elem] : "Unknown";
-                //            Imgui.SliderInt("slider enum", &elem, 0, Element_COUNT - 1, elem_name);
-                //            Imgui.SameLine(); HelpMarker("Using the format string parameter to display a name instead of the underlying integer.");
-                //        }
-                //
+                for (var i = 0; i < 7; i++)
+                {
+                    if (i > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+                    Imgui.PushId(i);
+                    Imgui.PushStyleColor(StyleColor.Button, Color.FromHsv(i / 7.0f, 0.6f, 0.6f));
+                    Imgui.PushStyleColor(StyleColor.ButtonHovered, Color.FromHsv(i / 7.0f, 0.7f, 0.7f));
+                    Imgui.PushStyleColor(StyleColor.ButtonActive, Color.FromHsv(i / 7.0f, 0.8f, 0.8f));
+                    _ = Imgui.Button("Click");
+                    Imgui.PopStyleColor(3);
+                    Imgui.PopId();
+                }
+
+                Imgui.AlignTextToFramePadding();
+                Imgui.Text("Hold to repeat:");
+                Imgui.SameLine();
+
+                var spacing = Imgui.GetStyle().ItemInnerSpacing.Width;
+                Imgui.PushButtonRepeat(true);
+                if (Imgui.ArrowButton("##left", Direction.Left))
+                {
+                    s_counter--;
+                }
+                Imgui.SameLine(0.0f, spacing);
+                if (Imgui.ArrowButton("##right", Direction.Right))
+                {
+                    s_counter++;
+                }
+                Imgui.PopButtonRepeat();
+                Imgui.SameLine();
+                Imgui.Text($"{s_counter}");
+
+                Imgui.Separator();
+                Imgui.LabelText("label", "Value");
+
+                {
+                    _ = Imgui.Combo("combo", s_itemCurrent, new[] { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" });
+                    Imgui.SameLine();
+                    HelpMarker("Using the simplified one-liner Combo API here.\nRefer to the \"Combo\" section below for an explanation of how to use the more flexible and general BeginCombo/EndCombo API.");
+                }
+
+                {
+                    _ = Imgui.InputText("input text", s_str0);
+                    Imgui.SameLine();
+                    HelpMarker(
+                        "USER:\n" +
+                        "Hold SHIFT or use mouse to select text.\n" +
+                        "CTRL+Left/Right to word jump.\n" +
+                        "CTRL+A or Double-Click to select all.\n" +
+                        "CTRL+X,CTRL+C,CTRL+V clipboard.\n" +
+                        "CTRL+Z,CTRL+Y undo/redo.\n" +
+                        "ESCAPE to revert.\n\n" +
+                        "PROGRAMMER:\n" +
+                        "You can use the Resize facility if you need to wire InputText() " +
+                        "to a dynamic string type. See misc/cpp/imgui_stdlib.h for an example (this is not demonstrated " +
+                        "in imgui_demo.cpp).");
+
+                    _ = Imgui.InputText("input text (w/ hint)", "enter text here", s_str1);
+
+                    _ = Imgui.Input("input int", s_i0);
+
+                    _ = Imgui.Input("input float", s_f0, 0.01f, 1.0f, "%.3f");
+
+                    _ = Imgui.Input("input double", s_d0, 0.01f, 1.0f, "%.8f");
+
+                    _ = Imgui.Input("input scientific", s_f1, 0.0f, 0.0f, "%e");
+                    Imgui.SameLine();
+                    HelpMarker(
+                        "You can input value using the scientific notation,\n" +
+                        "  e.g. \"1e+8\" becomes \"100000000\".");
+
+                    _ = Imgui.Input("input float3", s_vec3a);
+                }
+
+                {
+                    _ = Imgui.Drag("drag int", s_i1, 1);
+                    Imgui.SameLine();
+                    HelpMarker(
+                        "Click and drag to edit value.\n" +
+                        "Hold SHIFT/ALT for faster/slower edit.\n" +
+                        "Double-click or CTRL+click to input value.");
+
+                    _ = Imgui.Drag("drag int 0..100", s_i2, 1, 0, 100, "%d%%", SliderOptions.AlwaysClamp);
+
+                    _ = Imgui.Drag("drag float", s_f2, 0.005f);
+                    _ = Imgui.Drag("drag small float", s_f3, 0.0001f, 0.0f, 0.0f, "%.06f ns");
+                }
+
+                {
+                    _ = Imgui.Slider("slider int", s_i3, -1, 3);
+                    Imgui.SameLine();
+                    HelpMarker("CTRL+click to input value.");
+
+                    _ = Imgui.Slider("slider float", s_f4, 0.0f, 1.0f, "ratio = %.3f");
+                    _ = Imgui.Slider("slider float (log)", s_f5, -10.0f, 10.0f, "%.4f", SliderOptions.Logarithmic);
+
+                    _ = Imgui.SliderAngle("slider angle", s_angle);
+
+                    var elemName = (s_elem >= 0 && s_elem < (int)Element.Count) ? s_elemNames[s_elem] : "Unknown";
+                    _ = Imgui.Slider("slider enum", s_elem, 0, (int)Element.Count - 1, elemName);
+                    Imgui.SameLine(); HelpMarker("Using the format string parameter to display a name instead of the underlying integer.");
+                }
+
                 //        {
                 //            IMGUI_DEMO_MARKER("Widgets/Basic/ColorEdit3, ColorEdit4");
                 //            static float col1[3] = { 1.0f, 0.0f, 0.2f };

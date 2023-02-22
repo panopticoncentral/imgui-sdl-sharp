@@ -6,10 +6,19 @@
 
         public int Length { get; private set; }
 
-        public StateText(int length)
+        public StateText(int length, string? initializer = null)
         {
             _value = (byte*)Native.ImGui_MemAlloc((nuint)length);
             Length = length;
+
+            if (initializer != null)
+            {
+                Native.StringToUtf8(initializer).CopyTo(new Span<byte>(_value, Length));
+            }
+            else
+            {
+                _value[0] = 0;
+            }
         }
 
         public void Dispose() => Native.ImGui_MemFree(_value);

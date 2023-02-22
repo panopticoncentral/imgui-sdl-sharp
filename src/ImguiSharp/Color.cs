@@ -8,6 +8,12 @@
 
         public static Color Wrap(Native.ImVec4 native) => new(native);
 
+        public static Color FromHsv(float h, float s, float v, float a = 1.0f)
+        {
+            var (r, g, b) = Imgui.ColorConvertHsvToRgb(h, s, v);
+            return new(r, g, b, a);
+        }
+
         public Native.ImVec4 ToNative() => new(Red, Green, Blue, Alpha);
     }
 }

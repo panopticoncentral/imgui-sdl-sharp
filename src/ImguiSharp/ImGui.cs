@@ -384,7 +384,7 @@ namespace ImguiSharp
 
         public static bool InvisibleButton(string id, Size size, ButtonOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_InvisibleButton(idPtr, size.ToNative(), (Native.ImGuiButtonFlags)options));
 
-        public static bool ArrowButton(string id, BindingDirection direction) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ArrowButton(idPtr, (Native.ImGuiDir)direction));
+        public static bool ArrowButton(string id, Direction direction) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ArrowButton(idPtr, (Native.ImGuiDir)direction));
 
         public static bool Checkbox(string label, State<bool> v) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_Checkbox(labelPtr, v.ToNative()));
 
