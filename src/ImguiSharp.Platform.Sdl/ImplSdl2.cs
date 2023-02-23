@@ -381,7 +381,7 @@ namespace ImguiSharp.Platform.Sdl
                 throw new InvalidOperationException();
             }
 
-            MouseCursor imguiCursor = Imgui.GetMouseCursor();
+            var imguiCursor = Imgui.GetMouseCursor();
             if (io.MouseDrawCursor || imguiCursor == MouseCursor.None)
             {
                 _ = Cursor.Show(State.Disable);

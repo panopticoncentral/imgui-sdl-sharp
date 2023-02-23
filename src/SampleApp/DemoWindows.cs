@@ -2,6 +2,8 @@
 
 using ImguiSharp;
 
+using static ImguiSharp.Native;
+
 namespace SampleApp
 {
     public static class DemoWindows
@@ -359,7 +361,7 @@ namespace SampleApp
         private static readonly State<bool> s_check = new(true);
         private static readonly State<int> s_e = new(0);
         private static int s_counter;
-        private static readonly State<int> s_itemCurrent = new(0);
+        private static readonly State<int> s_itemCurrent1 = new(0);
         private static readonly StateText s_str0 = new(128, "Hello, world!");
         private static readonly StateText s_str1 = new(128);
         private static readonly State<int> s_i0 = new(123);
@@ -375,6 +377,13 @@ namespace SampleApp
         private enum Element { Fire, Earth, Air, Water, Count };
         private static readonly State<int> s_elem = new((int)Element.Fire);
         private static readonly string[] s_elemNames = { "Fire", "Earth", "Air", "Water" };
+        private static readonly StateVector<float> s_col1 = new(3, new[] { 1.0f, 0.0f, 0.2f });
+        private static readonly StateVector<float> s_col2 = new(4, new[] { 0.4f, 0.7f, 0.0f, 0.5f });
+        private static readonly State<int> s_itemCurrent2 = new(1);
+        private static readonly State<int> s_baseFlags = new((int)(TreeNodeOptions.OpenOnArrow | TreeNodeOptions.OpenOnDoubleClick | TreeNodeOptions.SpanAvailWidth));
+        private static readonly State<bool> s_alignLabelWithCurrentXPosition = new(false);
+        private static readonly State<bool> s_testDragAndDrop = new(false);
+        private static int s_selectionMask = 1 << 2;
 
         private static void ShowDemoWindowWidgets()
         {
@@ -446,7 +455,7 @@ namespace SampleApp
                 Imgui.LabelText("label", "Value");
 
                 {
-                    _ = Imgui.Combo("combo", s_itemCurrent, new[] { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" });
+                    _ = Imgui.Combo("combo", s_itemCurrent1, new[] { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" });
                     Imgui.SameLine();
                     HelpMarker("Using the simplified one-liner Combo API here.\nRefer to the \"Combo\" section below for an explanation of how to use the more flexible and general BeginCombo/EndCombo API.");
                 }
@@ -513,182 +522,170 @@ namespace SampleApp
                     Imgui.SameLine(); HelpMarker("Using the format string parameter to display a name instead of the underlying integer.");
                 }
 
-                //        {
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/ColorEdit3, ColorEdit4");
-                //            static float col1[3] = { 1.0f, 0.0f, 0.2f };
-                //            static float col2[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
-                //            Imgui.ColorEdit3("color 1", col1);
-                //            Imgui.SameLine(); HelpMarker(
-                //                "Click on the color square to open a color picker.\n"
-                //                "Click and hold to use drag and drop.\n"
-                //                "Right-click on the color square to show options.\n"
-                //                "CTRL+click on individual component to input value.\n");
-                //
-                //            Imgui.ColorEdit4("color 2", col2);
-                //        }
-                //
-                //        {
-                //            // Using the _simplified_ one-liner ListBox() api here
-                //            // See "List boxes" section for examples of how to use the more flexible BeginListBox()/EndListBox() api.
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/ListBox");
-                //            const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon" };
-                //            static int item_current = 1;
-                //            Imgui.ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4);
-                //            Imgui.SameLine(); HelpMarker(
-                //                "Using the simplified one-liner ListBox API here.\nRefer to the \"List boxes\" section below for an explanation of how to use the more flexible and general BeginListBox/EndListBox API.");
-                //        }
-                //
-                //        {
-                //            // Tooltips
-                //            IMGUI_DEMO_MARKER("Widgets/Basic/Tooltips");
-                //            Imgui.AlignTextToFramePadding();
-                //            Imgui.Text("Tooltips:");
-                //
-                //            Imgui.SameLine();
-                //            Imgui.Button("Button");
-                //            if (Imgui.IsItemHovered())
-                //                Imgui.SetTooltip("I am a tooltip");
-                //
-                //            Imgui.SameLine();
-                //            Imgui.Button("Fancy");
-                //            if (Imgui.IsItemHovered())
-                //            {
-                //                Imgui.BeginTooltip();
-                //                Imgui.Text("I am a fancy tooltip");
-                //                static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
-                //                Imgui.PlotLines("Curve", arr, IM_ARRAYSIZE(arr));
-                //                Imgui.Text("Sin(time) = %f", sinf((float)Imgui.GetTime()));
-                //                Imgui.EndTooltip();
-                //            }
-                //
-                //            Imgui.SameLine();
-                //            Imgui.Button("Delayed");
-                //            if (Imgui.IsItemHovered(ImGuiHoveredFlags_DelayNormal)) // Delay best used on items that highlight on hover, so this not a great example!
-                //                Imgui.SetTooltip("I am a tooltip with a delay.");
-                //
-                //            Imgui.SameLine();
-                //            HelpMarker(
-                //                "Tooltip are created by using the IsItemHovered() function over any kind of item.");
-                //
-                //        }
+                {
+                    _ = Imgui.ColorEdit("color 1", s_col1);
+                    Imgui.SameLine();
+                    HelpMarker(
+                        "Click on the color square to open a color picker.\n" +
+                        "Click and hold to use drag and drop.\n" +
+                        "Right-click on the color square to show options.\n" +
+                        "CTRL+click on individual component to input value.\n");
+
+                    _ = Imgui.ColorEdit("color 2", s_col2);
+                }
+
+                {
+                    _ = Imgui.ListBox("listbox", s_itemCurrent2, new[] { "Apple", "Banana", "Cherry", "Kiwi", "Mango", "Orange", "Pineapple", "Strawberry", "Watermelon" }, 4);
+                    Imgui.SameLine(); HelpMarker(
+                        "Using the simplified one-liner ListBox API here.\nRefer to the \"List boxes\" section below for an explanation of how to use the more flexible and general BeginListBox/EndListBox API.");
+                }
+
+                {
+                    Imgui.AlignTextToFramePadding();
+                    Imgui.Text("Tooltips:");
+
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Button");
+                    if (Imgui.IsItemHovered())
+                    {
+                        Imgui.SetTooltip("I am a tooltip");
+                    }
+
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Fancy");
+                    if (Imgui.IsItemHovered())
+                    {
+                        Imgui.BeginTooltip();
+                        Imgui.Text("I am a fancy tooltip");
+                        Imgui.PlotLines("Curve", new[] { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f });
+                        Imgui.Text($"Sin(time) = {Math.Sin(Imgui.GetTime())}");
+                        Imgui.EndTooltip();
+                    }
+
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Delayed");
+                    if (Imgui.IsItemHovered(HoveredOptions.DelayNormal))
+                    {
+                        Imgui.SetTooltip("I am a tooltip with a delay.");
+                    }
+
+                    Imgui.SameLine();
+                    HelpMarker(
+                        "Tooltip are created by using the IsItemHovered() function over any kind of item.");
+                }
 
                 Imgui.TreePop();
             }
 
-            //    // Testing ImGuiOnceUponAFrame helper.
-            //    //static ImGuiOnceUponAFrame once;
-            //    //for (int i = 0; i < 5; i++)
-            //    //    if (once)
-            //    //        Imgui.Text("This will be displayed only once.");
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/Trees");
-            //    if (Imgui.TreeNode("Trees"))
-            //    {
-            //        IMGUI_DEMO_MARKER("Widgets/Trees/Basic trees");
-            //        if (Imgui.TreeNode("Basic trees"))
-            //        {
-            //            for (int i = 0; i < 5; i++)
-            //            {
-            //                // Use SetNextItemOpen() so set the default state of a node to be open. We could
-            //                // also use TreeNodeEx() with the ImGuiTreeNodeFlags_DefaultOpen flag to achieve the same thing!
-            //                if (i == 0)
-            //                    Imgui.SetNextItemOpen(true, ImGuiCond_Once);
-            //
-            //                if (Imgui.TreeNode((void*)(intptr_t)i, "Child %d", i))
-            //                {
-            //                    Imgui.Text("blah blah");
-            //                    Imgui.SameLine();
-            //                    if (Imgui.SmallButton("button")) {}
-            //                    Imgui.TreePop();
-            //                }
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Trees/Advanced, with Selectable nodes");
-            //        if (Imgui.TreeNode("Advanced, with Selectable nodes"))
-            //        {
-            //            HelpMarker(
-            //                "This is a more typical looking tree with selectable nodes.\n"
-            //                "Click to select, CTRL+Click to toggle, click on arrows or double-click to open.");
-            //            static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-            //            static bool align_label_with_current_x_position = false;
-            //            static bool test_drag_and_drop = false;
-            //            Imgui.CheckboxFlags("ImGuiTreeNodeFlags_OpenOnArrow",       &base_flags, ImGuiTreeNodeFlags_OpenOnArrow);
-            //            Imgui.CheckboxFlags("ImGuiTreeNodeFlags_OpenOnDoubleClick", &base_flags, ImGuiTreeNodeFlags_OpenOnDoubleClick);
-            //            Imgui.CheckboxFlags("ImGuiTreeNodeFlags_SpanAvailWidth",    &base_flags, ImGuiTreeNodeFlags_SpanAvailWidth); Imgui.SameLine(); HelpMarker("Extend hit area to all available width instead of allowing more items to be laid out after the node.");
-            //            Imgui.CheckboxFlags("ImGuiTreeNodeFlags_SpanFullWidth",     &base_flags, ImGuiTreeNodeFlags_SpanFullWidth);
-            //            Imgui.Checkbox("Align label with current X position", &align_label_with_current_x_position);
-            //            Imgui.Checkbox("Test tree node as drag source", &test_drag_and_drop);
-            //            Imgui.Text("Hello!");
-            //            if (align_label_with_current_x_position)
-            //                Imgui.Unindent(Imgui.GetTreeNodeToLabelSpacing());
-            //
-            //            // 'selection_mask' is dumb representation of what may be user-side selection state.
-            //            //  You may retain selection state inside or outside your objects in whatever format you see fit.
-            //            // 'node_clicked' is temporary storage of what node we have clicked to process selection at the end
-            //            /// of the loop. May be a pointer to your own node type, etc.
-            //            static int selection_mask = (1 << 2);
-            //            int node_clicked = -1;
-            //            for (int i = 0; i < 6; i++)
-            //            {
-            //                // Disable the default "open on single-click behavior" + set Selected flag according to our selection.
-            //                // To alter selection we use IsItemClicked() && !IsItemToggledOpen(), so clicking on an arrow doesn't alter selection.
-            //                ImGuiTreeNodeFlags node_flags = base_flags;
-            //                const bool is_selected = (selection_mask & (1 << i)) != 0;
-            //                if (is_selected)
-            //                    node_flags |= ImGuiTreeNodeFlags_Selected;
-            //                if (i < 3)
-            //                {
-            //                    // Items 0..2 are Tree Node
-            //                    bool node_open = Imgui.TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i);
-            //                    if (Imgui.IsItemClicked() && !Imgui.IsItemToggledOpen())
-            //                        node_clicked = i;
-            //                    if (test_drag_and_drop && Imgui.BeginDragDropSource())
-            //                    {
-            //                        Imgui.SetDragDropPayload("_TREENODE", NULL, 0);
-            //                        Imgui.Text("This is a drag and drop source");
-            //                        Imgui.EndDragDropSource();
-            //                    }
-            //                    if (node_open)
-            //                    {
-            //                        Imgui.BulletText("Blah blah\nBlah Blah");
-            //                        Imgui.TreePop();
-            //                    }
-            //                }
-            //                else
-            //                {
-            //                    // Items 3..5 are Tree Leaves
-            //                    // The only reason we use TreeNode at all is to allow selection of the leaf. Otherwise we can
-            //                    // use BulletText() or advance the cursor by GetTreeNodeToLabelSpacing() and call Text().
-            //                    node_flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen; // ImGuiTreeNodeFlags_Bullet
-            //                    Imgui.TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Leaf %d", i);
-            //                    if (Imgui.IsItemClicked() && !Imgui.IsItemToggledOpen())
-            //                        node_clicked = i;
-            //                    if (test_drag_and_drop && Imgui.BeginDragDropSource())
-            //                    {
-            //                        Imgui.SetDragDropPayload("_TREENODE", NULL, 0);
-            //                        Imgui.Text("This is a drag and drop source");
-            //                        Imgui.EndDragDropSource();
-            //                    }
-            //                }
-            //            }
-            //            if (node_clicked != -1)
-            //            {
-            //                // Update selection state
-            //                // (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
-            //                if (Imgui.GetIO().KeyCtrl)
-            //                    selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
-            //                else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
-            //                    selection_mask = (1 << node_clicked);           // Click to single-select
-            //            }
-            //            if (align_label_with_current_x_position)
-            //                Imgui.Indent(Imgui.GetTreeNodeToLabelSpacing());
-            //            Imgui.TreePop();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Trees"))
+            {
+                if (Imgui.TreeNode("Basic trees"))
+                {
+                    for (var i = 0; i < 5; i++)
+                    {
+                        if (i == 0)
+                        {
+                            Imgui.SetNextItemOpen(true, Condition.Once);
+                        }
+
+                        if (Imgui.TreeNode((nuint)i, $"Child {i}"))
+                        {
+                            Imgui.Text("blah blah");
+                            Imgui.SameLine();
+                            if (Imgui.SmallButton("button")) { }
+                            Imgui.TreePop();
+                        }
+                    }
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Advanced, with Selectable nodes"))
+                {
+                    HelpMarker(
+                        "This is a more typical looking tree with selectable nodes.\n" +
+                        "Click to select, CTRL+Click to toggle, click on arrows or double-click to open.");
+                    _ = Imgui.CheckboxFlags("ImGuiTreeNodeFlags_OpenOnArrow", s_baseFlags, (int)TreeNodeOptions.OpenOnArrow);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.OpenOnDoubleClick", s_baseFlags, (int)TreeNodeOptions.OpenOnDoubleClick);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanAvailWidth", s_baseFlags, (int)TreeNodeOptions.SpanAvailWidth);
+                    Imgui.SameLine();
+                    HelpMarker("Extend hit area to all available width instead of allowing more items to be laid out after the node.");
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanFullWidth", s_baseFlags, (int)TreeNodeOptions.SpanFullWidth);
+                    _ = Imgui.Checkbox("Align label with current X position", s_alignLabelWithCurrentXPosition);
+                    _ = Imgui.Checkbox("Test tree node as drag source", s_testDragAndDrop);
+                    Imgui.Text("Hello!");
+                    if (s_alignLabelWithCurrentXPosition)
+                    {
+                        Imgui.Unindent(Imgui.GetTreeNodeToLabelSpacing());
+                    }
+
+                    var nodeClicked = -1;
+                    for (var i = 0; i < 6; i++)
+                    {
+                        var nodeFlags = (TreeNodeOptions)(int)s_baseFlags;
+                        var isSelected = (s_selectionMask & (1 << i)) != 0;
+                        if (isSelected)
+                        {
+                            nodeFlags |= TreeNodeOptions.Selected;
+                        }
+
+                        if (i < 3)
+                        {
+                            var node_open = Imgui.TreeNode((nuint)i, nodeFlags, $"Selectable Node {i}");
+                            if (Imgui.IsItemClicked() && !Imgui.IsItemToggledOpen())
+                            {
+                                nodeClicked = i;
+                            }
+
+                            if (s_testDragAndDrop && Imgui.BeginDragDropSource())
+                            {
+                                _ = Imgui.SetDragDropPayload("_TREENODE", null, 0);
+                                Imgui.Text("This is a drag and drop source");
+                                Imgui.EndDragDropSource();
+                            }
+                            if (node_open)
+                            {
+                                Imgui.BulletText("Blah blah\nBlah Blah");
+                                Imgui.TreePop();
+                            }
+                        }
+                        else
+                        {
+                            nodeFlags |= TreeNodeOptions.Leaf | TreeNodeOptions.NoTreePushOnOpen;
+                            _ = Imgui.TreeNode((nuint)i, nodeFlags, $"Selectable Leaf {i}");
+                            if (Imgui.IsItemClicked() && !Imgui.IsItemToggledOpen())
+                            {
+                                nodeClicked = i;
+                            }
+
+                            if (s_testDragAndDrop && Imgui.BeginDragDropSource())
+                            {
+                                _ = Imgui.SetDragDropPayload("_TREENODE", null, 0);
+                                Imgui.Text("This is a drag and drop source");
+                                Imgui.EndDragDropSource();
+                            }
+                        }
+                    }
+                    if (nodeClicked != -1)
+                    {
+                        if (Imgui.GetIo().KeyCtrl)
+                        {
+                            s_selectionMask ^= 1 << nodeClicked;
+                        }
+                        else
+                        {
+                            s_selectionMask = 1 << nodeClicked;           // Click to single-select
+                        }
+                    }
+                    if (s_alignLabelWithCurrentXPosition)
+                    {
+                        Imgui.Indent(Imgui.GetTreeNodeToLabelSpacing());
+                    }
+
+                    Imgui.TreePop();
+                }
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Collapsing Headers");
             //    if (Imgui.TreeNode("Collapsing Headers"))
             //    {
