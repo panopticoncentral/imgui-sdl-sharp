@@ -667,7 +667,7 @@ namespace SampleApp
                     }
                     if (nodeClicked != -1)
                     {
-                        if (Imgui.GetIo().KeyCtrl)
+                        if (Imgui.GetIo().ControlKeyDown)
                         {
                             s_selectionMask ^= 1 << nodeClicked;
                         }

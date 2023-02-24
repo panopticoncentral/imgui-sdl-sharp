@@ -390,12 +390,26 @@ namespace ImguiSharp
 
         public Position MousePosition => Position.Wrap(_io->MousePos);
 
+        public float MouseWheelVertical => _io->MouseWheel;
+
+        public float MouseWheelHorizontal => _io->MouseWheelH;
+
+        public bool ControlKeyDown => _io->KeyCtrl;
+
+        public bool ShiftKeyDown => _io->KeyShift;
+
+        public bool AltKeyDown => _io->KeyAlt;
+
+        public bool SuperKeyDown => _io->KeySuper;
+
         private Io(Native.ImGuiIO* io)
         {
             _io = io;
         }
 
         public static Io? Wrap(Native.ImGuiIO* native) => native == null ? null : new(native);
+
+        public bool ButtonDown(MouseButton button) => _io->MouseDown[(int)button];
 
         public void AddKeyEvent(Key key, bool down) => Native.ImGuiIO_AddKeyEvent(_io, (Native.ImGuiKey)key, down);
 

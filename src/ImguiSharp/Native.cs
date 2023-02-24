@@ -1,5 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+
+using System.Runtime.InteropServices;
 using System.Text;
+
+[assembly: DisableRuntimeMarshalling]
 
 // We are intentionally exposing the P/Invoke calls so people can do low-level calls if needed
 #pragma warning disable CA1401 // P/Invokes should not be visible
