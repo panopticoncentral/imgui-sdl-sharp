@@ -359,17 +359,17 @@ namespace ImguiSharp
 
         public static void TextUnformatted(string text) => Native.StringToUtf8Action(text, Native.ImGui_TextUnformatted);
 
-        public static void Text(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_Text(ptr, __arglist()));
+        public static void Text(string text) => Native.StringToUtf8Action(text, Native.ImGui_Text);
 
-        public static void TextColored(Color color, string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextColored(color.ToNative(), ptr, __arglist()));
+        public static void TextColored(Color color, string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextColored(color.ToNative(), ptr));
 
-        public static void TextDisabled(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextDisabled(ptr, __arglist()));
+        public static void TextDisabled(string text) => Native.StringToUtf8Action(text, Native.ImGui_TextDisabled);
 
-        public static void TextWrapped(string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextWrapped(ptr, __arglist()));
+        public static void TextWrapped(string text) => Native.StringToUtf8Action(text, Native.ImGui_TextWrapped);
 
-        public static void LabelText(string label, string text) => Native.StringToUtf8Action(label, text, (labelPtr, textPtr) => Native.ImGui_LabelText(labelPtr, textPtr, __arglist()));
+        public static void LabelText(string label, string text) => Native.StringToUtf8Action(label, text, Native.ImGui_LabelText);
 
-        public static void BulletText(string text) => Native.StringToUtf8Action(text, textPtr => Native.ImGui_BulletText(textPtr, __arglist()));
+        public static void BulletText(string text) => Native.StringToUtf8Action(text, Native.ImGui_BulletText);
 
         #endregion
 
@@ -939,15 +939,15 @@ namespace ImguiSharp
 
         public static bool TreeNode(string label) => Native.StringToUtf8Func(label, Native.ImGui_TreeNode);
 
-        public static bool TreeNode(string id, string format) => Native.StringToUtf8Func(id, format, (idPtr, formatPtr) => Native.ImGui_TreeNodeStr(idPtr, formatPtr, __arglist()));
+        public static bool TreeNode(string id, string format) => Native.StringToUtf8Func(id, format, Native.ImGui_TreeNodeStr);
 
-        public static bool TreeNode(nuint id, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodePtr((void*)id, formatPtr, __arglist()));
+        public static bool TreeNode(nuint id, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodePtr((void*)id, formatPtr));
 
         public static bool TreeNode(string label, TreeNodeOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_TreeNodeEx(labelPtr, (Native.ImGuiTreeNodeFlags)options));
 
-        public static bool TreeNode(string id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(id, format, (idPtr, formatPtr) => Native.ImGui_TreeNodeExStr(idPtr, (Native.ImGuiTreeNodeFlags)options, formatPtr, __arglist()));
+        public static bool TreeNode(string id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(id, format, (idPtr, formatPtr) => Native.ImGui_TreeNodeExStr(idPtr, (Native.ImGuiTreeNodeFlags)options, formatPtr));
 
-        public static bool TreeNode(nuint id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodeExPtr((void*)id, (Native.ImGuiTreeNodeFlags)options, formatPtr, __arglist()));
+        public static bool TreeNode(nuint id, TreeNodeOptions options, string format) => Native.StringToUtf8Func(format, formatPtr => Native.ImGui_TreeNodeExPtr((void*)id, (Native.ImGuiTreeNodeFlags)options, formatPtr));
 
         public static void TreePush(string id) => Native.StringToUtf8Action(id, Native.ImGui_TreePush);
 
@@ -1110,7 +1110,7 @@ namespace ImguiSharp
 
         public static void EndTooltip() => Native.ImGui_EndTooltip();
 
-        public static void SetTooltip(string text) => Native.StringToUtf8Action(text, textPtr => Native.ImGui_SetTooltip(textPtr, __arglist()));
+        public static void SetTooltip(string text) => Native.StringToUtf8Action(text, Native.ImGui_SetTooltip);
 
         #endregion
 
@@ -1262,7 +1262,7 @@ namespace ImguiSharp
 
         public static void LogButtons() => Native.ImGui_LogButtons();
 
-        public static void LogText(string text) => Native.StringToUtf8Action(text, textPtr => Native.ImGui_LogText(textPtr, __arglist()));
+        public static void LogText(string text) => Native.StringToUtf8Action(text, Native.ImGui_LogText);
 
         #endregion
 

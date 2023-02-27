@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -606,37 +605,37 @@ namespace ImguiSharp
         public static extern void ImGui_TextUnformattedEx(byte* text, byte* text_end = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_Text(byte* fmt, __arglist);
+        public static extern void ImGui_Text(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_TextV(byte* fmt, nuint /* va_list */ args);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_TextColored(ImVec4 col, byte* fmt, __arglist);
+        public static extern void ImGui_TextColored(ImVec4 col, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_TextColoredV(ImVec4 col, byte* fmt, nuint /* va_list */ args);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_TextDisabled(byte* fmt, __arglist);
+        public static extern void ImGui_TextDisabled(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_TextDisabledV(byte* fmt, nuint /* va_list */ args);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_TextWrapped(byte* fmt, __arglist);
+        public static extern void ImGui_TextWrapped(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_TextWrappedV(byte* fmt, nuint /* va_list */ args);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_LabelText(byte* label, byte* fmt, __arglist);
+        public static extern void ImGui_LabelText(byte* label, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_LabelTextV(byte* label, byte* fmt, nuint /* va_list */ args);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_BulletText(byte* fmt, __arglist);
+        public static extern void ImGui_BulletText(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_BulletTextV(byte* fmt, nuint /* va_list */ args);
@@ -1001,10 +1000,10 @@ namespace ImguiSharp
         public static extern bool ImGui_TreeNode(byte* label);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_TreeNodeStr(byte* str_id, byte* fmt, __arglist);
+        public static extern bool ImGui_TreeNodeStr(byte* str_id, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_TreeNodePtr(void* ptr_id, byte* fmt, __arglist);
+        public static extern bool ImGui_TreeNodePtr(void* ptr_id, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_TreeNodeV(byte* str_id, byte* fmt, nuint /* va_list */ args);
@@ -1016,10 +1015,10 @@ namespace ImguiSharp
         public static extern bool ImGui_TreeNodeEx(byte* label, ImGuiTreeNodeFlags flags = default);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_TreeNodeExStr(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist);
+        public static extern bool ImGui_TreeNodeExStr(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ImGui_TreeNodeExPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt, __arglist);
+        public static extern bool ImGui_TreeNodeExPtr(void* ptr_id, ImGuiTreeNodeFlags flags, byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern bool ImGui_TreeNodeExV(byte* str_id, ImGuiTreeNodeFlags flags, byte* fmt, nuint /* va_list */ args);
@@ -1156,7 +1155,7 @@ namespace ImguiSharp
         public static extern void ImGui_EndTooltip();
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_SetTooltip(byte* fmt, __arglist);
+        public static extern void ImGui_SetTooltip(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_SetTooltipV(byte* fmt, nuint /* va_list */ args);
@@ -1364,7 +1363,7 @@ namespace ImguiSharp
         public static extern void ImGui_LogButtons();
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ImGui_LogText(byte* fmt, __arglist);
+        public static extern void ImGui_LogText(byte* fmt/*, __arglist*/);
 
         [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
         public static extern void ImGui_LogTextV(byte* fmt, nuint /* va_list */ args);
