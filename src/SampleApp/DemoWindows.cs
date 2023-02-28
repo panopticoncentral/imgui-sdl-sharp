@@ -1,8 +1,4 @@
-﻿using System.Resources;
-
-using ImguiSharp;
-
-using static ImguiSharp.Native;
+﻿using ImguiSharp;
 
 namespace SampleApp
 {
@@ -384,6 +380,9 @@ namespace SampleApp
         private static readonly State<bool> s_alignLabelWithCurrentXPosition = new(false);
         private static readonly State<bool> s_testDragAndDrop = new(false);
         private static int s_selectionMask = 1 << 2;
+        private static readonly State<bool> s_closableGroup = new(true);
+        private static readonly State<float> s_wrapWidth = new(200.0f);
+
 
         private static void ShowDemoWindowWidgets()
         {
@@ -686,120 +685,104 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Collapsing Headers");
-            //    if (Imgui.TreeNode("Collapsing Headers"))
-            //    {
-            //        static bool closable_group = true;
-            //        Imgui.Checkbox("Show 2nd header", &closable_group);
-            //        if (Imgui.CollapsingHeader("Header", ImGuiTreeNodeFlags_None))
-            //        {
-            //            Imgui.Text("IsItemHovered: %d", Imgui.IsItemHovered());
-            //            for (int i = 0; i < 5; i++)
-            //                Imgui.Text("Some content %d", i);
-            //        }
-            //        if (Imgui.CollapsingHeader("Header with a close button", &closable_group))
-            //        {
-            //            Imgui.Text("IsItemHovered: %d", Imgui.IsItemHovered());
-            //            for (int i = 0; i < 5; i++)
-            //                Imgui.Text("More content %d", i);
-            //        }
-            //        /*
-            //        if (Imgui.CollapsingHeader("Header with a bullet", ImGuiTreeNodeFlags_Bullet))
-            //            Imgui.Text("IsItemHovered: %d", Imgui.IsItemHovered());
-            //        */
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/Bullets");
-            //    if (Imgui.TreeNode("Bullets"))
-            //    {
-            //        Imgui.BulletText("Bullet point 1");
-            //        Imgui.BulletText("Bullet point 2\nOn multiple lines");
-            //        if (Imgui.TreeNode("Tree node"))
-            //        {
-            //            Imgui.BulletText("Another bullet point");
-            //            Imgui.TreePop();
-            //        }
-            //        Imgui.Bullet(); Imgui.Text("Bullet point 3 (two calls)");
-            //        Imgui.Bullet(); Imgui.SmallButton("Button");
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/Text");
-            //    if (Imgui.TreeNode("Text"))
-            //    {
-            //        IMGUI_DEMO_MARKER("Widgets/Text/Colored Text");
-            //        if (Imgui.TreeNode("Colorful Text"))
-            //        {
-            //            // Using shortcut. You can use PushStyleColor()/PopStyleColor() for more flexibility.
-            //            Imgui.TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Pink");
-            //            Imgui.TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Yellow");
-            //            Imgui.TextDisabled("Disabled");
-            //            Imgui.SameLine(); HelpMarker("The TextDisabled color is stored in ImGuiStyle.");
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Text/Word Wrapping");
-            //        if (Imgui.TreeNode("Word Wrapping"))
-            //        {
-            //            // Using shortcut. You can use PushTextWrapPos()/PopTextWrapPos() for more flexibility.
-            //            Imgui.TextWrapped(
-            //                "This text should automatically wrap on the edge of the window. The current implementation "
-            //                "for text wrapping follows simple rules suitable for English and possibly other languages.");
-            //            Imgui.Spacing();
-            //
-            //            static float wrap_width = 200.0f;
-            //            Imgui.SliderFloat("Wrap width", &wrap_width, -20, 600, "%.0f");
-            //
-            //            ImDrawList* draw_list = Imgui.GetWindowDrawList();
-            //            for (int n = 0; n < 2; n++)
-            //            {
-            //                Imgui.Text("Test paragraph %d:", n);
-            //                ImVec2 pos = Imgui.GetCursorScreenPos();
-            //                ImVec2 marker_min = ImVec2(pos.x + wrap_width, pos.y);
-            //                ImVec2 marker_max = ImVec2(pos.x + wrap_width + 10, pos.y + Imgui.GetTextLineHeight());
-            //                Imgui.PushTextWrapPos(Imgui.GetCursorPos().x + wrap_width);
-            //                if (n == 0)
-            //                    Imgui.Text("The lazy dog is a good dog. This paragraph should fit within %.0f pixels. Testing a 1 character word. The quick brown fox jumps over the lazy dog.", wrap_width);
-            //                else
-            //                    Imgui.Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
-            //
-            //                // Draw actual text bounding box, following by marker of our expected limit (should not overlap!)
-            //                draw_list->AddRect(Imgui.GetItemRectMin(), Imgui.GetItemRectMax(), IM_COL32(255, 255, 0, 255));
-            //                draw_list->AddRectFilled(marker_min, marker_max, IM_COL32(255, 0, 255, 255));
-            //                Imgui.PopTextWrapPos();
-            //            }
-            //
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Text/UTF-8 Text");
-            //        if (Imgui.TreeNode("UTF-8 Text"))
-            //        {
-            //            // UTF-8 test with Japanese characters
-            //            // (Needs a suitable font? Try "Google Noto" or "Arial Unicode". See docs/FONTS.md for details.)
-            //            // - From C++11 you can use the u8"my text" syntax to encode literal strings as UTF-8
-            //            // - For earlier compiler, you may be able to encode your sources as UTF-8 (e.g. in Visual Studio, you
-            //            //   can save your source files as 'UTF-8 without signature').
-            //            // - FOR THIS DEMO FILE ONLY, BECAUSE WE WANT TO SUPPORT OLD COMPILERS, WE ARE *NOT* INCLUDING RAW UTF-8
-            //            //   CHARACTERS IN THIS SOURCE FILE. Instead we are encoding a few strings with hexadecimal constants.
-            //            //   Don't do this in your application! Please use u8"text in any language" in your application!
-            //            // Note that characters values are preserved even by InputText() if the font cannot be displayed,
-            //            // so you can safely copy & paste garbled characters into another application.
-            //            Imgui.TextWrapped(
-            //                "CJK text will only appear if the font was loaded with the appropriate CJK character ranges. "
-            //                "Call io.Fonts->AddFontFromFileTTF() manually to load extra character ranges. "
-            //                "Read docs/FONTS.md for details.");
-            //            Imgui.Text("Hiragana: \xe3\x81\x8b\xe3\x81\x8d\xe3\x81\x8f\xe3\x81\x91\xe3\x81\x93 (kakikukeko)"); // Normally we would use u8"blah blah" with the proper characters directly in the string.
-            //            Imgui.Text("Kanjis: \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e (nihongo)");
-            //            static char buf[32] = "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e";
-            //            //static char buf[32] = u8"NIHONGO"; // <- this is how you would write it with C++11, using real kanjis
-            //            Imgui.InputText("UTF-8 input", buf, IM_ARRAYSIZE(buf));
-            //            Imgui.TreePop();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Collapsing Headers"))
+            {
+                _ = Imgui.Checkbox("Show 2nd header", s_closableGroup);
+                if (Imgui.CollapsingHeader("Header", TreeNodeOptions.None))
+                {
+                    Imgui.Text($"IsItemHovered: {Imgui.IsItemHovered()}");
+                    for (var i = 0; i < 5; i++)
+                    {
+                        Imgui.Text($"Some content {i}");
+                    }
+                }
+                if (Imgui.CollapsingHeader("Header with a close button", s_closableGroup))
+                {
+                    Imgui.Text($"IsItemHovered: {Imgui.IsItemHovered()}");
+                    for (var i = 0; i < 5; i++)
+                    {
+                        Imgui.Text($"More content {i}");
+                    }
+                }
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Bullets"))
+            {
+                Imgui.BulletText("Bullet point 1");
+                Imgui.BulletText("Bullet point 2\nOn multiple lines");
+                if (Imgui.TreeNode("Tree node"))
+                {
+                    Imgui.BulletText("Another bullet point");
+                    Imgui.TreePop();
+                }
+                Imgui.Bullet();
+                Imgui.Text("Bullet point 3 (two calls)");
+                Imgui.Bullet();
+                _ = Imgui.SmallButton("Button");
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Text"))
+            {
+                if (Imgui.TreeNode("Colorful Text"))
+                {
+                    // Using shortcut. You can use PushStyleColor()/PopStyleColor() for more flexibility.
+                    Imgui.TextColored(new(1.0f, 0.0f, 1.0f, 1.0f), "Pink");
+                    Imgui.TextColored(new(1.0f, 1.0f, 0.0f, 1.0f), "Yellow");
+                    Imgui.TextDisabled("Disabled");
+                    Imgui.SameLine(); HelpMarker("The TextDisabled color is stored in ImGuiStyle.");
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Word Wrapping"))
+                {
+                    // Using shortcut. You can use PushTextWrapPos()/PopTextWrapPos() for more flexibility.
+                    Imgui.TextWrapped(
+                        "This text should automatically wrap on the edge of the window. The current implementation " +
+                        "for text wrapping follows simple rules suitable for English and possibly other languages.");
+                    Imgui.Spacing();
+
+                    _ = Imgui.Slider("Wrap width", s_wrapWidth, -20, 600, "%.0f");
+
+                    var drawList = Imgui.GetWindowDrawList()!.Value;
+                    for (var n = 0; n < 2; n++)
+                    {
+                        Imgui.Text($"Test paragraph {n}:");
+                        var pos = Imgui.GetCursorScreenPosition();
+                        Rectangle marker = new(new(pos.X + s_wrapWidth, pos.Y), new(pos.X + s_wrapWidth + 10, pos.Y + Imgui.GetTextLineHeight()));
+                        Imgui.PushTextWrapPosition(Imgui.GetCursorPosition().X + s_wrapWidth);
+                        if (n == 0)
+                        {
+                            Imgui.Text($"The lazy dog is a good dog. This paragraph should fit within {(float)s_wrapWidth} pixels. Testing a 1 character word. The quick brown fox jumps over the lazy dog.");
+                        }
+                        else
+                        {
+                            Imgui.Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
+                        }
+
+                        drawList.AddRect(Imgui.GetItemRectangle(), Native.IM_COL32(255, 255, 0, 255));
+                        drawList.AddRectFilled(marker, Native.IM_COL32(255, 0, 255, 255));
+                        Imgui.PopTextWrapPosition();
+                    }
+
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("UTF-8 Text"))
+                {
+                    Imgui.TextWrapped(
+                        "CJK text will only appear if the font was loaded with the appropriate CJK character ranges. " +
+                        "Call io.Fonts.AddFontFromFileTtf() manually to load extra character ranges. " +
+                        "Read docs/FONTS.md for details.");
+                    Imgui.Text("Hiragana: \xe3\x81\x8b\xe3\x81\x8d\xe3\x81\x8f\xe3\x81\x91\xe3\x81\x93 (kakikukeko)");
+                    Imgui.Text("Kanjis: \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e (nihongo)");
+                    _ = Imgui.InputText("UTF-8 input", new(32, "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e"));
+                    Imgui.TreePop();
+                }
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Images");
             //    if (Imgui.TreeNode("Images"))
             //    {

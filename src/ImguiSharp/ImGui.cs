@@ -1349,11 +1349,9 @@ namespace ImguiSharp
 
         public static Id GetItemId() => Id.Wrap(Native.ImGui_GetItemID());
 
-        public static Position GetItemRectMin() => Position.Wrap(Native.ImGui_GetItemRectMin());
+        public static Rectangle GetItemRectangle() => new(Position.Wrap(Native.ImGui_GetItemRectMin()), Position.Wrap(Native.ImGui_GetItemRectMax()));
 
-        public static Position GetItemRectMax() => Position.Wrap(Native.ImGui_GetItemRectMax());
-
-        public static Size GetItemRectSize() => Size.Wrap(Native.ImGui_GetItemRectSize());
+        public static Size GetItemRectangleSize() => Size.Wrap(Native.ImGui_GetItemRectSize());
 
         public static void SetItemAllowOverlap() => Native.ImGui_SetItemAllowOverlap();
 
