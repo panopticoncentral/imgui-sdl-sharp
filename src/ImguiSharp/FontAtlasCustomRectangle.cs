@@ -16,7 +16,7 @@
 
         public float GlyphAdvanceX => _rect->GlyphAdvanceX;
 
-        public Position GlyphOffset => Position.Wrap(_rect->GlyphOffset);
+        public PositionF GlyphOffset => PositionF.Wrap(_rect->GlyphOffset);
 
         public Font? Font => ImguiSharp.Font.Wrap(_rect->Font);
 

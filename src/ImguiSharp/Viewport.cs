@@ -10,33 +10,33 @@
             set => _viewport->Flags = (Native.ImGuiViewportFlags)value;
         }
 
-        public Position Position
+        public PositionF Position
         {
-            get => Position.Wrap(_viewport->Pos);
+            get => PositionF.Wrap(_viewport->Pos);
             set => _viewport->Pos = value.ToNative();
         }
 
-        public Size Size
+        public SizeF Size
         {
-            get => Size.Wrap(_viewport->Size);
+            get => SizeF.Wrap(_viewport->Size);
             set => _viewport->Size = value.ToNative();
         }
 
-        public Position WorkPosition
+        public PositionF WorkPosition
         {
-            get => Position.Wrap(_viewport->WorkPos);
+            get => PositionF.Wrap(_viewport->WorkPos);
             set => _viewport->WorkPos = value.ToNative();
         }
 
-        public Size WorkSize
+        public SizeF WorkSize
         {
-            get => Size.Wrap(_viewport->WorkSize);
+            get => SizeF.Wrap(_viewport->WorkSize);
             set => _viewport->WorkSize = value.ToNative();
         }
 
-        public Position Center => Position.Wrap(Native.ImGuiViewport_GetCenter(_viewport));
+        public PositionF Center => PositionF.Wrap(Native.ImGuiViewport_GetCenter(_viewport));
 
-        public Position WorkCenter => Position.Wrap(Native.ImGuiViewport_GetWorkCenter(_viewport));
+        public PositionF WorkCenter => PositionF.Wrap(Native.ImGuiViewport_GetWorkCenter(_viewport));
 
         public nuint PlatformHandleRaw
         {

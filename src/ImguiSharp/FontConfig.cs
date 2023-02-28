@@ -48,15 +48,15 @@
             set => _fontConfig->PixelSnapH = value;
         }
 
-        public Size GlyphExtraSpacing
+        public SizeF GlyphExtraSpacing
         {
-            get => Size.Wrap(_fontConfig->GlyphExtraSpacing);
+            get => SizeF.Wrap(_fontConfig->GlyphExtraSpacing);
             set => _fontConfig->GlyphExtraSpacing = value.ToNative();
         }
 
-        public Position GlyphOffset
+        public PositionF GlyphOffset
         {
-            get => Position.Wrap(_fontConfig->GlyphOffset);
+            get => PositionF.Wrap(_fontConfig->GlyphOffset);
             set => _fontConfig->GlyphOffset = value.ToNative();
         }
 

@@ -5,8 +5,8 @@ namespace ImguiSharp
 {
     public static unsafe class Imgui
     {
-        private static Dictionary<nuint, Func<Position, Size, Size, Size>>? s_sizeCallbacks;
-        private static Dictionary<nuint, Func<Position, Size, Size, Size>> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, Func<Position, Size, Size, Size>>();
+        private static Dictionary<nuint, Func<PositionF, SizeF, SizeF, SizeF>>? s_sizeCallbacks;
+        private static Dictionary<nuint, Func<PositionF, SizeF, SizeF, SizeF>> SizeCallbacks => s_sizeCallbacks ??= new Dictionary<nuint, Func<PositionF, SizeF, SizeF, SizeF>>();
 
         private static Dictionary<nuint, Func<int, float>>? s_plotCallbacks;
         private static Dictionary<nuint, Func<int, float>> PlotCallbacks => s_plotCallbacks ??= new Dictionary<nuint, Func<int, float>>();
@@ -96,9 +96,9 @@ namespace ImguiSharp
 
         #region Child Windows
 
-        public static bool BeginChild(string name, Size size = default, bool border = false, WindowOptions options = default) => Native.StringToUtf8Func(name, namePtr => Native.ImGui_BeginChild(namePtr, size.ToNative(), border, (Native.ImGuiWindowFlags)options));
+        public static bool BeginChild(string name, SizeF size = default, bool border = false, WindowOptions options = default) => Native.StringToUtf8Func(name, namePtr => Native.ImGui_BeginChild(namePtr, size.ToNative(), border, (Native.ImGuiWindowFlags)options));
 
-        public static void BeginChildId(Id id, Size size = default, bool border = false, WindowOptions options = default) => Native.ImGui_BeginChildID(id.ToNative(), size.ToNative(), border, (Native.ImGuiWindowFlags)options);
+        public static void BeginChildId(Id id, SizeF size = default, bool border = false, WindowOptions options = default) => Native.ImGui_BeginChildID(id.ToNative(), size.ToNative(), border, (Native.ImGuiWindowFlags)options);
 
         public static void EndChild() => Native.ImGui_EndChild();
 
@@ -116,9 +116,9 @@ namespace ImguiSharp
 
         public static DrawList? GetWindowDrawList() => DrawList.Wrap(Native.ImGui_GetWindowDrawList());
 
-        public static Position GetWindowPosition() => Position.Wrap(Native.ImGui_GetWindowPos());
+        public static PositionF GetWindowPosition() => PositionF.Wrap(Native.ImGui_GetWindowPos());
 
-        public static Size GetWindowSize() => Size.Wrap(Native.ImGui_GetWindowSize());
+        public static SizeF GetWindowSize() => SizeF.Wrap(Native.ImGui_GetWindowSize());
 
         public static float GetWindowWidth() => Native.ImGui_GetWindowWidth();
 
@@ -128,50 +128,50 @@ namespace ImguiSharp
 
         #region Window Manipulation
 
-        public static void SetNextWindowPosition(Position position, Condition condition = default) => Native.ImGui_SetNextWindowPos(position.ToNative(), (Native.ImGuiCond)condition);
+        public static void SetNextWindowPosition(PositionF position, Condition condition = default) => Native.ImGui_SetNextWindowPos(position.ToNative(), (Native.ImGuiCond)condition);
 
-        public static void SetNextWindowPosition(Position position, Condition condition = default, Position pivot = default) => Native.ImGui_SetNextWindowPosEx(position.ToNative(), (Native.ImGuiCond)condition, pivot.ToNative());
+        public static void SetNextWindowPosition(PositionF position, Condition condition = default, PositionF pivot = default) => Native.ImGui_SetNextWindowPosEx(position.ToNative(), (Native.ImGuiCond)condition, pivot.ToNative());
 
-        public static void SetNextWindowSize(Size size, Condition condition = default) => Native.ImGui_SetNextWindowSize(size.ToNative(), (Native.ImGuiCond)condition);
+        public static void SetNextWindowSize(SizeF size, Condition condition = default) => Native.ImGui_SetNextWindowSize(size.ToNative(), (Native.ImGuiCond)condition);
 
         [UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
         private static void NativeSizeCallback(Native.ImGuiSizeCallbackData* data)
         {
             if (SizeCallbacks.TryGetValue((nuint)data->UserData, out var callback))
             {
-                data->DesiredSize = callback(Position.Wrap(data->Pos), Size.Wrap(data->CurrentSize), Size.Wrap(data->DesiredSize)).ToNative();
+                data->DesiredSize = callback(PositionF.Wrap(data->Pos), SizeF.Wrap(data->CurrentSize), SizeF.Wrap(data->DesiredSize)).ToNative();
             }
         }
 
-        public static void SetNextWindowSizeConstraints(Rectangle rect) => Native.ImGui_SetNextWindowSizeConstraints(rect.Min.ToNative(), rect.Max.ToNative());
+        public static void SetNextWindowSizeConstraints(RectangleF rect) => Native.ImGui_SetNextWindowSizeConstraints(rect.Min.ToNative(), rect.Max.ToNative());
 
-        public static void SetNextWindowSizeConstraints(Rectangle rect, Func<Position, Size, Size, Size> callback)
+        public static void SetNextWindowSizeConstraints(RectangleF rect, Func<PositionF, SizeF, SizeF, SizeF> callback)
         {
             SizeCallbacks[(nuint)callback.GetHashCode()] = callback;
             Native.ImGui_SetNextWindowSizeConstraints(rect.Min.ToNative(), rect.Max.ToNative(), &NativeSizeCallback, (void*)callback.GetHashCode());
         }
 
-        public static void SetNextWindowContentSize(Size size) => Native.ImGui_SetNextWindowContentSize(size.ToNative());
+        public static void SetNextWindowContentSize(SizeF size) => Native.ImGui_SetNextWindowContentSize(size.ToNative());
 
         public static void SetNextWindowCollapsed(bool collapsed, Condition condition = default) => Native.ImGui_SetNextWindowCollapsed(collapsed, (Native.ImGuiCond)condition);
 
         public static void SetNextWindowFocus() => Native.ImGui_SetNextWindowFocus();
 
-        public static void SetNextWindowScroll(Position scroll) => Native.ImGui_SetNextWindowScroll(scroll.ToNative());
+        public static void SetNextWindowScroll(PositionF scroll) => Native.ImGui_SetNextWindowScroll(scroll.ToNative());
 
         public static void SetNextWindowBackgroundAlpha(float alpha) => Native.ImGui_SetNextWindowBgAlpha(alpha);
 
-        public static void SetWindowPosition(Position position, Condition condition) => Native.ImGui_SetWindowPos(position.ToNative(), (Native.ImGuiCond)condition);
+        public static void SetWindowPosition(PositionF position, Condition condition) => Native.ImGui_SetWindowPos(position.ToNative(), (Native.ImGuiCond)condition);
 
-        public static void SetWindowSize(Size size, Condition condition) => Native.ImGui_SetWindowSize(size.ToNative(), (Native.ImGuiCond)condition);
+        public static void SetWindowSize(SizeF size, Condition condition) => Native.ImGui_SetWindowSize(size.ToNative(), (Native.ImGuiCond)condition);
 
         public static void SetWindowCollapsed(bool collapsed, Condition condition) => Native.ImGui_SetWindowCollapsed(collapsed, (Native.ImGuiCond)condition);
 
         public static void SetWindowFocus() => Native.ImGui_SetWindowFocus();
 
-        public static void SetNamedWindowPosition(string name, Position position, Condition condition = default) => Native.StringToUtf8Action(name, namePtr => Native.ImGui_SetWindowPosStr(namePtr, position.ToNative(), (Native.ImGuiCond)condition));
+        public static void SetNamedWindowPosition(string name, PositionF position, Condition condition = default) => Native.StringToUtf8Action(name, namePtr => Native.ImGui_SetWindowPosStr(namePtr, position.ToNative(), (Native.ImGuiCond)condition));
 
-        public static void SetNamedWindowSize(string name, Size size, Condition condition = default) => Native.StringToUtf8Action(name, namePtr => Native.ImGui_SetWindowSizeStr(namePtr, size.ToNative(), (Native.ImGuiCond)condition));
+        public static void SetNamedWindowSize(string name, SizeF size, Condition condition = default) => Native.StringToUtf8Action(name, namePtr => Native.ImGui_SetWindowSizeStr(namePtr, size.ToNative(), (Native.ImGuiCond)condition));
 
         public static void SetNamedWindowCollapsed(string name, bool collapsed, Condition condition = default) => Native.StringToUtf8Action(name, namePtr => Native.ImGui_SetWindowCollapsedStr(namePtr, collapsed, (Native.ImGuiCond)condition));
 
@@ -181,13 +181,13 @@ namespace ImguiSharp
 
         #region Content region
 
-        public static Size GetContentRegionAvailable() => Size.Wrap(Native.ImGui_GetContentRegionAvail());
+        public static SizeF GetContentRegionAvailable() => SizeF.Wrap(Native.ImGui_GetContentRegionAvail());
 
-        public static Position GetContentRegionMax() => Position.Wrap(Native.ImGui_GetContentRegionMax());
+        public static PositionF GetContentRegionMax() => PositionF.Wrap(Native.ImGui_GetContentRegionMax());
 
-        public static Position GetWindowContentRegionMin() => Position.Wrap(Native.ImGui_GetWindowContentRegionMin());
+        public static PositionF GetWindowContentRegionMin() => PositionF.Wrap(Native.ImGui_GetWindowContentRegionMin());
 
-        public static Position GetWindowContentRegionMax() => Position.Wrap(Native.ImGui_GetWindowContentRegionMax());
+        public static PositionF GetWindowContentRegionMax() => PositionF.Wrap(Native.ImGui_GetWindowContentRegionMax());
 
         #endregion
 
@@ -223,7 +223,7 @@ namespace ImguiSharp
 
         public static void PushStyleColor(StyleColor property, uint color) => Native.ImGui_PushStyleColor((Native.ImGuiCol)property, color);
 
-        public static void PushStyleColor(StyleColor property, Color color) => Native.ImGui_PushStyleColorImVec4((Native.ImGuiCol)property, color.ToNative());
+        public static void PushStyleColor(StyleColor property, ColorF color) => Native.ImGui_PushStyleColorImVec4((Native.ImGuiCol)property, color.ToNative());
 
         public static void PopStyleColor() => Native.ImGui_PopStyleColor();
 
@@ -231,7 +231,7 @@ namespace ImguiSharp
 
         public static void PushStyleVariable(StyleVariable variable, float value) => Native.ImGui_PushStyleVar((Native.ImGuiStyleVar)variable, value);
 
-        public static void PushStyleVariable(StyleVariable variable, Size value) => Native.ImGui_PushStyleVarImVec2((Native.ImGuiStyleVar)variable, value.ToNative());
+        public static void PushStyleVariable(StyleVariable variable, SizeF value) => Native.ImGui_PushStyleVarImVec2((Native.ImGuiStyleVar)variable, value.ToNative());
 
         public static void PopStyleVar() => Native.ImGui_PopStyleVar();
 
@@ -269,17 +269,17 @@ namespace ImguiSharp
 
         public static float GetFontSize() => Native.ImGui_GetFontSize();
 
-        public static TextureCoordinate GetFontWhitePixelTextureCoordinate() => TextureCoordinate.Wrap(Native.ImGui_GetFontTexUvWhitePixel());
+        public static TexturePosition GetFontWhitePixelTextureCoordinate() => TexturePosition.Wrap(Native.ImGui_GetFontTexUvWhitePixel());
 
         public static uint GetColor(StyleColor color) => Native.ImGui_GetColorU32((Native.ImGuiCol)color);
 
         public static uint GetColor(StyleColor color, float alphaMul) => Native.ImGui_GetColorU32Ex((Native.ImGuiCol)color, alphaMul);
 
-        public static uint GetColor(Color color) => Native.ImGui_GetColorU32ImVec4(color.ToNative());
+        public static uint GetColor(ColorF color) => Native.ImGui_GetColorU32ImVec4(color.ToNative());
 
         public static uint GetColor(uint color) => Native.ImGui_GetColorU32uint(color);
 
-        public static Color GetStyleColor(StyleColor color) => Color.Wrap(*Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
+        public static ColorF GetStyleColor(StyleColor color) => ColorF.Wrap(*Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
 
         #endregion
 
@@ -295,7 +295,7 @@ namespace ImguiSharp
 
         public static void Spacing() => Native.ImGui_Spacing();
 
-        public static void Dummy(Size size) => Native.ImGui_Dummy(size.ToNative());
+        public static void Dummy(SizeF size) => Native.ImGui_Dummy(size.ToNative());
 
         public static void Indent() => Native.ImGui_Indent();
 
@@ -309,23 +309,23 @@ namespace ImguiSharp
 
         public static void EndGroup() => Native.ImGui_EndGroup();
 
-        public static Position GetCursorPosition() => Position.Wrap(Native.ImGui_GetCursorPos());
+        public static PositionF GetCursorPosition() => PositionF.Wrap(Native.ImGui_GetCursorPos());
 
         public static float GetCursorPosX() => Native.ImGui_GetCursorPosX();
 
         public static float GetCursorPosY() => Native.ImGui_GetCursorPosY();
 
-        public static void SetCursorPosition(Position localPosition) => Native.ImGui_SetCursorPos(localPosition.ToNative());
+        public static void SetCursorPosition(PositionF localPosition) => Native.ImGui_SetCursorPos(localPosition.ToNative());
 
         public static void SetCursorPosX(float localX) => Native.ImGui_SetCursorPosX(localX);
 
         public static void SetCursorPosY(float localY) => Native.ImGui_SetCursorPosY(localY);
 
-        public static Position GetCursorStartPosition() => Position.Wrap(Native.ImGui_GetCursorStartPos());
+        public static PositionF GetCursorStartPosition() => PositionF.Wrap(Native.ImGui_GetCursorStartPos());
 
-        public static Position GetCursorScreenPosition() => Position.Wrap(Native.ImGui_GetCursorScreenPos());
+        public static PositionF GetCursorScreenPosition() => PositionF.Wrap(Native.ImGui_GetCursorScreenPos());
 
-        public static void SetCursorScreenPosition(Position position) => Native.ImGui_SetCursorScreenPos(position.ToNative());
+        public static void SetCursorScreenPosition(PositionF position) => Native.ImGui_SetCursorScreenPos(position.ToNative());
 
         public static void AlignTextToFramePadding() => Native.ImGui_AlignTextToFramePadding();
 
@@ -361,7 +361,7 @@ namespace ImguiSharp
 
         public static void Text(string text) => Native.StringToUtf8Action(text, Native.ImGui_Text);
 
-        public static void TextColored(Color color, string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextColored(color.ToNative(), ptr));
+        public static void TextColored(ColorF color, string text) => Native.StringToUtf8Action(text, ptr => Native.ImGui_TextColored(color.ToNative(), ptr));
 
         public static void TextDisabled(string text) => Native.StringToUtf8Action(text, Native.ImGui_TextDisabled);
 
@@ -377,11 +377,11 @@ namespace ImguiSharp
 
         public static bool Button(string label) => Native.StringToUtf8Func(label, Native.ImGui_Button);
 
-        public static bool Button(string label, Size size) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_ButtonEx(labelPtr, size.ToNative()));
+        public static bool Button(string label, SizeF size) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_ButtonEx(labelPtr, size.ToNative()));
 
         public static bool SmallButton(string label) => Native.StringToUtf8Func(label, Native.ImGui_SmallButton);
 
-        public static bool InvisibleButton(string id, Size size, ButtonOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_InvisibleButton(idPtr, size.ToNative(), (Native.ImGuiButtonFlags)options));
+        public static bool InvisibleButton(string id, SizeF size, ButtonOptions options = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_InvisibleButton(idPtr, size.ToNative(), (Native.ImGuiButtonFlags)options));
 
         public static bool ArrowButton(string id, Direction direction) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ArrowButton(idPtr, (Native.ImGuiDir)direction));
 
@@ -397,7 +397,7 @@ namespace ImguiSharp
 
         public static void ProgressBar(float fraction) => Native.ImGui_ProgressBar(fraction, new(float.MinValue, 0), null);
 
-        public static void ProgressBar(float fraction, Size size, string? overlay = null) => Native.StringToUtf8Action(overlay, overlayPtr => Native.ImGui_ProgressBar(fraction, size.ToNative(), overlayPtr));
+        public static void ProgressBar(float fraction, SizeF size, string? overlay = null) => Native.StringToUtf8Action(overlay, overlayPtr => Native.ImGui_ProgressBar(fraction, size.ToNative(), overlayPtr));
 
         public static void Bullet() => Native.ImGui_Bullet();
 
@@ -405,25 +405,25 @@ namespace ImguiSharp
 
         #region Widgets: Images
 
-        public static void Image(TextureId userTextureId, Size size) => Native.ImGui_Image(userTextureId.ToNative(), size.ToNative());
+        public static void Image(TextureId userTextureId, SizeF size) => Native.ImGui_Image(userTextureId.ToNative(), size.ToNative());
 
-        public static void Image(TextureId userTextureId, Size size, TextureCoordinate uv0) => Image(userTextureId, size, uv0, new(1, 1));
+        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0) => Image(userTextureId, size, uv0, new(1, 1));
 
-        public static void Image(TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1) => Image(userTextureId, size, uv0, uv1, new(1, 1, 1, 1));
+        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1) => Image(userTextureId, size, uv0, uv1, new(1, 1, 1, 1));
 
-        public static void Image(TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1, Color tintColor) => Image(userTextureId, size, uv0, uv1, tintColor, default);
+        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF tintColor) => Image(userTextureId, size, uv0, uv1, tintColor, default);
 
-        public static void Image(TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1, Color tintColor, Color borderColor) => Native.ImGui_ImageEx(userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), tintColor.ToNative(), borderColor.ToNative());
+        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF tintColor, ColorF borderColor) => Native.ImGui_ImageEx(userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), tintColor.ToNative(), borderColor.ToNative());
 
-        public static bool ImageButton(string id, TextureId userTextureId, Size size) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButton(idPtr, userTextureId.ToNative(), size.ToNative()));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButton(idPtr, userTextureId.ToNative(), size.ToNative()));
 
-        public static bool ImageButton(string id, TextureId userTextureId, Size size, TextureCoordinate uv0) => ImageButton(id, userTextureId, size, uv0, new(1, 1));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0) => ImageButton(id, userTextureId, size, uv0, new(1, 1));
 
-        public static bool ImageButton(string id, TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1) => ImageButton(id, userTextureId, size, uv0, uv1, default);
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1) => ImageButton(id, userTextureId, size, uv0, uv1, default);
 
-        public static bool ImageButton(string id, TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1, Color backgroundColor) => ImageButton(id, userTextureId, size, uv0, uv1, backgroundColor, new(1, 1, 1, 1));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF backgroundColor) => ImageButton(id, userTextureId, size, uv0, uv1, backgroundColor, new(1, 1, 1, 1));
 
-        public static bool ImageButton(string id, TextureId userTextureId, Size size, TextureCoordinate uv0, TextureCoordinate uv1, Color backgroundColor, Color tintColor) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButtonEx(idPtr, userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), backgroundColor.ToNative(), tintColor.ToNative()));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF backgroundColor, ColorF tintColor) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButtonEx(idPtr, userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), backgroundColor.ToNative(), tintColor.ToNative()));
 
         #endregion
 
@@ -693,45 +693,45 @@ namespace ImguiSharp
 
         public static bool Slider(string label, StateVector<double> v, double min, double max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_SliderScalarNEx(labelPtr, Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), v.Length, (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<float> v, float min, float max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderFloat(labelPtr, size.ToNative(), v.ToNative(), min, max));
+        public static bool VerticalSlider(string label, SizeF size, State<float> v, float min, float max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderFloat(labelPtr, size.ToNative(), v.ToNative(), min, max));
 
-        public static bool VerticalSlider(string label, Size size, State<float> v, float min, float max, string? format = "%.3f", SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderFloatEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<float> v, float min, float max, string? format = "%.3f", SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderFloatEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<int> v, int min, int max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderInt(labelPtr, size.ToNative(), v.ToNative(), min, max));
+        public static bool VerticalSlider(string label, SizeF size, State<int> v, int min, int max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderInt(labelPtr, size.ToNative(), v.ToNative(), min, max));
 
-        public static bool VerticalSlider(string label, Size size, State<int> v, int min, int max, string? format = "%d", SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderIntEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<int> v, int min, int max, string? format = "%d", SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderIntEx(labelPtr, size.ToNative(), v.ToNative(), min, max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<byte> v, byte min, byte max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<byte> v, byte min, byte max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<byte> v, byte min, byte max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<byte> v, byte min, byte max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<sbyte> v, sbyte min, sbyte max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<sbyte> v, sbyte min, sbyte max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<sbyte> v, sbyte min, sbyte max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<sbyte> v, sbyte min, sbyte max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S8, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<ushort> v, ushort min, ushort max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<ushort> v, ushort min, ushort max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<ushort> v, ushort min, ushort max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<ushort> v, ushort min, ushort max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<short> v, short min, short max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<short> v, short min, short max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<short> v, short min, short max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<short> v, short min, short max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S16, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<uint> v, uint min, uint max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<uint> v, uint min, uint max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<uint> v, uint min, uint max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<uint> v, uint min, uint max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U32, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<ulong> v, ulong min, ulong max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<ulong> v, ulong min, ulong max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<ulong> v, ulong min, ulong max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<ulong> v, ulong min, ulong max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_U64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<long> v, long min, long max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max));
+        public static bool VerticalSlider(string label, SizeF size, State<long> v, long min, long max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max));
 
-        public static bool VerticalSlider(string label, Size size, State<long> v, long min, long max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<long> v, long min, long max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_S64, v.ToNative(), (void*)min, (void*)max, formatPtr, (Native.ImGuiSliderFlags)options));
 
-        public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max)));
+        public static bool VerticalSlider(string label, SizeF size, State<double> v, double min, double max) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_VSliderScalar(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max)));
 
-        public static bool VerticalSlider(string label, Size size, State<double> v, double min, double max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
+        public static bool VerticalSlider(string label, SizeF size, State<double> v, double min, double max, string? format = default, SliderOptions options = default) => Native.StringToUtf8Func(label, format, (labelPtr, formatPtr) => Native.ImGui_VSliderScalarEx(labelPtr, size.ToNative(), Native.ImGuiDataType.ImGuiDataType_Double, v.ToNative(), (void*)BitConverter.DoubleToInt64Bits(min), (void*)BitConverter.DoubleToInt64Bits(max), formatPtr, (Native.ImGuiSliderFlags)options));
 
         #endregion
 
@@ -791,9 +791,9 @@ namespace ImguiSharp
 
         public static bool InputTextMultiline(string label, StateText buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Length));
 
-        public static bool InputTextMultiline(string label, StateText buffer, Size size, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options));
+        public static bool InputTextMultiline(string label, StateText buffer, SizeF size, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options));
 
-        public static bool InputTextMultiline(string label, StateText buffer, Size size, InputTextOptions options, InputTextCallbacks callbacks)
+        public static bool InputTextMultiline(string label, StateText buffer, SizeF size, InputTextOptions options, InputTextCallbacks callbacks)
         {
             InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
             return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
@@ -927,9 +927,9 @@ namespace ImguiSharp
             }
         }
 
-        public static bool ColorButton(string descriptionId, Color col, ColorEditOptions options = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButton(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options));
+        public static bool ColorButton(string descriptionId, ColorF col, ColorEditOptions options = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButton(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        public static bool ColorButton(string descriptionId, Color col, ColorEditOptions options = default, Size size = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButtonEx(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options, size.ToNative()));
+        public static bool ColorButton(string descriptionId, ColorF col, ColorEditOptions options = default, SizeF size = default) => Native.StringToUtf8Func(descriptionId, ptr => Native.ImGui_ColorButtonEx(ptr, col.ToNative(), (Native.ImGuiColorEditFlags)options, size.ToNative()));
 
         public static void SetColorEditOptions(ColorEditOptions options) => Native.ImGui_SetColorEditOptions((Native.ImGuiColorEditFlags)options);
 
@@ -969,17 +969,17 @@ namespace ImguiSharp
 
         public static bool Selectable(string label) => Native.StringToUtf8Func(label, Native.ImGui_Selectable);
 
-        public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableEx(labelPtr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
+        public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, SizeF size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableEx(labelPtr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
         public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtr(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
 
-        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtrEx(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, SizeF size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtrEx(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
         #endregion
 
         #region Widgets: List Boxes
 
-        public static bool BeginListBox(string label, Size size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginListBox(labelPtr, size.ToNative()));
+        public static bool BeginListBox(string label, SizeF size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginListBox(labelPtr, size.ToNative()));
 
         public static void EndListBox() => Native.ImGui_EndListBox();
 
@@ -1022,7 +1022,7 @@ namespace ImguiSharp
             }
         }
 
-        public static void PlotLines(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default)
+        public static void PlotLines(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
         {
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* valuesPtr = values)
@@ -1041,7 +1041,7 @@ namespace ImguiSharp
             Native.ImGui_PlotLinesCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
         });
 
-        public static void PlotLines(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        public static void PlotLines(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
         {
             PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
             Native.ImGui_PlotLinesCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
@@ -1056,7 +1056,7 @@ namespace ImguiSharp
             }
         }
 
-        public static void PlotHistogram(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default)
+        public static void PlotHistogram(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
         {
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* valuesPtr = values)
@@ -1072,7 +1072,7 @@ namespace ImguiSharp
             Native.ImGui_PlotHistogramCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
         });
 
-        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, Size graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
         {
             PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
             Native.ImGui_PlotHistogramCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
@@ -1164,7 +1164,7 @@ namespace ImguiSharp
 
         public static bool BeginTable(string id, int column, TableOptions options) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTable(idPtr, column, (Native.ImGuiTableFlags)options));
 
-        public static bool BeginTable(string id, int column, TableOptions options = default, Size outerSize = default, float innerWidth = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTableEx(idPtr, column, (Native.ImGuiTableFlags)options, outerSize.ToNative(), innerWidth));
+        public static bool BeginTable(string id, int column, TableOptions options = default, SizeF outerSize = default, float innerWidth = default) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_BeginTableEx(idPtr, column, (Native.ImGuiTableFlags)options, outerSize.ToNative(), innerWidth));
 
         public static void EndTable() => Native.ImGui_EndTable();
 
@@ -1301,7 +1301,7 @@ namespace ImguiSharp
 
         #region Clipping
 
-        public static void PushClipRect(Rectangle rect, bool intersectWithCurrentClipRect) => Native.ImGui_PushClipRect(rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRect);
+        public static void PushClipRect(RectangleF rect, bool intersectWithCurrentClipRect) => Native.ImGui_PushClipRect(rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRect);
 
         public static void PopClipRect() => Native.ImGui_PopClipRect();
 
@@ -1349,9 +1349,9 @@ namespace ImguiSharp
 
         public static Id GetItemId() => Id.Wrap(Native.ImGui_GetItemID());
 
-        public static Rectangle GetItemRectangle() => new(Position.Wrap(Native.ImGui_GetItemRectMin()), Position.Wrap(Native.ImGui_GetItemRectMax()));
+        public static RectangleF GetItemRectangle() => new(PositionF.Wrap(Native.ImGui_GetItemRectMin()), PositionF.Wrap(Native.ImGui_GetItemRectMax()));
 
-        public static Size GetItemRectangleSize() => Size.Wrap(Native.ImGui_GetItemRectSize());
+        public static SizeF GetItemRectangleSize() => SizeF.Wrap(Native.ImGui_GetItemRectSize());
 
         public static void SetItemAllowOverlap() => Native.ImGui_SetItemAllowOverlap();
 
@@ -1373,9 +1373,9 @@ namespace ImguiSharp
 
         #region Miscellaneous Utilities
 
-        public static bool IsRectVisibleBySize(Size size) => Native.ImGui_IsRectVisibleBySize(size.ToNative());
+        public static bool IsRectVisibleBySize(SizeF size) => Native.ImGui_IsRectVisibleBySize(size.ToNative());
 
-        public static bool IsRectVisible(Rectangle rect) => Native.ImGui_IsRectVisible(rect.Min.ToNative(), rect.Max.ToNative());
+        public static bool IsRectVisible(RectangleF rect) => Native.ImGui_IsRectVisible(rect.Min.ToNative(), rect.Max.ToNative());
 
         public static double GetTime() => Native.ImGui_GetTime();
 
@@ -1387,7 +1387,7 @@ namespace ImguiSharp
 
         public static Storage? GetStateStorage() => Storage.Wrap(Native.ImGui_GetStateStorage());
 
-        public static bool BeginChildFrame(Id id, Size size, WindowOptions flags = default) => Native.ImGui_BeginChildFrame(id.ToNative(), size.ToNative(), (Native.ImGuiWindowFlags)flags);
+        public static bool BeginChildFrame(Id id, SizeF size, WindowOptions flags = default) => Native.ImGui_BeginChildFrame(id.ToNative(), size.ToNative(), (Native.ImGuiWindowFlags)flags);
 
         public static void EndChildFrame() => Native.ImGui_EndChildFrame();
 
@@ -1395,19 +1395,19 @@ namespace ImguiSharp
 
         #region Text Utilities
 
-        public static Size CalcTextSize(string text) => Size.Wrap(Native.StringToUtf8Func(text, Native.ImGui_CalcTextSize));
+        public static SizeF CalcTextSize(string text) => SizeF.Wrap(Native.StringToUtf8Func(text, Native.ImGui_CalcTextSize));
 
-        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash) => Size.Wrap(Native.StringToUtf8Func(text, textPtr => Native.ImGui_CalcTextSizeEx(textPtr, null, hideTextAfterDoubleHash)));
+        public static SizeF CalcTextSize(string text, bool hideTextAfterDoubleHash) => SizeF.Wrap(Native.StringToUtf8Func(text, textPtr => Native.ImGui_CalcTextSizeEx(textPtr, null, hideTextAfterDoubleHash)));
 
-        public static Size CalcTextSize(string text, bool hideTextAfterDoubleHash, float wrapWidth) => Size.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash, wrapWidth)));
+        public static SizeF CalcTextSize(string text, bool hideTextAfterDoubleHash, float wrapWidth) => SizeF.Wrap(Native.StringToUtf8Func(text, ptr => Native.ImGui_CalcTextSizeEx(ptr, null, hideTextAfterDoubleHash, wrapWidth)));
 
         #endregion
 
         #region Color Utilities
 
-        public static Color ColorConvert(uint i) => Color.Wrap(Native.ImGui_ColorConvertU32ToFloat4(i));
+        public static ColorF ColorConvert(uint i) => ColorF.Wrap(Native.ImGui_ColorConvertU32ToFloat4(i));
 
-        public static uint ColorConvert(Color c) => Native.ImGui_ColorConvertFloat4ToU32(c.ToNative());
+        public static uint ColorConvert(ColorF c) => Native.ImGui_ColorConvertFloat4ToU32(c.ToNative());
 
         public static (float H, float S, float V) ColorConvertRgbToHsv(float r, float g, float b)
         {
@@ -1457,11 +1457,11 @@ namespace ImguiSharp
 
         public static int GetMouseClickedCount(MouseButton button) => Native.ImGui_GetMouseClickedCount((Native.ImGuiMouseButton)button);
 
-        public static bool IsMouseHovering(Rectangle rect) => Native.ImGui_IsMouseHoveringRect(rect.Min.ToNative(), rect.Max.ToNative());
+        public static bool IsMouseHovering(RectangleF rect) => Native.ImGui_IsMouseHoveringRect(rect.Min.ToNative(), rect.Max.ToNative());
 
-        public static bool IsMouseHovering(Rectangle rect, bool clip) => Native.ImGui_IsMouseHoveringRectEx(rect.Min.ToNative(), rect.Max.ToNative(), clip);
+        public static bool IsMouseHovering(RectangleF rect, bool clip) => Native.ImGui_IsMouseHoveringRectEx(rect.Min.ToNative(), rect.Max.ToNative(), clip);
 
-        public static bool IsMousePosValid(Position? mousePosition = default)
+        public static bool IsMousePosValid(PositionF? mousePosition = default)
         {
             if (mousePosition == null)
             {
@@ -1476,13 +1476,13 @@ namespace ImguiSharp
 
         public static bool IsAnyMouseDown() => Native.ImGui_IsAnyMouseDown();
 
-        public static Position GetMousePosition() => Position.Wrap(Native.ImGui_GetMousePos());
+        public static PositionF GetMousePosition() => PositionF.Wrap(Native.ImGui_GetMousePos());
 
-        public static Position GetMousePositionOnOpeningCurrentPopup() => Position.Wrap(Native.ImGui_GetMousePosOnOpeningCurrentPopup());
+        public static PositionF GetMousePositionOnOpeningCurrentPopup() => PositionF.Wrap(Native.ImGui_GetMousePosOnOpeningCurrentPopup());
 
         public static bool IsMouseDragging(MouseButton button, float lockThreshold = -1.0f) => Native.ImGui_IsMouseDragging((Native.ImGuiMouseButton)button, lockThreshold);
 
-        public static Size GetMouseDragDelta(MouseButton button = default, float lockThreshold = -1.0f) => Size.Wrap(Native.ImGui_GetMouseDragDelta((Native.ImGuiMouseButton)button, lockThreshold));
+        public static SizeF GetMouseDragDelta(MouseButton button = default, float lockThreshold = -1.0f) => SizeF.Wrap(Native.ImGui_GetMouseDragDelta((Native.ImGuiMouseButton)button, lockThreshold));
 
         public static void ResetMouseDragDelta() => Native.ImGui_ResetMouseDragDelta();
 

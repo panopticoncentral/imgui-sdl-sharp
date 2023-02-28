@@ -10,9 +10,9 @@
             set => _native->WantVisible = value;
         }
 
-        public Position InputPos
+        public PositionF InputPos
         {
-            get => Position.Wrap(_native->InputPos);
+            get => PositionF.Wrap(_native->InputPos);
             set => _native->InputPos = value.ToNative();
         }
 

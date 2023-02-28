@@ -5,22 +5,22 @@ namespace ImguiSharp
 {
     public readonly unsafe record struct DrawVertex : INativeValueWrapper<DrawVertex, Native.ImDrawVert>
     {
-        private readonly Position _xy;
-        private readonly TextureCoordinate _uv;
+        private readonly PositionF _xy;
+        private readonly TexturePosition _uv;
         private readonly uint _color;
 
-        public Position Xy => _xy;
-        public TextureCoordinate Uv => _uv;
+        public PositionF Xy => _xy;
+        public TexturePosition Uv => _uv;
         public uint Color => _color;
 
-        public DrawVertex(Position xy, TextureCoordinate uv, uint color)
+        public DrawVertex(PositionF xy, TexturePosition uv, uint color)
         {
             _xy = xy;
             _uv = uv;
             _color = color;
         }
 
-        public static DrawVertex Wrap(Native.ImDrawVert native) => new(Position.Wrap(native.pos), TextureCoordinate.Wrap(native.uv), native.col);
+        public static DrawVertex Wrap(Native.ImDrawVert native) => new(PositionF.Wrap(native.pos), TexturePosition.Wrap(native.uv), native.col);
 
         public Native.ImDrawVert ToNative() => new() { pos = Xy.ToNative(), uv = Uv.ToNative(), col = Color };
     }

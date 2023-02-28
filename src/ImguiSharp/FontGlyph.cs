@@ -48,7 +48,7 @@
             set => _glyph->AdvanceX = value;
         }
 
-        public Rectangle Corners
+        public RectangleF Corners
         {
             get => new(new(_glyph->X0, _glyph->Y0), new(_glyph->X1, _glyph->Y1));
             set

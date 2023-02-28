@@ -161,7 +161,7 @@ namespace SampleApp
             }
 
             var mainViewport = Imgui.GetMainViewport();
-            Imgui.SetNextWindowPosition(mainViewport.WorkPosition + new Position(650, 20), Condition.FirstUseEver);
+            Imgui.SetNextWindowPosition(mainViewport.WorkPosition + new PositionF(650, 20), Condition.FirstUseEver);
             Imgui.SetNextWindowSize(new(550, 680), Condition.FirstUseEver);
 
             if (!Imgui.Begin("Dear ImGui Managed Demo", open, windowOptions))
@@ -423,9 +423,9 @@ namespace SampleApp
                         Imgui.SameLine();
                     }
                     Imgui.PushId(i);
-                    Imgui.PushStyleColor(StyleColor.Button, Color.FromHsv(i / 7.0f, 0.6f, 0.6f));
-                    Imgui.PushStyleColor(StyleColor.ButtonHovered, Color.FromHsv(i / 7.0f, 0.7f, 0.7f));
-                    Imgui.PushStyleColor(StyleColor.ButtonActive, Color.FromHsv(i / 7.0f, 0.8f, 0.8f));
+                    Imgui.PushStyleColor(StyleColor.Button, ColorF.FromHsv(i / 7.0f, 0.6f, 0.6f));
+                    Imgui.PushStyleColor(StyleColor.ButtonHovered, ColorF.FromHsv(i / 7.0f, 0.7f, 0.7f));
+                    Imgui.PushStyleColor(StyleColor.ButtonActive, ColorF.FromHsv(i / 7.0f, 0.8f, 0.8f));
                     _ = Imgui.Button("Click");
                     Imgui.PopStyleColor(3);
                     Imgui.PopId();
@@ -727,7 +727,6 @@ namespace SampleApp
             {
                 if (Imgui.TreeNode("Colorful Text"))
                 {
-                    // Using shortcut. You can use PushStyleColor()/PopStyleColor() for more flexibility.
                     Imgui.TextColored(new(1.0f, 0.0f, 1.0f, 1.0f), "Pink");
                     Imgui.TextColored(new(1.0f, 1.0f, 0.0f, 1.0f), "Yellow");
                     Imgui.TextDisabled("Disabled");
@@ -737,7 +736,6 @@ namespace SampleApp
 
                 if (Imgui.TreeNode("Word Wrapping"))
                 {
-                    // Using shortcut. You can use PushTextWrapPos()/PopTextWrapPos() for more flexibility.
                     Imgui.TextWrapped(
                         "This text should automatically wrap on the edge of the window. The current implementation " +
                         "for text wrapping follows simple rules suitable for English and possibly other languages.");
@@ -750,7 +748,7 @@ namespace SampleApp
                     {
                         Imgui.Text($"Test paragraph {n}:");
                         var pos = Imgui.GetCursorScreenPosition();
-                        Rectangle marker = new(new(pos.X + s_wrapWidth, pos.Y), new(pos.X + s_wrapWidth + 10, pos.Y + Imgui.GetTextLineHeight()));
+                        RectangleF marker = new(new(pos.X + s_wrapWidth, pos.Y), new(pos.X + s_wrapWidth + 10, pos.Y + Imgui.GetTextLineHeight()));
                         Imgui.PushTextWrapPosition(Imgui.GetCursorPosition().X + s_wrapWidth);
                         if (n == 0)
                         {
@@ -769,15 +767,15 @@ namespace SampleApp
                     Imgui.TreePop();
                 }
 
-                if (Imgui.TreeNode("UTF-8 Text"))
+                if (Imgui.TreeNode("Unicode Text"))
                 {
                     Imgui.TextWrapped(
                         "CJK text will only appear if the font was loaded with the appropriate CJK character ranges. " +
                         "Call io.Fonts.AddFontFromFileTtf() manually to load extra character ranges. " +
                         "Read docs/FONTS.md for details.");
-                    Imgui.Text("Hiragana: \xe3\x81\x8b\xe3\x81\x8d\xe3\x81\x8f\xe3\x81\x91\xe3\x81\x93 (kakikukeko)");
-                    Imgui.Text("Kanjis: \xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e (nihongo)");
-                    _ = Imgui.InputText("UTF-8 input", new(32, "\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e"));
+                    Imgui.Text("Hiragana: かきくけこ (kakikukeko)");
+                    Imgui.Text("Kanjis: 日本語 (nihongo)");
+                    _ = Imgui.InputText("UTF-8 input", new(32, "日本語"));
                     Imgui.TreePop();
                 }
                 Imgui.TreePop();

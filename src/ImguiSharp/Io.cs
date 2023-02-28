@@ -25,9 +25,9 @@ namespace ImguiSharp
             set => _io->BackendFlags = (Native.ImGuiBackendFlags)value;
         }
 
-        public Size DisplaySize
+        public SizeF DisplaySize
         {
-            get => Size.Wrap(_io->DisplaySize);
+            get => SizeF.Wrap(_io->DisplaySize);
             set => _io->DisplaySize = value.ToNative();
         }
 
@@ -131,9 +131,9 @@ namespace ImguiSharp
             set => _io->FontDefault = value == null ? null : value.Value.ToNative();
         }
 
-        public Size DisplayFramebufferScale
+        public SizeF DisplayFramebufferScale
         {
-            get => Size.Wrap(_io->DisplayFramebufferScale);
+            get => SizeF.Wrap(_io->DisplayFramebufferScale);
             set => _io->DisplayFramebufferScale = value.ToNative();
         }
 
@@ -382,13 +382,13 @@ namespace ImguiSharp
             set => _io->MetricsActiveAllocations = value;
         }
 
-        public Size MouseDelta
+        public SizeF MouseDelta
         {
-            get => Size.Wrap(_io->MouseDelta);
+            get => SizeF.Wrap(_io->MouseDelta);
             set => _io->MouseDelta = value.ToNative();
         }
 
-        public Position MousePosition => Position.Wrap(_io->MousePos);
+        public PositionF MousePosition => PositionF.Wrap(_io->MousePos);
 
         public float MouseWheelVertical => _io->MouseWheel;
 
@@ -415,11 +415,11 @@ namespace ImguiSharp
 
         public void AddKeyAnalogEvent(Key key, bool down, float v) => Native.ImGuiIO_AddKeyAnalogEvent(_io, (Native.ImGuiKey)key, down, v);
 
-        public void AddMousePosEvent(Position position) => Native.ImGuiIO_AddMousePosEvent(_io, position.X, position.Y);
+        public void AddMousePosEvent(PositionF position) => Native.ImGuiIO_AddMousePosEvent(_io, position.X, position.Y);
 
         public void AddMouseButtonEvent(int button, bool down) => Native.ImGuiIO_AddMouseButtonEvent(_io, button, down);
 
-        public void AddMouseWheelEvent(Position location) => Native.ImGuiIO_AddMouseWheelEvent(_io, location.X, location.Y);
+        public void AddMouseWheelEvent(PositionF location) => Native.ImGuiIO_AddMouseWheelEvent(_io, location.X, location.Y);
 
         public void AddFocusEvent(bool focused) => Native.ImGuiIO_AddFocusEvent(_io, focused);
 

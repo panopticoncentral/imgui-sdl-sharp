@@ -11,7 +11,7 @@
                     ? DrawCommandKind.ResetRenderState
                     : DrawCommandKind.Callback;
 
-        public Rectangle ClipRectangle => Rectangle.Wrap(_cmd->ClipRect);
+        public RectangleF ClipRectangle => RectangleF.Wrap(_cmd->ClipRect);
 
         public TextureId TextureId => TextureId.Wrap(Native.ImDrawCmd_GetTexID(_cmd));
 

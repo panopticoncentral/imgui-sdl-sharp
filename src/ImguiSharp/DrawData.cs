@@ -16,9 +16,9 @@ namespace ImguiSharp
 
         public DrawList this[int index] => index >= 0 && index < _data->CmdListsCount ? DrawList.Wrap(_data->CmdLists[index])!.Value : throw new InvalidOperationException();
 
-        public Position DisplayPosition => Position.Wrap(_data->DisplayPos);
+        public PositionF DisplayPosition => PositionF.Wrap(_data->DisplayPos);
 
-        public Size DisplaySize => Size.Wrap(_data->DisplaySize);
+        public SizeF DisplaySize => SizeF.Wrap(_data->DisplaySize);
 
         public (float X, float Y) FramebufferScale => (_data->FramebufferScale.X, _data->FramebufferScale.Y);
 
@@ -31,7 +31,7 @@ namespace ImguiSharp
 
         public void DeIndexAllBuffers() => Native.ImDrawData_DeIndexAllBuffers(_data);
 
-        public void ScaleClipRects(Size scale) => Native.ImDrawData_ScaleClipRects(_data, scale.ToNative());
+        public void ScaleClipRects(SizeF scale) => Native.ImDrawData_ScaleClipRects(_data, scale.ToNative());
 
         public static DrawData? Wrap(Native.ImDrawData* native) => native == null ? null : new(native);
 

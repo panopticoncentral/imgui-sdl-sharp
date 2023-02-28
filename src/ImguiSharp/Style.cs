@@ -16,9 +16,9 @@
             set => _style->DisabledAlpha = value;
         }
 
-        public Size WindowPadding
+        public SizeF WindowPadding
         {
-            get => Size.Wrap(_style->WindowPadding);
+            get => SizeF.Wrap(_style->WindowPadding);
             set => _style->WindowPadding = value.ToNative();
         }
 
@@ -34,15 +34,15 @@
             set => _style->WindowBorderSize = value;
         }
 
-        public Size WindowMinSize
+        public SizeF WindowMinSize
         {
-            get => Size.Wrap(_style->WindowMinSize);
+            get => SizeF.Wrap(_style->WindowMinSize);
             set => _style->WindowMinSize = value.ToNative();
         }
 
-        public Position WindowTitleAlign
+        public PositionF WindowTitleAlign
         {
-            get => Position.Wrap(_style->WindowTitleAlign);
+            get => PositionF.Wrap(_style->WindowTitleAlign);
             set => _style->WindowTitleAlign = value.ToNative();
         }
 
@@ -76,9 +76,9 @@
             set => _style->PopupBorderSize = value;
         }
 
-        public Size FramePadding
+        public SizeF FramePadding
         {
-            get => Size.Wrap(_style->FramePadding);
+            get => SizeF.Wrap(_style->FramePadding);
             set => _style->FramePadding = value.ToNative();
         }
 
@@ -94,27 +94,27 @@
             set => _style->FrameBorderSize = value;
         }
 
-        public Size ItemSpacing
+        public SizeF ItemSpacing
         {
-            get => Size.Wrap(_style->ItemSpacing);
+            get => SizeF.Wrap(_style->ItemSpacing);
             set => _style->ItemSpacing = value.ToNative();
         }
 
-        public Size ItemInnerSpacing
+        public SizeF ItemInnerSpacing
         {
-            get => Size.Wrap(_style->ItemInnerSpacing);
+            get => SizeF.Wrap(_style->ItemInnerSpacing);
             set => _style->ItemInnerSpacing = value.ToNative();
         }
 
-        public Size CellPadding
+        public SizeF CellPadding
         {
-            get => Size.Wrap(_style->CellPadding);
+            get => SizeF.Wrap(_style->CellPadding);
             set => _style->CellPadding = value.ToNative();
         }
 
-        public Size TouchExtraPadding
+        public SizeF TouchExtraPadding
         {
-            get => Size.Wrap(_style->TouchExtraPadding);
+            get => SizeF.Wrap(_style->TouchExtraPadding);
             set => _style->TouchExtraPadding = value.ToNative();
         }
 
@@ -184,27 +184,27 @@
             set => _style->ColorButtonPosition = (Native.ImGuiDir)value;
         }
 
-        public Position ButtonTextAlign
+        public PositionF ButtonTextAlign
         {
-            get => Position.Wrap(_style->ButtonTextAlign);
+            get => PositionF.Wrap(_style->ButtonTextAlign);
             set => _style->ButtonTextAlign = value.ToNative();
         }
 
-        public Position SelectableTextAlign
+        public PositionF SelectableTextAlign
         {
-            get => Position.Wrap(_style->SelectableTextAlign);
+            get => PositionF.Wrap(_style->SelectableTextAlign);
             set => _style->SelectableTextAlign = value.ToNative();
         }
 
-        public Size DisplayWindowPadding
+        public SizeF DisplayWindowPadding
         {
-            get => Size.Wrap(_style->DisplayWindowPadding);
+            get => SizeF.Wrap(_style->DisplayWindowPadding);
             set => _style->DisplayWindowPadding = value.ToNative();
         }
 
-        public Size DisplaySafeAreaPadding
+        public SizeF DisplaySafeAreaPadding
         {
-            get => Size.Wrap(_style->DisplaySafeAreaPadding);
+            get => SizeF.Wrap(_style->DisplaySafeAreaPadding);
             set => _style->DisplaySafeAreaPadding = value.ToNative();
         }
 
@@ -249,10 +249,10 @@
             _style = style;
         }
 
-        public Color GetColor(StyleColor color) =>
-            Color.Wrap(new(_style->Colors[(int)color * 4], _style->Colors[((int)color * 4) + 1], _style->Colors[((int)color * 4) + 2], _style->Colors[((int)color * 4) + 3]));
+        public ColorF GetColor(StyleColor color) =>
+            ColorF.Wrap(new(_style->Colors[(int)color * 4], _style->Colors[((int)color * 4) + 1], _style->Colors[((int)color * 4) + 2], _style->Colors[((int)color * 4) + 3]));
 
-        public void SetColor(StyleColor styleColor, Color color)
+        public void SetColor(StyleColor styleColor, ColorF color)
         {
             _style->Colors[(int)styleColor * 4] = color.Red;
             _style->Colors[((int)styleColor * 4) + 1] = color.Green;
