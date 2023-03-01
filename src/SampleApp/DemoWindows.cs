@@ -382,7 +382,7 @@ namespace SampleApp
         private static int s_selectionMask = 1 << 2;
         private static readonly State<bool> s_closableGroup = new(true);
         private static readonly State<float> s_wrapWidth = new(200.0f);
-
+        private static int s_pressedCount;
 
         private static void ShowDemoWindowWidgets()
         {
@@ -781,89 +781,87 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Images");
-            //    if (Imgui.TreeNode("Images"))
-            //    {
-            //        ImGuiIO& io = Imgui.GetIO();
-            //        Imgui.TextWrapped(
-            //            "Below we are displaying the font texture (which is the only texture we have access to in this demo). "
-            //            "Use the 'ImTextureID' type as storage to pass pointers or identifier to your own texture data. "
-            //            "Hover the texture for a zoomed view!");
-            //
-            //        // Below we are displaying the font texture because it is the only texture we have access to inside the demo!
-            //        // Remember that ImTextureID is just storage for whatever you want it to be. It is essentially a value that
-            //        // will be passed to the rendering backend via the ImDrawCmd structure.
-            //        // If you use one of the default imgui_impl_XXXX.cpp rendering backend, they all have comments at the top
-            //        // of their respective source file to specify what they expect to be stored in ImTextureID, for example:
-            //        // - The imgui_impl_dx11.cpp renderer expect a 'ID3D11ShaderResourceView*' pointer
-            //        // - The imgui_impl_opengl3.cpp renderer expect a GLuint OpenGL texture identifier, etc.
-            //        // More:
-            //        // - If you decided that ImTextureID = MyEngineTexture*, then you can pass your MyEngineTexture* pointers
-            //        //   to Imgui.Image(), and gather width/height through your own functions, etc.
-            //        // - You can use ShowMetricsWindow() to inspect the draw data that are being passed to your renderer,
-            //        //   it will help you debug issues if you are confused about it.
-            //        // - Consider using the lower-level ImDrawList::AddImage() API, via Imgui.GetWindowDrawList()->AddImage().
-            //        // - Read https://github.com/ocornut/imgui/blob/master/docs/FAQ.md
-            //        // - Read https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-            //        ImTextureID my_tex_id = io.Fonts->TexID;
-            //        float my_tex_w = (float)io.Fonts->TexWidth;
-            //        float my_tex_h = (float)io.Fonts->TexHeight;
-            //        {
-            //            Imgui.Text("%.0fx%.0f", my_tex_w, my_tex_h);
-            //            ImVec2 pos = Imgui.GetCursorScreenPos();
-            //            ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
-            //            ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
-            //            ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);   // No tint
-            //            ImVec4 border_col = ImVec4(1.0f, 1.0f, 1.0f, 0.5f); // 50% opaque white
-            //            Imgui.Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
-            //            if (Imgui.IsItemHovered())
-            //            {
-            //                Imgui.BeginTooltip();
-            //                float region_sz = 32.0f;
-            //                float region_x = io.MousePos.x - pos.x - region_sz * 0.5f;
-            //                float region_y = io.MousePos.y - pos.y - region_sz * 0.5f;
-            //                float zoom = 4.0f;
-            //                if (region_x < 0.0f) { region_x = 0.0f; }
-            //                else if (region_x > my_tex_w - region_sz) { region_x = my_tex_w - region_sz; }
-            //                if (region_y < 0.0f) { region_y = 0.0f; }
-            //                else if (region_y > my_tex_h - region_sz) { region_y = my_tex_h - region_sz; }
-            //                Imgui.Text("Min: (%.2f, %.2f)", region_x, region_y);
-            //                Imgui.Text("Max: (%.2f, %.2f)", region_x + region_sz, region_y + region_sz);
-            //                ImVec2 uv0 = ImVec2((region_x) / my_tex_w, (region_y) / my_tex_h);
-            //                ImVec2 uv1 = ImVec2((region_x + region_sz) / my_tex_w, (region_y + region_sz) / my_tex_h);
-            //                Imgui.Image(my_tex_id, ImVec2(region_sz * zoom, region_sz * zoom), uv0, uv1, tint_col, border_col);
-            //                Imgui.EndTooltip();
-            //            }
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Images/Textured buttons");
-            //        Imgui.TextWrapped("And now some textured buttons..");
-            //        static int pressed_count = 0;
-            //        for (int i = 0; i < 8; i++)
-            //        {
-            //            // UV coordinates are often (0.0f, 0.0f) and (1.0f, 1.0f) to display an entire textures.
-            //            // Here are trying to display only a 32x32 pixels area of the texture, hence the UV computation.
-            //            // Read about UV coordinates here: https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
-            //            Imgui.PushID(i);
-            //            if (i > 0)
-            //                Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(i - 1.0f, i - 1.0f));
-            //            ImVec2 size = ImVec2(32.0f, 32.0f);                         // Size of the image we want to make visible
-            //            ImVec2 uv0 = ImVec2(0.0f, 0.0f);                            // UV coordinates for lower-left
-            //            ImVec2 uv1 = ImVec2(32.0f / my_tex_w, 32.0f / my_tex_h);    // UV coordinates for (32,32) in our texture
-            //            ImVec4 bg_col = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);             // Black background
-            //            ImVec4 tint_col = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);           // No tint
-            //            if (Imgui.ImageButton("", my_tex_id, size, uv0, uv1, bg_col, tint_col))
-            //                pressed_count += 1;
-            //            if (i > 0)
-            //                Imgui.PopStyleVar();
-            //            Imgui.PopID();
-            //            Imgui.SameLine();
-            //        }
-            //        Imgui.NewLine();
-            //        Imgui.Text("Pressed %d times.", pressed_count);
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Images"))
+            {
+                var io = Imgui.GetIo();
+                Imgui.TextWrapped(
+                    "Below we are displaying the font texture (which is the only texture we have access to in this demo). " +
+                    "Use the 'TextureId' type as storage to pass pointers or identifier to your own texture data. " +
+                    "Hover the texture for a zoomed view!");
+
+                var myTextureId = io.Fonts.TextureId;
+                io.Fonts.GetTextureDataAsRgba32(out _, out var textureSize, out _);
+                var myTextureSize = (SizeF)textureSize;
+                {
+                    Imgui.Text($"{myTextureSize.Width}x{myTextureSize.Height}");
+                    var position = Imgui.GetCursorScreenPosition();
+                    TextureRectangle rect = new(new(0.0f, 0.0f), new(1.0f, 1.0f));
+                    ColorF tint_col = new(1.0f, 1.0f, 1.0f, 1.0f);
+                    ColorF border_col = new(1.0f, 1.0f, 1.0f, 0.5f);
+                    Imgui.Image(myTextureId, myTextureSize, rect, tint_col, border_col);
+                    if (Imgui.IsItemHovered())
+                    {
+                        Imgui.BeginTooltip();
+                        var regionSize = 32.0f;
+                        var regionX = io.MousePosition.X - position.X - (regionSize * 0.5f);
+                        var regionY = io.MousePosition.Y - position.Y - (regionSize * 0.5f);
+                        var zoom = 4.0f;
+                        if (regionX < 0.0f)
+                        {
+                            regionX = 0.0f;
+                        }
+                        else if (regionX > myTextureSize.Width - regionSize)
+                        {
+                            regionX = myTextureSize.Width - regionSize;
+                        }
+                        if (regionY < 0.0f)
+                        {
+                            regionY = 0.0f;
+                        }
+                        else if (regionY > myTextureSize.Height - regionSize)
+                        {
+                            regionY = myTextureSize.Height - regionSize;
+                        }
+                        Imgui.Text($"Min: ({regionX}, {regionY})");
+                        Imgui.Text($"Max: ({regionX + regionSize}, {regionY + regionSize})");
+                        TexturePosition uv0 = new(regionX / myTextureSize.Width, regionY / myTextureSize.Height);
+                        TexturePosition uv1 = new((regionX + regionSize) / myTextureSize.Width, (regionY + regionSize) / myTextureSize.Height);
+                        Imgui.Image(myTextureId, new(regionSize * zoom, regionSize * zoom), new(uv0, uv1), tint_col, border_col);
+                        Imgui.EndTooltip();
+                    }
+                }
+
+                Imgui.TextWrapped("And now some textured buttons..");
+                for (var i = 0; i < 8; i++)
+                {
+                    Imgui.PushId(i);
+                    if (i > 0)
+                    {
+                        Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(i - 1.0f, i - 1.0f));
+                    }
+
+                    SizeF size = new(32.0f, 32.0f);
+                    TextureRectangle rect = new(new(0.0f, 0.0f), new(32.0f / myTextureSize.Width, 32.0f / myTextureSize.Height));
+                    ColorF bg_col = new(0.0f, 0.0f, 0.0f, 1.0f);
+                    ColorF tint_col = new(1.0f, 1.0f, 1.0f, 1.0f);
+                    if (Imgui.ImageButton("", myTextureId, size, rect, bg_col, tint_col))
+                    {
+                        s_pressedCount += 1;
+                    }
+
+                    if (i > 0)
+                    {
+                        Imgui.PopStyleVar();
+                    }
+
+                    Imgui.PopId();
+                    Imgui.SameLine();
+                }
+                Imgui.NewLine();
+                Imgui.Text($"Pressed {s_pressedCount} times.");
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Combo");
             //    if (Imgui.TreeNode("Combo"))
             //    {

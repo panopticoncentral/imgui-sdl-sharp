@@ -187,8 +187,8 @@ namespace ImguiSharp.Renderer.Sdl
             var io = Imgui.GetIo();
             var bd = BackendData;
 
-            io.Fonts.GetTextureDataAsRgba32(out var pixels, out var width, out var height, out var _);
-            SdlSharp.Graphics.Size size = new(width, height);
+            io.Fonts.GetTextureDataAsRgba32(out var pixels, out var textureSize, out var _);
+            SdlSharp.Graphics.Size size = new(textureSize.Width, textureSize.Height);
 
             var texture = bd._renderer.CreateTexture(EnumeratedPixelFormat.Abgr8888, TextureAccess.Static, size);
             if (texture == null)

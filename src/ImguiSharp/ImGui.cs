@@ -407,23 +407,23 @@ namespace ImguiSharp
 
         public static void Image(TextureId userTextureId, SizeF size) => Native.ImGui_Image(userTextureId.ToNative(), size.ToNative());
 
-        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0) => Image(userTextureId, size, uv0, new(1, 1));
+        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0) => Image(userTextureId, size, new TextureRectangle(uv0, new(1, 1)));
 
-        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1) => Image(userTextureId, size, uv0, uv1, new(1, 1, 1, 1));
+        public static void Image(TextureId userTextureId, SizeF size, TextureRectangle rect) => Image(userTextureId, size, rect, new(1, 1, 1, 1));
 
-        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF tintColor) => Image(userTextureId, size, uv0, uv1, tintColor, default);
+        public static void Image(TextureId userTextureId, SizeF size, TextureRectangle rect, ColorF tintColor) => Image(userTextureId, size, rect, tintColor, default);
 
-        public static void Image(TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF tintColor, ColorF borderColor) => Native.ImGui_ImageEx(userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), tintColor.ToNative(), borderColor.ToNative());
+        public static void Image(TextureId userTextureId, SizeF size, TextureRectangle rect, ColorF tintColor, ColorF borderColor) => Native.ImGui_ImageEx(userTextureId.ToNative(), size.ToNative(), rect.Min.ToNative(), rect.Max.ToNative(), tintColor.ToNative(), borderColor.ToNative());
 
         public static bool ImageButton(string id, TextureId userTextureId, SizeF size) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButton(idPtr, userTextureId.ToNative(), size.ToNative()));
 
-        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0) => ImageButton(id, userTextureId, size, uv0, new(1, 1));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0) => ImageButton(id, userTextureId, size, new TextureRectangle(uv0, new(1, 1)));
 
-        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1) => ImageButton(id, userTextureId, size, uv0, uv1, default);
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TextureRectangle rect) => ImageButton(id, userTextureId, size, rect, default);
 
-        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF backgroundColor) => ImageButton(id, userTextureId, size, uv0, uv1, backgroundColor, new(1, 1, 1, 1));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TextureRectangle rect, ColorF backgroundColor) => ImageButton(id, userTextureId, size, rect, backgroundColor, new(1, 1, 1, 1));
 
-        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TexturePosition uv0, TexturePosition uv1, ColorF backgroundColor, ColorF tintColor) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButtonEx(idPtr, userTextureId.ToNative(), size.ToNative(), uv0.ToNative(), uv1.ToNative(), backgroundColor.ToNative(), tintColor.ToNative()));
+        public static bool ImageButton(string id, TextureId userTextureId, SizeF size, TextureRectangle rect, ColorF backgroundColor, ColorF tintColor) => Native.StringToUtf8Func(id, idPtr => Native.ImGui_ImageButtonEx(idPtr, userTextureId.ToNative(), size.ToNative(), rect.Min.ToNative(), rect.Max.ToNative(), backgroundColor.ToNative(), tintColor.ToNative()));
 
         #endregion
 

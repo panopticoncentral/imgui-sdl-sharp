@@ -85,27 +85,25 @@
 
         public bool Build() => Native.ImFontAtlas_Build(_fontAtlas);
 
-        public void GetTextureDataAsAlpha8(out Span<byte> pixels, out int width, out int height, out int bytesPerPixel)
+        public void GetTextureDataAsAlpha8(out Span<byte> pixels, out Size size, out int bytesPerPixel)
         {
             byte* pixelsLocal;
             int widthLocal, heightLocal, bytesPerPixelLocal;
 
             Native.ImFontAtlas_GetTexDataAsAlpha8(_fontAtlas, &pixelsLocal, &widthLocal, &heightLocal, &bytesPerPixelLocal);
             pixels = new(pixelsLocal, widthLocal * heightLocal * bytesPerPixelLocal);
-            width = widthLocal;
-            height = heightLocal;
+            size = new(widthLocal, heightLocal);
             bytesPerPixel = bytesPerPixelLocal;
         }
 
-        public void GetTextureDataAsRgba32(out Span<byte> pixels, out int width, out int height, out int bytesPerPixel)
+        public void GetTextureDataAsRgba32(out Span<byte> pixels, out Size size, out int bytesPerPixel)
         {
             byte* pixelsLocal;
             int widthLocal, heightLocal, bytesPerPixelLocal;
 
             Native.ImFontAtlas_GetTexDataAsRGBA32(_fontAtlas, &pixelsLocal, &widthLocal, &heightLocal, &bytesPerPixelLocal);
             pixels = new(pixelsLocal, widthLocal * heightLocal * bytesPerPixelLocal);
-            width = widthLocal;
-            height = heightLocal;
+            size = new(widthLocal, heightLocal);
             bytesPerPixel = bytesPerPixelLocal;
         }
 
