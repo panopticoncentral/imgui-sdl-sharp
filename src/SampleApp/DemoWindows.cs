@@ -759,8 +759,8 @@ namespace SampleApp
                             Imgui.Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
                         }
 
-                        drawList.AddRect(Imgui.GetItemRectangle(), Native.IM_COL32(255, 255, 0, 255));
-                        drawList.AddRectFilled(marker, Native.IM_COL32(255, 0, 255, 255));
+                        drawList.AddRect(Imgui.GetItemRectangle(), new Color(255, 255, 0, 255));
+                        drawList.AddRectFilled(marker, new Color(255, 0, 255, 255));
                         Imgui.PopTextWrapPosition();
                     }
 

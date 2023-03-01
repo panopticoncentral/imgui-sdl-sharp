@@ -221,7 +221,7 @@ namespace ImguiSharp
 
         public static void PopFont() => Native.ImGui_PopFont();
 
-        public static void PushStyleColor(StyleColor property, uint color) => Native.ImGui_PushStyleColor((Native.ImGuiCol)property, color);
+        public static void PushStyleColor(StyleColor property, Color color) => Native.ImGui_PushStyleColor((Native.ImGuiCol)property, color.ToNative());
 
         public static void PushStyleColor(StyleColor property, ColorF color) => Native.ImGui_PushStyleColorImVec4((Native.ImGuiCol)property, color.ToNative());
 
@@ -271,13 +271,13 @@ namespace ImguiSharp
 
         public static TexturePosition GetFontWhitePixelTextureCoordinate() => TexturePosition.Wrap(Native.ImGui_GetFontTexUvWhitePixel());
 
-        public static uint GetColor(StyleColor color) => Native.ImGui_GetColorU32((Native.ImGuiCol)color);
+        public static Color GetColor(StyleColor color) => Color.Wrap(Native.ImGui_GetColorU32((Native.ImGuiCol)color));
 
-        public static uint GetColor(StyleColor color, float alphaMul) => Native.ImGui_GetColorU32Ex((Native.ImGuiCol)color, alphaMul);
+        public static Color GetColor(StyleColor color, float alphaMul) => Color.Wrap(Native.ImGui_GetColorU32Ex((Native.ImGuiCol)color, alphaMul));
 
-        public static uint GetColor(ColorF color) => Native.ImGui_GetColorU32ImVec4(color.ToNative());
+        public static Color GetColor(ColorF color) => Color.Wrap(Native.ImGui_GetColorU32ImVec4(color.ToNative()));
 
-        public static uint GetColor(uint color) => Native.ImGui_GetColorU32uint(color);
+        public static Color GetColor(Color color) => Color.Wrap(Native.ImGui_GetColorU32uint(color.ToNative()));
 
         public static ColorF GetStyleColor(StyleColor color) => ColorF.Wrap(*Native.ImGui_GetStyleColorVec4((Native.ImGuiCol)color));
 
