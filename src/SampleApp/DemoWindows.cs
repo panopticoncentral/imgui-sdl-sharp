@@ -1,5 +1,7 @@
 ﻿using ImguiSharp;
 
+using static ImguiSharp.Native;
+
 namespace SampleApp
 {
     public static class DemoWindows
@@ -376,13 +378,14 @@ namespace SampleApp
         private static readonly StateVector<float> s_col1 = new(3, new[] { 1.0f, 0.0f, 0.2f });
         private static readonly StateVector<float> s_col2 = new(4, new[] { 0.4f, 0.7f, 0.0f, 0.5f });
         private static readonly State<int> s_itemCurrent2 = new(1);
-        private static readonly State<int> s_baseFlags = new((int)(TreeNodeOptions.OpenOnArrow | TreeNodeOptions.OpenOnDoubleClick | TreeNodeOptions.SpanAvailWidth));
+        private static readonly StateOption<TreeNodeOptions> s_baseFlags = new(TreeNodeOptions.OpenOnArrow | TreeNodeOptions.OpenOnDoubleClick | TreeNodeOptions.SpanAvailWidth);
         private static readonly State<bool> s_alignLabelWithCurrentXPosition = new(false);
         private static readonly State<bool> s_testDragAndDrop = new(false);
         private static int s_selectionMask = 1 << 2;
         private static readonly State<bool> s_closableGroup = new(true);
         private static readonly State<float> s_wrapWidth = new(200.0f);
         private static int s_pressedCount;
+        private static readonly StateOption<ComboOptions> s_flags = new(0);
 
         private static void ShowDemoWindowWidgets()
         {
@@ -603,12 +606,12 @@ namespace SampleApp
                     HelpMarker(
                         "This is a more typical looking tree with selectable nodes.\n" +
                         "Click to select, CTRL+Click to toggle, click on arrows or double-click to open.");
-                    _ = Imgui.CheckboxFlags("ImGuiTreeNodeFlags_OpenOnArrow", s_baseFlags, (int)TreeNodeOptions.OpenOnArrow);
-                    _ = Imgui.CheckboxFlags("TreeNodeOptions.OpenOnDoubleClick", s_baseFlags, (int)TreeNodeOptions.OpenOnDoubleClick);
-                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanAvailWidth", s_baseFlags, (int)TreeNodeOptions.SpanAvailWidth);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.OpenOnArrow", s_baseFlags, TreeNodeOptions.OpenOnArrow);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.OpenOnDoubleClick", s_baseFlags, TreeNodeOptions.OpenOnDoubleClick);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanAvailWidth", s_baseFlags, TreeNodeOptions.SpanAvailWidth);
                     Imgui.SameLine();
                     HelpMarker("Extend hit area to all available width instead of allowing more items to be laid out after the node.");
-                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanFullWidth", s_baseFlags, (int)TreeNodeOptions.SpanFullWidth);
+                    _ = Imgui.CheckboxFlags("TreeNodeOptions.SpanFullWidth", s_baseFlags, TreeNodeOptions.SpanFullWidth);
                     _ = Imgui.Checkbox("Align label with current X position", s_alignLabelWithCurrentXPosition);
                     _ = Imgui.Checkbox("Test tree node as drag source", s_testDragAndDrop);
                     Imgui.Text("Hello!");
@@ -620,7 +623,7 @@ namespace SampleApp
                     var nodeClicked = -1;
                     for (var i = 0; i < 6; i++)
                     {
-                        var nodeFlags = (TreeNodeOptions)(int)s_baseFlags;
+                        var nodeFlags = (TreeNodeOptions)s_baseFlags;
                         var isSelected = (s_selectionMask & (1 << i)) != 0;
                         if (isSelected)
                         {
@@ -862,101 +865,102 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Combo");
-            //    if (Imgui.TreeNode("Combo"))
-            //    {
-            //        // Combo Boxes are also called "Dropdown" in other systems
-            //        // Expose flags as checkbox for the demo
-            //        static ImGuiComboFlags flags = 0;
-            //        Imgui.CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
-            //        Imgui.SameLine(); HelpMarker("Only makes a difference if the popup is larger than the combo");
-            //        if (Imgui.CheckboxFlags("ImGuiComboFlags_NoArrowButton", &flags, ImGuiComboFlags_NoArrowButton))
-            //            flags &= ~ImGuiComboFlags_NoPreview;     // Clear the other flag, as we cannot combine both
-            //        if (Imgui.CheckboxFlags("ImGuiComboFlags_NoPreview", &flags, ImGuiComboFlags_NoPreview))
-            //            flags &= ~ImGuiComboFlags_NoArrowButton; // Clear the other flag, as we cannot combine both
-            //
-            //        // Using the generic BeginCombo() API, you have full control over how to display the combo contents.
-            //        // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
-            //        // stored in the object itself, etc.)
-            //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-            //        static int item_current_idx = 0; // Here we store our selection data as an index.
-            //        const char* combo_preview_value = items[item_current_idx];  // Pass in the preview value visible before opening the combo (it could be anything)
-            //        if (Imgui.BeginCombo("combo 1", combo_preview_value, flags))
-            //        {
-            //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            //            {
-            //                const bool is_selected = (item_current_idx == n);
-            //                if (Imgui.Selectable(items[n], is_selected))
-            //                    item_current_idx = n;
-            //
-            //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            //                if (is_selected)
-            //                    Imgui.SetItemDefaultFocus();
-            //            }
-            //            Imgui.EndCombo();
-            //        }
-            //
-            //        // Simplified one-liner Combo() API, using values packed in a single constant string
-            //        // This is a convenience for when the selection set is small and known at compile-time.
-            //        static int item_current_2 = 0;
-            //        Imgui.Combo("combo 2 (one-liner)", &item_current_2, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
-            //
-            //        // Simplified one-liner Combo() using an array of const char*
-            //        // This is not very useful (may obsolete): prefer using BeginCombo()/EndCombo() for full control.
-            //        static int item_current_3 = -1; // If the selection isn't within 0..count, Combo won't display a preview
-            //        Imgui.Combo("combo 3 (array)", &item_current_3, items, IM_ARRAYSIZE(items));
-            //
-            //        // Simplified one-liner Combo() using an accessor function
-            //        struct Funcs { static bool ItemGetter(void* data, int n, const char** out_str) { *out_str = ((const char**)data)[n]; return true; } };
-            //        static int item_current_4 = 0;
-            //        Imgui.Combo("combo 4 (function)", &item_current_4, &Funcs::ItemGetter, items, IM_ARRAYSIZE(items));
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/List Boxes");
-            //    if (Imgui.TreeNode("List boxes"))
-            //    {
-            //        // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
-            //        // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
-            //        // stored in the object itself, etc.)
-            //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-            //        static int item_current_idx = 0; // Here we store our selection data as an index.
-            //        if (Imgui.BeginListBox("listbox 1"))
-            //        {
-            //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            //            {
-            //                const bool is_selected = (item_current_idx == n);
-            //                if (Imgui.Selectable(items[n], is_selected))
-            //                    item_current_idx = n;
-            //
-            //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            //                if (is_selected)
-            //                    Imgui.SetItemDefaultFocus();
-            //            }
-            //            Imgui.EndListBox();
-            //        }
-            //
-            //        // Custom size: use all width, 5 items tall
-            //        Imgui.Text("Full-width:");
-            //        if (Imgui.BeginListBox("##listbox 2", ImVec2(-FLT_MIN, 5 * Imgui.GetTextLineHeightWithSpacing())))
-            //        {
-            //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            //            {
-            //                const bool is_selected = (item_current_idx == n);
-            //                if (Imgui.Selectable(items[n], is_selected))
-            //                    item_current_idx = n;
-            //
-            //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            //                if (is_selected)
-            //                    Imgui.SetItemDefaultFocus();
-            //            }
-            //            Imgui.EndListBox();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Combo"))
+            {
+                _ = Imgui.CheckboxFlags("ComboOptions.PopupAlignLeft", s_flags, ComboOptions.PopupAlignLeft);
+                Imgui.SameLine();
+                HelpMarker("Only makes a difference if the popup is larger than the combo");
+                if (Imgui.CheckboxFlags("ComboOptions.NoArrowButton", s_flags, ComboOptions.NoArrowButton))
+                {
+                    s_flags.Value &= ~ComboOptions.NoPreview;
+                }
+
+                if (Imgui.CheckboxFlags("ComboOptions.NoPreview", s_flags, ComboOptions.NoPreview))
+                {
+                    s_flags.Value &= ~ComboOptions.NoArrowButton;
+                }
+
+                //        // Using the generic BeginCombo() API, you have full control over how to display the combo contents.
+                //        // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
+                //        // stored in the object itself, etc.)
+                //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
+                //        static int item_current_idx = 0; // Here we store our selection data as an index.
+                //        const char* combo_preview_value = items[item_current_idx];  // Pass in the preview value visible before opening the combo (it could be anything)
+                //        if (Imgui.BeginCombo("combo 1", combo_preview_value, flags))
+                //        {
+                //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+                //            {
+                //                const bool is_selected = (item_current_idx == n);
+                //                if (Imgui.Selectable(items[n], is_selected))
+                //                    item_current_idx = n;
+                //
+                //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                //                if (is_selected)
+                //                    Imgui.SetItemDefaultFocus();
+                //            }
+                //            Imgui.EndCombo();
+                //        }
+                //
+                //        // Simplified one-liner Combo() API, using values packed in a single constant string
+                //        // This is a convenience for when the selection set is small and known at compile-time.
+                //        static int item_current_2 = 0;
+                //        Imgui.Combo("combo 2 (one-liner)", &item_current_2, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
+                //
+                //        // Simplified one-liner Combo() using an array of const char*
+                //        // This is not very useful (may obsolete): prefer using BeginCombo()/EndCombo() for full control.
+                //        static int item_current_3 = -1; // If the selection isn't within 0..count, Combo won't display a preview
+                //        Imgui.Combo("combo 3 (array)", &item_current_3, items, IM_ARRAYSIZE(items));
+                //
+                //        // Simplified one-liner Combo() using an accessor function
+                //        struct Funcs { static bool ItemGetter(void* data, int n, const char** out_str) { *out_str = ((const char**)data)[n]; return true; } };
+                //        static int item_current_4 = 0;
+                //        Imgui.Combo("combo 4 (function)", &item_current_4, &Funcs::ItemGetter, items, IM_ARRAYSIZE(items));
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("List boxes"))
+            {
+                //        // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
+                //        // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
+                //        // stored in the object itself, etc.)
+                //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
+                //        static int item_current_idx = 0; // Here we store our selection data as an index.
+                //        if (Imgui.BeginListBox("listbox 1"))
+                //        {
+                //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+                //            {
+                //                const bool is_selected = (item_current_idx == n);
+                //                if (Imgui.Selectable(items[n], is_selected))
+                //                    item_current_idx = n;
+                //
+                //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                //                if (is_selected)
+                //                    Imgui.SetItemDefaultFocus();
+                //            }
+                //            Imgui.EndListBox();
+                //        }
+                //
+                //        // Custom size: use all width, 5 items tall
+                //        Imgui.Text("Full-width:");
+                //        if (Imgui.BeginListBox("##listbox 2", ImVec2(-FLT_MIN, 5 * Imgui.GetTextLineHeightWithSpacing())))
+                //        {
+                //            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+                //            {
+                //                const bool is_selected = (item_current_idx == n);
+                //                if (Imgui.Selectable(items[n], is_selected))
+                //                    item_current_idx = n;
+                //
+                //                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                //                if (is_selected)
+                //                    Imgui.SetItemDefaultFocus();
+                //            }
+                //            Imgui.EndListBox();
+                //        }
+
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Selectables");
             //    if (Imgui.TreeNode("Selectables"))
             //    {

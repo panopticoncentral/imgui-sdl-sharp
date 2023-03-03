@@ -387,6 +387,8 @@ namespace ImguiSharp
 
         public static bool Checkbox(string label, State<bool> v) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_Checkbox(labelPtr, v.ToNative()));
 
+        public static bool CheckboxFlags<T>(string label, StateOption<T> flags, T flagsValue) where T : unmanaged, Enum => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_CheckboxFlagsIntPtr(labelPtr, flags.ToNative(), (int)(object)flagsValue));
+
         public static bool CheckboxFlags(string label, State<int> flags, int flagsValue) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_CheckboxFlagsIntPtr(labelPtr, flags.ToNative(), flagsValue));
 
         public static bool CheckboxFlags(string label, State<uint> flags, uint flagsValue) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_CheckboxFlagsUintPtr(labelPtr, flags.ToNative(), flagsValue));

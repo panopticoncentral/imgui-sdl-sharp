@@ -6,7 +6,7 @@
         None = Native.ImGuiConfigFlags.ImGuiConfigFlags_None,
         NavEnableKeyboard = Native.ImGuiConfigFlags.ImGuiConfigFlags_NavEnableKeyboard,
         NavEnableGamepad = Native.ImGuiConfigFlags.ImGuiConfigFlags_NavEnableGamepad,
-        NavEnableSetMousePos = Native.ImGuiConfigFlags.ImGuiConfigFlags_NavEnableSetMousePos,
+        NavEnableSetMousePosition = Native.ImGuiConfigFlags.ImGuiConfigFlags_NavEnableSetMousePos,
         NavNoCaptureKeyboard = Native.ImGuiConfigFlags.ImGuiConfigFlags_NavNoCaptureKeyboard,
         NoMouse = Native.ImGuiConfigFlags.ImGuiConfigFlags_NoMouse,
         NoMouseCursorChange = Native.ImGuiConfigFlags.ImGuiConfigFlags_NoMouseCursorChange,

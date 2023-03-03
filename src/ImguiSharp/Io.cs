@@ -322,7 +322,7 @@ namespace ImguiSharp
             set => _io->WantTextInput = value;
         }
 
-        public bool WantSetMousePos
+        public bool WantSetMousePosition
         {
             get => _io->WantSetMousePos;
             set => _io->WantSetMousePos = value;

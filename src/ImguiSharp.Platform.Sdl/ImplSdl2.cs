@@ -352,7 +352,7 @@ namespace ImguiSharp.Platform.Sdl
 
             if (bd._window == focusedWindow)
             {
-                if (io.WantSetMousePos)
+                if (io.WantSetMousePosition)
                 {
                     Mouse.Warp(bd._window, new((int)io.MousePosition.X, (int)io.MousePosition.Y));
                 }
