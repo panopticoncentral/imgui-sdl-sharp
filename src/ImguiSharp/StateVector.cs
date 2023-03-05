@@ -2,7 +2,7 @@
 
 namespace ImguiSharp
 {
-    public sealed unsafe class StateVector<T> : IDisposable, IEnumerable<T>
+    public readonly unsafe struct StateVector<T> : IDisposable, IEnumerable<T>
         where T : unmanaged
     {
         private readonly T* _value;
@@ -25,26 +25,25 @@ namespace ImguiSharp
 
         public StateVector(int length, IReadOnlyList<T>? values = default)
         {
+            if (values?.Count > length)
+            {
+                throw new InvalidOperationException();
+            }
+
             _value = (T*)Native.ImGui_MemAlloc((nuint)(sizeof(T) * length));
             Length = length;
 
-            if (values != null)
+            for (var index = 0; index < length; index++)
             {
-                if (values.Count > length)
-                {
-                    throw new InvalidOperationException();
-                }
-
-                for (var index = 0; index < values.Count; index++)
-                {
-                    _value[index] = values[index];
-                }
+                _value[index] = values != null && index < values.Count ? values[index] : default;
             }
         }
 
         public void Dispose() => Native.ImGui_MemFree(_value);
 
         internal T* ToNative() => _value;
+
+        public State<T> GetStateOfElement(int index) => index >= 0 && index < Length ? new(&_value[index]) : throw new InvalidOperationException();
 
         public IEnumerator<T> GetEnumerator() => new StateVectorEnumerator(this);
 

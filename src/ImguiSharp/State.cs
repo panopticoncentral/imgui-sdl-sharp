@@ -17,6 +17,11 @@
             Value = initialValue;
         }
 
+        internal State(T* value)
+        {
+            _value = value;
+        }
+
         public void Dispose() => Native.ImGui_MemFree(_value);
 
         public static implicit operator T(State<T> v) => v.Value;

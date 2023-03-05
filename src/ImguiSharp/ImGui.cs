@@ -233,6 +233,8 @@ namespace ImguiSharp
 
         public static void PushStyleVariable(StyleVariable variable, SizeF value) => Native.ImGui_PushStyleVarImVec2((Native.ImGuiStyleVar)variable, value.ToNative());
 
+        public static void PushStyleVariable(StyleVariable variable, PositionF value) => Native.ImGui_PushStyleVarImVec2((Native.ImGuiStyleVar)variable, value.ToNative());
+
         public static void PopStyleVar() => Native.ImGui_PopStyleVar();
 
         public static void PopStyleVar(int count) => Native.ImGui_PopStyleVarEx(count);
@@ -289,7 +291,7 @@ namespace ImguiSharp
 
         public static void SameLine() => Native.ImGui_SameLine();
 
-        public static void SameLine(float offsetFromStartX, float spacing) => Native.ImGui_SameLineEx(offsetFromStartX, spacing);
+        public static void SameLine(float offsetFromStartX, float spacing = -1.0f) => Native.ImGui_SameLineEx(offsetFromStartX, spacing);
 
         public static void NewLine() => Native.ImGui_NewLine();
 
@@ -973,9 +975,11 @@ namespace ImguiSharp
 
         public static bool Selectable(string label, bool selected = false, SelectableOptions options = default, SizeF size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableEx(labelPtr, selected, (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
-        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtr(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
+        public static bool Selectable(string label, State<bool> selected) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtr(labelPtr, selected.ToNative(), default));
 
-        public static bool Selectable(string label, State<bool> selected, SelectableOptions options = default, SizeF size = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtrEx(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtr(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options));
+
+        public static bool Selectable(string label, State<bool> selected, SelectableOptions options, SizeF size) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_SelectableBoolPtrEx(labelPtr, selected.ToNative(), (Native.ImGuiSelectableFlags)options, size.ToNative()));
 
         #endregion
 

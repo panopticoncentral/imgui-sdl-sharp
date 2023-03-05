@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public sealed unsafe class StateText : IDisposable
+    public unsafe struct StateText : IDisposable
     {
         private byte* _value;
 

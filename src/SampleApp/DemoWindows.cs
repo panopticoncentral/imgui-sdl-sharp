@@ -1,7 +1,5 @@
 ﻿using ImguiSharp;
 
-using static ImguiSharp.Native;
-
 namespace SampleApp
 {
     public static class DemoWindows
@@ -390,6 +388,19 @@ namespace SampleApp
         private static readonly State<int> s_itemCurrent3 = new(0);
         private static readonly State<int> s_itemCurrent4 = new(-1);
         private static int s_itemCurrentIdx2;
+        private static readonly StateVector<bool> s_selected = new(5, new[] { false, true, false, false, false });
+        private static int s_selected2 = -1;
+        private static readonly StateVector<bool> s_selected3 = new(5, new[] { false, false, false, false, false });
+        private static readonly StateVector<bool> s_selected4 = new(3, new[] { false, false, false });
+        private static readonly StateVector<bool> s_selected5 = new(10);
+        private static readonly StateVector<bool>[] s_selected6 = new StateVector<bool>[]
+        {
+            new(4, new[] { true, false, false, false }),
+            new(4, new[] { false, true, false, false }),
+            new(4, new[] { false, false, true, false }),
+            new(4, new[] { false, false, false, true })
+        };
+        private static readonly StateVector<bool> s_selected7 = new(3 * 3, new[] { true, false, true, false, true, false, true, false, true });
 
         private static void ShowDemoWindowWidgets()
         {
@@ -955,164 +966,171 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Selectables");
-            //    if (Imgui.TreeNode("Selectables"))
-            //    {
-            //        // Selectable() has 2 overloads:
-            //        // - The one taking "bool selected" as a read-only selection information.
-            //        //   When Selectable() has been clicked it returns true and you can alter selection state accordingly.
-            //        // - The one taking "bool* p_selected" as a read-write selection information (convenient in some cases)
-            //        // The earlier is more flexible, as in real application your selection may be stored in many different ways
-            //        // and not necessarily inside a bool value (e.g. in flags within objects, as an external list, etc).
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Basic");
-            //        if (Imgui.TreeNode("Basic"))
-            //        {
-            //            static bool selection[5] = { false, true, false, false, false };
-            //            Imgui.Selectable("1. I am selectable", &selection[0]);
-            //            Imgui.Selectable("2. I am selectable", &selection[1]);
-            //            Imgui.Text("(I am not selectable)");
-            //            Imgui.Selectable("4. I am selectable", &selection[3]);
-            //            if (Imgui.Selectable("5. I am double clickable", selection[4], ImGuiSelectableFlags_AllowDoubleClick))
-            //                if (Imgui.IsMouseDoubleClicked(0))
-            //                    selection[4] = !selection[4];
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Single Selection");
-            //        if (Imgui.TreeNode("Selection State: Single Selection"))
-            //        {
-            //            static int selected = -1;
-            //            for (int n = 0; n < 5; n++)
-            //            {
-            //                char buf[32];
-            //                sprintf(buf, "Object %d", n);
-            //                if (Imgui.Selectable(buf, selected == n))
-            //                    selected = n;
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Multiple Selection");
-            //        if (Imgui.TreeNode("Selection State: Multiple Selection"))
-            //        {
-            //            HelpMarker("Hold CTRL and click to select multiple items.");
-            //            static bool selection[5] = { false, false, false, false, false };
-            //            for (int n = 0; n < 5; n++)
-            //            {
-            //                char buf[32];
-            //                sprintf(buf, "Object %d", n);
-            //                if (Imgui.Selectable(buf, selection[n]))
-            //                {
-            //                    if (!Imgui.GetIO().KeyCtrl)    // Clear selection when CTRL is not held
-            //                        memset(selection, 0, sizeof(selection));
-            //                    selection[n] ^= 1;
-            //                }
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Rendering more text into the same line");
-            //        if (Imgui.TreeNode("Rendering more text into the same line"))
-            //        {
-            //            // Using the Selectable() override that takes "bool* p_selected" parameter,
-            //            // this function toggle your bool value automatically.
-            //            static bool selected[3] = { false, false, false };
-            //            Imgui.Selectable("main.c",    &selected[0]); Imgui.SameLine(300); Imgui.Text(" 2,345 bytes");
-            //            Imgui.Selectable("Hello.cpp", &selected[1]); Imgui.SameLine(300); Imgui.Text("12,345 bytes");
-            //            Imgui.Selectable("Hello.h",   &selected[2]); Imgui.SameLine(300); Imgui.Text(" 2,345 bytes");
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/In columns");
-            //        if (Imgui.TreeNode("In columns"))
-            //        {
-            //            static bool selected[10] = {};
-            //
-            //            if (Imgui.BeginTable("split1", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
-            //            {
-            //                for (int i = 0; i < 10; i++)
-            //                {
-            //                    char label[32];
-            //                    sprintf(label, "Item %d", i);
-            //                    Imgui.TableNextColumn();
-            //                    Imgui.Selectable(label, &selected[i]); // FIXME-TABLE: Selection overlap
-            //                }
-            //                Imgui.EndTable();
-            //            }
-            //            Imgui.Spacing();
-            //            if (Imgui.BeginTable("split2", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Borders))
-            //            {
-            //                for (int i = 0; i < 10; i++)
-            //                {
-            //                    char label[32];
-            //                    sprintf(label, "Item %d", i);
-            //                    Imgui.TableNextRow();
-            //                    Imgui.TableNextColumn();
-            //                    Imgui.Selectable(label, &selected[i], ImGuiSelectableFlags_SpanAllColumns);
-            //                    Imgui.TableNextColumn();
-            //                    Imgui.Text("Some other contents");
-            //                    Imgui.TableNextColumn();
-            //                    Imgui.Text("123456");
-            //                }
-            //                Imgui.EndTable();
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Grid");
-            //        if (Imgui.TreeNode("Grid"))
-            //        {
-            //            static char selected[4][4] = { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-            //
-            //            // Add in a bit of silly fun...
-            //            const float time = (float)Imgui.GetTime();
-            //            const bool winning_state = memchr(selected, 0, sizeof(selected)) == NULL; // If all cells are selected...
-            //            if (winning_state)
-            //                Imgui.PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f + 0.5f * cosf(time * 2.0f), 0.5f + 0.5f * sinf(time * 3.0f)));
-            //
-            //            for (int y = 0; y < 4; y++)
-            //                for (int x = 0; x < 4; x++)
-            //                {
-            //                    if (x > 0)
-            //                        Imgui.SameLine();
-            //                    Imgui.PushID(y * 4 + x);
-            //                    if (Imgui.Selectable("Sailor", selected[y][x] != 0, 0, ImVec2(50, 50)))
-            //                    {
-            //                        // Toggle clicked cell + toggle neighbors
-            //                        selected[y][x] ^= 1;
-            //                        if (x > 0) { selected[y][x - 1] ^= 1; }
-            //                        if (x < 3) { selected[y][x + 1] ^= 1; }
-            //                        if (y > 0) { selected[y - 1][x] ^= 1; }
-            //                        if (y < 3) { selected[y + 1][x] ^= 1; }
-            //                    }
-            //                    Imgui.PopID();
-            //                }
-            //
-            //            if (winning_state)
-            //                Imgui.PopStyleVar();
-            //            Imgui.TreePop();
-            //        }
-            //        IMGUI_DEMO_MARKER("Widgets/Selectables/Alignment");
-            //        if (Imgui.TreeNode("Alignment"))
-            //        {
-            //            HelpMarker(
-            //                "By default, Selectables uses style.SelectableTextAlign but it can be overridden on a per-item "
-            //                "basis using PushStyleVar(). You'll probably want to always keep your default situation to "
-            //                "left-align otherwise it becomes difficult to layout multiple items on a same line");
-            //            static bool selected[3 * 3] = { true, false, true, false, true, false, true, false, true };
-            //            for (int y = 0; y < 3; y++)
-            //            {
-            //                for (int x = 0; x < 3; x++)
-            //                {
-            //                    ImVec2 alignment = ImVec2((float)x / 2.0f, (float)y / 2.0f);
-            //                    char name[32];
-            //                    sprintf(name, "(%.1f,%.1f)", alignment.x, alignment.y);
-            //                    if (x > 0) Imgui.SameLine();
-            //                    Imgui.PushStyleVar(ImGuiStyleVar_SelectableTextAlign, alignment);
-            //                    Imgui.Selectable(name, &selected[3 * y + x], ImGuiSelectableFlags_None, ImVec2(80, 80));
-            //                    Imgui.PopStyleVar();
-            //                }
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Selectables"))
+            {
+                if (Imgui.TreeNode("Basic"))
+                {
+                    _ = Imgui.Selectable("1. I am selectable", s_selected.GetStateOfElement(0));
+                    _ = Imgui.Selectable("2. I am selectable", s_selected.GetStateOfElement(1));
+                    Imgui.Text("(I am not selectable)");
+                    _ = Imgui.Selectable("4. I am selectable", s_selected.GetStateOfElement(3));
+                    if (Imgui.Selectable("5. I am double clickable", s_selected[4], SelectableOptions.AllowDoubleClick))
+                    {
+                        if (Imgui.IsMouseDoubleClicked(0))
+                        {
+                            s_selected[4] = !s_selected[4];
+                        }
+                    }
+
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("Selection State: Single Selection"))
+                {
+                    for (var n = 0; n < 5; n++)
+                    {
+                        if (Imgui.Selectable($"Object {n}", s_selected2 == n))
+                        {
+                            s_selected2 = n;
+                        }
+                    }
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("Selection State: Multiple Selection"))
+                {
+                    HelpMarker("Hold CTRL and click to select multiple items.");
+                    for (var n = 0; n < 5; n++)
+                    {
+                        if (Imgui.Selectable($"Object {n}", s_selected3[n]))
+                        {
+                            if (!Imgui.GetIo().ControlKeyDown)
+                            {
+                                for (var i = 0; i < 5; i++)
+                                {
+                                    s_selected3[i] = false;
+                                }
+                            }
+                            s_selected3[n] ^= true;
+                        }
+                    }
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("Rendering more text into the same line"))
+                {
+                    _ = Imgui.Selectable("main.c", s_selected4.GetStateOfElement(0));
+                    Imgui.SameLine(300);
+                    Imgui.Text(" 2,345 bytes");
+                    _ = Imgui.Selectable("Hello.cpp", s_selected4.GetStateOfElement(1));
+                    Imgui.SameLine(300);
+                    Imgui.Text("12,345 bytes");
+                    _ = Imgui.Selectable("Hello.h", s_selected.GetStateOfElement(2));
+                    Imgui.SameLine(300);
+                    Imgui.Text(" 2,345 bytes");
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("In columns"))
+                {
+                    if (Imgui.BeginTable("split1", 3, TableOptions.Resizable | TableOptions.NoSavedSettings | TableOptions.Borders))
+                    {
+                        for (var i = 0; i < 10; i++)
+                        {
+                            _ = Imgui.TableNextColumn();
+                            _ = Imgui.Selectable($"Item {i}", s_selected5.GetStateOfElement(i)); // FIXME-TABLE: Selection overlap
+                        }
+                        Imgui.EndTable();
+                    }
+                    Imgui.Spacing();
+                    if (Imgui.BeginTable("split2", 3, TableOptions.Resizable | TableOptions.NoSavedSettings | TableOptions.Borders))
+                    {
+                        for (var i = 0; i < 10; i++)
+                        {
+                            Imgui.TableNextRow();
+                            _ = Imgui.TableNextColumn();
+                            _ = Imgui.Selectable($"Item {i}", s_selected5.GetStateOfElement(i), SelectableOptions.SpanAllColumns);
+                            _ = Imgui.TableNextColumn();
+                            Imgui.Text("Some other contents");
+                            _ = Imgui.TableNextColumn();
+                            Imgui.Text("123456");
+                        }
+                        Imgui.EndTable();
+                    }
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("Grid"))
+                {
+                    var time = (float)Imgui.GetTime();
+                    var winning_state = s_selected6.All(a => a.All(v => v));
+                    if (winning_state)
+                    {
+                        Imgui.PushStyleVariable(StyleVariable.SelectableTextAlign, new SizeF(0.5f + (0.5f * (float)Math.Cos(time * 2.0f)), 0.5f + (0.5f * (float)Math.Sin(time * 3.0f))));
+                    }
+
+                    for (var y = 0; y < 4; y++)
+                    {
+                        for (var x = 0; x < 4; x++)
+                        {
+                            if (x > 0)
+                            {
+                                Imgui.SameLine();
+                            }
+
+                            Imgui.PushId((y * 4) + x);
+                            if (Imgui.Selectable("Sailor", s_selected6[y][x], 0, new SizeF(50, 50)))
+                            {
+                                s_selected6[y][x] ^= true;
+                                if (x > 0)
+                                {
+                                    s_selected6[y][x - 1] ^= true;
+                                }
+                                if (x < 3)
+                                {
+                                    s_selected6[y][x + 1] ^= true;
+                                }
+                                if (y > 0)
+                                {
+                                    s_selected6[y - 1][x] ^= true;
+                                }
+                                if (y < 3)
+                                {
+                                    s_selected6[y + 1][x] ^= true;
+                                }
+                            }
+                            Imgui.PopId();
+                        }
+                    }
+
+                    if (winning_state)
+                    {
+                        Imgui.PopStyleVar();
+                    }
+
+                    Imgui.TreePop();
+                }
+                if (Imgui.TreeNode("Alignment"))
+                {
+                    HelpMarker(
+                        "By default, Selectables uses style.SelectableTextAlign but it can be overridden on a per-item " +
+                        "basis using PushStyleVariable(). You'll probably want to always keep your default situation to " +
+                        "left-align otherwise it becomes difficult to layout multiple items on a same line");
+                    for (var y = 0; y < 3; y++)
+                    {
+                        for (var x = 0; x < 3; x++)
+                        {
+                            PositionF alignment = new(x / 2.0f, y / 2.0f);
+                            if (x > 0)
+                            {
+                                Imgui.SameLine();
+                            }
+
+                            Imgui.PushStyleVariable(StyleVariable.SelectableTextAlign, alignment);
+                            _ = Imgui.Selectable($"({alignment.X:F1},{alignment.Y:F1})", s_selected7.GetStateOfElement((3 * y) + x), SelectableOptions.None, new(80, 80));
+                            Imgui.PopStyleVar();
+                        }
+                    }
+                    Imgui.TreePop();
+                }
+                Imgui.TreePop();
+            }
+
             //    // To wire InputText() with std::string or any other custom string type,
             //    // see the "Text Input > Resize Callback" section of this demo, and the misc/cpp/imgui_stdlib.h file.
             //    IMGUI_DEMO_MARKER("Widgets/Text Input");
