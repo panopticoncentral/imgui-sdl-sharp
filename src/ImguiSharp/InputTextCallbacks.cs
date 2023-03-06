@@ -1,17 +1,12 @@
 ﻿namespace ImguiSharp
 {
-    public sealed class InputTextCallbacks
+    public readonly record struct InputTextCallbacks(
+        Func<char, char?>? Filter = null,
+        Action<StateText, int>? Resize = null,
+        Action<Key, InputTextState>? Completion = null,
+        Action<Key, InputTextState>? History = null,
+        Action<InputTextState>? Edit = null,
+        Action<InputTextState>? Always = null)
     {
-        public Func<char, char?>? Filter { get; init; }
-
-        public Action<StateText, int>? Resize { get; init; }
-
-        public Action<Key, InputTextState>? Completion { get; init; }
-
-        public Action<Key, InputTextState>? History { get; init; }
-
-        public Action<InputTextState>? Edit { get; init; }
-
-        public Action<InputTextState>? Always { get; init; }
     }
 }

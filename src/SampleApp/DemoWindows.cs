@@ -1,5 +1,7 @@
 ﻿using ImguiSharp;
 
+using static ImguiSharp.Native;
+
 namespace SampleApp
 {
     public static class DemoWindows
@@ -401,6 +403,24 @@ namespace SampleApp
             new(4, new[] { false, false, false, true })
         };
         private static readonly StateVector<bool> s_selected7 = new(3 * 3, new[] { true, false, true, false, true, false, true, false, true });
+        private static readonly StateText s_text = new(1024 * 16,
+            "/*\n" +
+            " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n" +
+            " the hexadecimal encoding of one offending instruction,\n" +
+            " more formally, the invalid operand with locked CMPXCHG8B\n" +
+            " instruction bug, is a design flaw in the majority of\n" +
+            " Intel Pentium, Pentium MMX, and Pentium OverDrive\n" +
+            " processors (all in the P5 microarchitecture).\n" +
+            "*/\n\n" +
+            "label:\n" +
+            "\tlock cmpxchg8b eax\n");
+        private static readonly StateOption<InputTextOptions> s_flags2 = new(InputTextOptions.AllowTabInput);
+        private static readonly StateText s_buf1 = new(64, "");
+        private static readonly StateText s_buf2 = new(64, "");
+        private static readonly StateText s_buf3 = new(64, "");
+        private static readonly StateText s_buf4 = new(64, "");
+        private static readonly StateText s_buf5 = new(64, "");
+        private static readonly StateText s_buf6 = new(64, "");
 
         private static void ShowDemoWindowWidgets()
         {
@@ -1131,173 +1151,149 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    // To wire InputText() with std::string or any other custom string type,
-            //    // see the "Text Input > Resize Callback" section of this demo, and the misc/cpp/imgui_stdlib.h file.
-            //    IMGUI_DEMO_MARKER("Widgets/Text Input");
-            //    if (Imgui.TreeNode("Text Input"))
-            //    {
-            //        IMGUI_DEMO_MARKER("Widgets/Text Input/Multi-line Text Input");
-            //        if (Imgui.TreeNode("Multi-line Text Input"))
-            //        {
-            //            // Note: we are using a fixed-sized buffer for simplicity here. See ImGuiInputTextFlags_CallbackResize
-            //            // and the code in misc/cpp/imgui_stdlib.h for how to setup InputText() for dynamically resizing strings.
-            //            static char text[1024 * 16] =
-            //                "/*\n"
-            //                " The Pentium F00F bug, shorthand for F0 0F C7 C8,\n"
-            //                " the hexadecimal encoding of one offending instruction,\n"
-            //                " more formally, the invalid operand with locked CMPXCHG8B\n"
-            //                " instruction bug, is a design flaw in the majority of\n"
-            //                " Intel Pentium, Pentium MMX, and Pentium OverDrive\n"
-            //                " processors (all in the P5 microarchitecture).\n"
-            //                "*/\n\n"
-            //                "label:\n"
-            //                "\tlock cmpxchg8b eax\n";
-            //
-            //            static ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-            //            HelpMarker("You can use the ImGuiInputTextFlags_CallbackResize facility if you need to wire InputTextMultiline() to a dynamic string type. See misc/cpp/imgui_stdlib.h for an example. (This is not demonstrated in imgui_demo.cpp because we don't want to include <string> in here)");
-            //            Imgui.CheckboxFlags("ImGuiInputTextFlags_ReadOnly", &flags, ImGuiInputTextFlags_ReadOnly);
-            //            Imgui.CheckboxFlags("ImGuiInputTextFlags_AllowTabInput", &flags, ImGuiInputTextFlags_AllowTabInput);
-            //            Imgui.CheckboxFlags("ImGuiInputTextFlags_CtrlEnterForNewLine", &flags, ImGuiInputTextFlags_CtrlEnterForNewLine);
-            //            Imgui.InputTextMultiline("##source", text, IM_ARRAYSIZE(text), ImVec2(-FLT_MIN, Imgui.GetTextLineHeight() * 16), flags);
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Text Input/Filtered Text Input");
-            //        if (Imgui.TreeNode("Filtered Text Input"))
-            //        {
-            //            struct TextFilters
-            //            {
-            //                // Return 0 (pass) if the character is 'i' or 'm' or 'g' or 'u' or 'i'
-            //                static int FilterImGuiLetters(ImGuiInputTextCallbackData* data)
-            //                {
-            //                    if (data->EventChar < 256 && strchr("imgui", (char)data->EventChar))
-            //                        return 0;
-            //                    return 1;
-            //                }
-            //            };
-            //
-            //            static char buf1[64] = ""; Imgui.InputText("default",     buf1, 64);
-            //            static char buf2[64] = ""; Imgui.InputText("decimal",     buf2, 64, ImGuiInputTextFlags_CharsDecimal);
-            //            static char buf3[64] = ""; Imgui.InputText("hexadecimal", buf3, 64, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase);
-            //            static char buf4[64] = ""; Imgui.InputText("uppercase",   buf4, 64, ImGuiInputTextFlags_CharsUppercase);
-            //            static char buf5[64] = ""; Imgui.InputText("no blank",    buf5, 64, ImGuiInputTextFlags_CharsNoBlank);
-            //            static char buf6[64] = ""; Imgui.InputText("\"imgui\" letters", buf6, 64, ImGuiInputTextFlags_CallbackCharFilter, TextFilters::FilterImGuiLetters);
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Text Input/Password input");
-            //        if (Imgui.TreeNode("Password Input"))
-            //        {
-            //            static char password[64] = "password123";
-            //            Imgui.InputText("password", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
-            //            Imgui.SameLine(); HelpMarker("Display all characters as '*'.\nDisable clipboard cut and copy.\nDisable logging.\n");
-            //            Imgui.InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), ImGuiInputTextFlags_Password);
-            //            Imgui.InputText("password (clear)", password, IM_ARRAYSIZE(password));
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        if (Imgui.TreeNode("Completion, History, Edit Callbacks"))
-            //        {
-            //            struct Funcs
-            //            {
-            //                static int MyCallback(ImGuiInputTextCallbackData* data)
-            //                {
-            //                    if (data->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
-            //                    {
-            //                        data->InsertChars(data->CursorPos, "..");
-            //                    }
-            //                    else if (data->EventFlag == ImGuiInputTextFlags_CallbackHistory)
-            //                    {
-            //                        if (data->EventKey == ImGuiKey_UpArrow)
-            //                        {
-            //                            data->DeleteChars(0, data->BufTextLen);
-            //                            data->InsertChars(0, "Pressed Up!");
-            //                            data->SelectAll();
-            //                        }
-            //                        else if (data->EventKey == ImGuiKey_DownArrow)
-            //                        {
-            //                            data->DeleteChars(0, data->BufTextLen);
-            //                            data->InsertChars(0, "Pressed Down!");
-            //                            data->SelectAll();
-            //                        }
-            //                    }
-            //                    else if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
-            //                    {
-            //                        // Toggle casing of first character
-            //                        char c = data->Buf[0];
-            //                        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) data->Buf[0] ^= 32;
-            //                        data->BufDirty = true;
-            //
-            //                        // Increment a counter
-            //                        int* p_int = (int*)data->UserData;
-            //                        *p_int = *p_int + 1;
-            //                    }
-            //                    return 0;
-            //                }
-            //            };
-            //            static char buf1[64];
-            //            Imgui.InputText("Completion", buf1, 64, ImGuiInputTextFlags_CallbackCompletion, Funcs::MyCallback);
-            //            Imgui.SameLine(); HelpMarker("Here we append \"..\" each time Tab is pressed. See 'Examples>Console' for a more meaningful demonstration of using this callback.");
-            //
-            //            static char buf2[64];
-            //            Imgui.InputText("History", buf2, 64, ImGuiInputTextFlags_CallbackHistory, Funcs::MyCallback);
-            //            Imgui.SameLine(); HelpMarker("Here we replace and select text each time Up/Down are pressed. See 'Examples>Console' for a more meaningful demonstration of using this callback.");
-            //
-            //            static char buf3[64];
-            //            static int edit_count = 0;
-            //            Imgui.InputText("Edit", buf3, 64, ImGuiInputTextFlags_CallbackEdit, Funcs::MyCallback, (void*)&edit_count);
-            //            Imgui.SameLine(); HelpMarker("Here we toggle the casing of the first character on every edit + count edits.");
-            //            Imgui.SameLine(); Imgui.Text("(%d)", edit_count);
-            //
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Text Input/Resize Callback");
-            //        if (Imgui.TreeNode("Resize Callback"))
-            //        {
-            //            // To wire InputText() with std::string or any other custom string type,
-            //            // you can use the ImGuiInputTextFlags_CallbackResize flag + create a custom Imgui.InputText() wrapper
-            //            // using your preferred type. See misc/cpp/imgui_stdlib.h for an implementation of this using std::string.
-            //            HelpMarker(
-            //                "Using ImGuiInputTextFlags_CallbackResize to wire your custom string type to InputText().\n\n"
-            //                "See misc/cpp/imgui_stdlib.h for an implementation of this for std::string.");
-            //            struct Funcs
-            //            {
-            //                static int MyResizeCallback(ImGuiInputTextCallbackData* data)
-            //                {
-            //                    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-            //                    {
-            //                        ImVector<char>* my_str = (ImVector<char>*)data->UserData;
-            //                        IM_ASSERT(my_str->begin() == data->Buf);
-            //                        my_str->resize(data->BufSize); // NB: On resizing calls, generally data->BufSize == data->BufTextLen + 1
-            //                        data->Buf = my_str->begin();
-            //                    }
-            //                    return 0;
-            //                }
-            //
-            //                // Note: Because Imgui. is a namespace you would typically add your own function into the namespace.
-            //                // For example, you code may declare a function 'Imgui.InputText(const char* label, MyString* my_str)'
-            //                static bool MyInputTextMultiline(const char* label, ImVector<char>* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
-            //                {
-            //                    IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
-            //                    return Imgui.InputTextMultiline(label, my_str->begin(), (size_t)my_str->size(), size, flags | ImGuiInputTextFlags_CallbackResize, Funcs::MyResizeCallback, (void*)my_str);
-            //                }
-            //            };
-            //
-            //            // For this demo we are using ImVector as a string container.
-            //            // Note that because we need to store a terminating zero character, our size/capacity are 1 more
-            //            // than usually reported by a typical string class.
-            //            static ImVector<char> my_str;
-            //            if (my_str.empty())
-            //                my_str.push_back(0);
-            //            Funcs::MyInputTextMultiline("##MyStr", &my_str, ImVec2(-FLT_MIN, Imgui.GetTextLineHeight() * 16));
-            //            Imgui.Text("Data: %p\nSize: %d\nCapacity: %d", (void*)my_str.begin(), my_str.size(), my_str.capacity());
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Text Input"))
+            {
+                if (Imgui.TreeNode("Multi-line Text Input"))
+                {
+                    HelpMarker("You can use the ImGuiInputTextFlags_CallbackResize facility if you need to wire InputTextMultiline() to a dynamic string type. See misc/cpp/imgui_stdlib.h for an example. (This is not demonstrated in imgui_demo.cpp because we don't want to include <string> in here)");
+                    _ = Imgui.CheckboxFlags("InputTextOptions.ReadOnly", s_flags2, InputTextOptions.ReadOnly);
+                    _ = Imgui.CheckboxFlags("InputTextOptions.AllowTabInput", s_flags2, InputTextOptions.AllowTabInput);
+                    _ = Imgui.CheckboxFlags("InputTextOptions.CtrlEnterForNewLine", s_flags2, InputTextOptions.CtrlEnterForNewLine);
+                    _ = Imgui.InputTextMultiline("##source", s_text, new(-SizeF.MinNormalizedValue, Imgui.GetTextLineHeight() * 16), s_flags2);
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Filtered Text Input"))
+                {
+                    static char? FilterImGuiLetters(char c) =>
+                        c switch
+                        {
+                            'i' or 'm' or 'g' or 'u' => c,
+                            _ => null
+                        };
+
+                    _ = Imgui.InputText("default", s_buf1);
+                    _ = Imgui.InputText("decimal", s_buf2, InputTextOptions.CharsDecimal);
+                    _ = Imgui.InputText("hexadecimal", s_buf3, InputTextOptions.CharsHexadecimal | InputTextOptions.CharsUppercase);
+                    _ = Imgui.InputText("uppercase", s_buf4, InputTextOptions.CharsUppercase);
+                    _ = Imgui.InputText("no blank", s_buf5, InputTextOptions.CharsNoBlank);
+                    _ = Imgui.InputText("\"imgui\" letters", s_buf6, 0, new(Filter: FilterImGuiLetters));
+                    Imgui.TreePop();
+                }
+                //
+                //        IMGUI_DEMO_MARKER("Widgets/Text Input/Password input");
+                //        if (Imgui.TreeNode("Password Input"))
+                //        {
+                //            static char password[64] = "password123";
+                //            Imgui.InputText("password", password, IM_ARRAYSIZE(password), InputTextOptions.Password);
+                //            Imgui.SameLine(); HelpMarker("Display all characters as '*'.\nDisable clipboard cut and copy.\nDisable logging.\n");
+                //            Imgui.InputTextWithHint("password (w/ hint)", "<password>", password, IM_ARRAYSIZE(password), InputTextOptions.Password);
+                //            Imgui.InputText("password (clear)", password, IM_ARRAYSIZE(password));
+                //            Imgui.TreePop();
+                //        }
+                //
+                //        if (Imgui.TreeNode("Completion, History, Edit Callbacks"))
+                //        {
+                //            struct Funcs
+                //            {_
+                //                static int MyCallback(ImGuiInputTextCallbackData* data)
+                //                {
+                //                    if (data->EventFlag == InputTextOptions.CallbackCompletion)
+                //                    {
+                //                        data->InsertChars(data->CursorPos, "..");
+                //                    }
+                //                    else if (data->EventFlag == InputTextOptions.CallbackHistory)
+                //                    {
+                //                        if (data->EventKey == ImGuiKey_UpArrow)
+                //                        {
+                //                            data->DeleteChars(0, data->BufTextLen);
+                //                            data->InsertChars(0, "Pressed Up!");
+                //                            data->SelectAll();
+                //                        }
+                //                        else if (data->EventKey == ImGuiKey_DownArrow)
+                //                        {
+                //                            data->DeleteChars(0, data->BufTextLen);
+                //                            data->InsertChars(0, "Pressed Down!");
+                //                            data->SelectAll();
+                //                        }
+                //                    }
+                //                    else if (data->EventFlag == InputTextOptions.CallbackEdit)
+                //                    {
+                //                        // Toggle casing of first character
+                //                        char c = data->Buf[0];
+                //                        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) data->Buf[0] ^= 32;
+                //                        data->BufDirty = true;
+                //
+                //                        // Increment a counter
+                //                        int* p_int = (int*)data->UserData;
+                //                        *p_int = *p_int + 1;
+                //                    }
+                //                    return 0;
+                //                }
+                //            };
+                //            static char buf1[64];
+                //            Imgui.InputText("Completion", buf1, 64, InputTextOptions.CallbackCompletion, Funcs::MyCallback);
+                //            Imgui.SameLine(); HelpMarker("Here we append \"..\" each time Tab is pressed. See 'Examples>Console' for a more meaningful demonstration of using this callback.");
+                //
+                //            static char buf2[64];
+                //            Imgui.InputText("History", buf2, 64, InputTextOptions.CallbackHistory, Funcs::MyCallback);
+                //            Imgui.SameLine(); HelpMarker("Here we replace and select text each time Up/Down are pressed. See 'Examples>Console' for a more meaningful demonstration of using this callback.");
+                //
+                //            static char buf3[64];
+                //            static int edit_count = 0;
+                //            Imgui.InputText("Edit", buf3, 64, InputTextOptions.CallbackEdit, Funcs::MyCallback, (void*)&edit_count);
+                //            Imgui.SameLine(); HelpMarker("Here we toggle the casing of the first character on every edit + count edits.");
+                //            Imgui.SameLine(); Imgui.Text("(%d)", edit_count);
+                //
+                //            Imgui.TreePop();
+                //        }
+                //
+                //        IMGUI_DEMO_MARKER("Widgets/Text Input/Resize Callback");
+                //        if (Imgui.TreeNode("Resize Callback"))
+                //        {
+                //            // To wire InputText() with std::string or any other custom string type,
+                //            // you can use the InputTextOptions.CallbackResize flag + create a custom Imgui.InputText() wrapper
+                //            // using your preferred type. See misc/cpp/imgui_stdlib.h for an implementation of this using std::string.
+                //            HelpMarker(
+                //                "Using InputTextOptions.CallbackResize to wire your custom string type to InputText().\n\n"
+                //                "See misc/cpp/imgui_stdlib.h for an implementation of this for std::string.");
+                //            struct Funcs
+                //            {
+                //                static int MyResizeCallback(ImGuiInputTextCallbackData* data)
+                //                {
+                //                    if (data->EventFlag == InputTextOptions.CallbackResize)
+                //                    {
+                //                        ImVector<char>* my_str = (ImVector<char>*)data->UserData;
+                //                        IM_ASSERT(my_str->begin() == data->Buf);
+                //                        my_str->resize(data->BufSize); // NB: On resizing calls, generally data->BufSize == data->BufTextLen + 1
+                //                        data->Buf = my_str->begin();
+                //                    }
+                //                    return 0;
+                //                }
+                //
+                //                // Note: Because Imgui. is a namespace you would typically add your own function into the namespace.
+                //                // For example, you code may declare a function 'Imgui.InputText(const char* label, MyString* my_str)'
+                //                static bool MyInputTextMultiline(const char* label, ImVector<char>* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
+                //                {
+                //                    IM_ASSERT((flags & InputTextOptions.CallbackResize) == 0);
+                //                    return Imgui.InputTextMultiline(label, my_str->begin(), (size_t)my_str->size(), size, flags | InputTextOptions.CallbackResize, Funcs::MyResizeCallback, (void*)my_str);
+                //                }
+                //            };
+                //
+                //            // For this demo we are using ImVector as a string container.
+                //            // Note that because we need to store a terminating zero character, our size/capacity are 1 more
+                //            // than usually reported by a typical string class.
+                //            static ImVector<char> my_str;
+                //            if (my_str.empty())
+                //                my_str.push_back(0);
+                //            Funcs::MyInputTextMultiline("##MyStr", &my_str, ImVec2(-FLT_MIN, Imgui.GetTextLineHeight() * 16));
+                //            Imgui.Text("Data: %p\nSize: %d\nCapacity: %d", (void*)my_str.begin(), my_str.size(), my_str.capacity());
+                //            Imgui.TreePop();
+                //        }
+
+                Imgui.TreePop();
+            }
+
             //    // Tabs
             //    IMGUI_DEMO_MARKER("Widgets/Tabs");
             //    if (Imgui.TreeNode("Tabs"))
