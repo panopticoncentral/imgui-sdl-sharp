@@ -785,30 +785,30 @@ namespace ImguiSharp
             return 0;
         }
 
-        public static bool InputText(string label, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputText(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+        public static bool InputText(string label, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputText(labelPtr, buffer.ToNative(), (nuint)buffer.Capacity, (Native.ImGuiInputTextFlags)options));
 
         public static bool InputText(string label, StateText buffer, InputTextOptions options, InputTextCallbacks callbacks)
         {
             InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
-            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextEx(labelPtr, buffer.ToNative(), (nuint)buffer.Capacity, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
         }
 
-        public static bool InputTextMultiline(string label, StateText buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Length));
+        public static bool InputTextMultiline(string label, StateText buffer) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultiline(labelPtr, buffer.ToNative(), (nuint)buffer.Capacity));
 
-        public static bool InputTextMultiline(string label, StateText buffer, SizeF size, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options));
+        public static bool InputTextMultiline(string label, StateText buffer, SizeF size, InputTextOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Capacity, size.ToNative(), (Native.ImGuiInputTextFlags)options));
 
         public static bool InputTextMultiline(string label, StateText buffer, SizeF size, InputTextOptions options, InputTextCallbacks callbacks)
         {
             InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
-            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Length, size.ToNative(), (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+            return Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputTextMultilineEx(labelPtr, buffer.ToNative(), (nuint)buffer.Capacity, size.ToNative(), (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
         }
 
-        public static bool InputText(string label, string hint, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHint(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options));
+        public static bool InputText(string label, string hint, StateText buffer, InputTextOptions options = default) => Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHint(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Capacity, (Native.ImGuiInputTextFlags)options));
 
         public static bool InputText(string label, string hint, StateText buffer, InputTextOptions options, InputTextCallbacks callbacks)
         {
             InputTextCallbacks[(nuint)callbacks.GetHashCode()] = (buffer, callbacks);
-            return Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHintEx(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Length, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
+            return Native.StringToUtf8Func(label, hint, (labelPtr, hintPtr) => Native.ImGui_InputTextWithHintEx(labelPtr, hintPtr, buffer.ToNative(), (nuint)buffer.Capacity, (Native.ImGuiInputTextFlags)options | CallbackOptions(callbacks), &InputTextCallback, (void*)callbacks.GetHashCode()));
         }
 
         public static bool Input(string label, State<sbyte> data) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_InputScalar(labelPtr, Native.ImGuiDataType.ImGuiDataType_S8, data.ToNative()));

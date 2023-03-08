@@ -1,19 +1,24 @@
 ﻿namespace ImguiSharp
 {
-    public unsafe struct StateText : IDisposable
+    public sealed unsafe class StateText : IDisposable
     {
         private byte* _value;
 
-        public int Length { get; private set; }
+        public int Capacity { get; private set; }
 
-        public StateText(int length, string? initializer = null)
+        public StateText(int capacity, string? initializer = null)
         {
-            _value = (byte*)Native.ImGui_MemAlloc((nuint)length);
-            Length = length;
+            if (capacity < 1)
+            {
+                throw new InvalidOperationException();
+            }
+
+            _value = (byte*)Native.ImGui_MemAlloc((nuint)capacity);
+            Capacity = capacity;
 
             if (initializer != null)
             {
-                Native.StringToUtf8(initializer).CopyTo(new Span<byte>(_value, Length));
+                Native.StringToUtf8(initializer).CopyTo(new Span<byte>(_value, Capacity));
             }
             else
             {
@@ -23,13 +28,17 @@
 
         public void Dispose() => Native.ImGui_MemFree(_value);
 
-        public void Resize(int newLength)
+        public void Resize(int newCapacity)
         {
-            var newValue = (byte*)Native.ImGui_MemAlloc((nuint)newLength);
-            new Span<byte>(_value, Math.Min(Length, newLength)).CopyTo(new Span<byte>(newValue, newLength));
+            if (newCapacity < 1)
+            {
+                throw new InvalidOperationException();
+            }
+            var newValue = (byte*)Native.ImGui_MemAlloc((nuint)newCapacity);
+            new Span<byte>(_value, Math.Min(Capacity, newCapacity)).CopyTo(new Span<byte>(newValue, newCapacity));
             Native.ImGui_MemFree(_value);
             _value = newValue;
-            Length = newLength;
+            Capacity = newCapacity;
         }
 
         public override string ToString() => Native.Utf8ToString(_value)!;
