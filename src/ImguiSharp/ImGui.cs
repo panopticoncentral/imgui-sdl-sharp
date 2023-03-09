@@ -1028,13 +1028,13 @@ namespace ImguiSharp
             }
         }
 
-        public static void PlotLines(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
+        public static void PlotLines(string label, Span<float> values, int offset = 0, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
         {
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* valuesPtr = values)
             fixed (byte* overlayTextPtr = Native.StringToUtf8(overlayText))
             {
-                Native.ImGui_PlotLinesEx(labelPtr, valuesPtr, values.Length, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative(), default);
+                Native.ImGui_PlotLinesEx(labelPtr, valuesPtr, values.Length, offset, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
             }
         }
 
@@ -1047,10 +1047,10 @@ namespace ImguiSharp
             Native.ImGui_PlotLinesCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
         });
 
-        public static void PlotLines(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        public static void PlotLines(string label, Func<int, float> getter, int valuesCount, int offset, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
         {
             PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
-            Native.ImGui_PlotLinesCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
+            Native.ImGui_PlotLinesCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, offset, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
         });
 
         public static void PlotHistogram(string label, Span<float> values)
@@ -1062,13 +1062,13 @@ namespace ImguiSharp
             }
         }
 
-        public static void PlotHistogram(string label, Span<float> values, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
+        public static void PlotHistogram(string label, Span<float> values, int offset = 0, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default)
         {
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             fixed (float* valuesPtr = values)
             fixed (byte* overlayTextPtr = Native.StringToUtf8(overlayText))
             {
-                Native.ImGui_PlotHistogramEx(labelPtr, valuesPtr, values.Length, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative(), default);
+                Native.ImGui_PlotHistogramEx(labelPtr, valuesPtr, values.Length, offset, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
             }
         }
 
@@ -1078,10 +1078,10 @@ namespace ImguiSharp
             Native.ImGui_PlotHistogramCallback(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount);
         });
 
-        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
+        public static void PlotHistogram(string label, Func<int, float> getter, int valuesCount, int offset = 0, string? overlayText = default, float scaleMin = float.MaxValue, float scaleMax = float.MaxValue, SizeF graphSize = default) => Native.StringToUtf8Action(label, overlayText, (labelPtr, overlayTextPtr) =>
         {
             PlotCallbacks[(nuint)getter.GetHashCode()] = getter;
-            Native.ImGui_PlotHistogramCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, default, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
+            Native.ImGui_PlotHistogramCallbackEx(labelPtr, &NativePlotCallback, (void*)getter.GetHashCode(), valuesCount, offset, overlayTextPtr, scaleMin, scaleMax, graphSize.ToNative());
         });
 
         #endregion

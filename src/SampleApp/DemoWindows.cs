@@ -436,6 +436,15 @@ namespace SampleApp
         private static readonly State<bool> s_showLeadingButton = new(true);
         private static readonly State<bool> s_showTrailingButton = new(true);
         private static readonly StateOption<TabBarOptions> s_tabBarOptions2 = new(TabBarOptions.AutoSelectNewTabs | TabBarOptions.Reorderable | TabBarOptions.FittingPolicyResizeDown);
+        private static readonly State<bool> s_animate = new(true);
+        private static readonly float[] s_values = new float[90];
+        private static int s_valuesOffset;
+        private static double s_refreshTime;
+        private static float s_phase;
+        private static readonly State<int> s_funcType = new(0);
+        private static readonly State<int> s_displayCount = new(70);
+        private static float s_progress;
+        private static float s_progressDir = 1.0f;
 
         private static void ShowDemoWindowWidgets()
         {
@@ -1424,92 +1433,77 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    // Plot/Graph widgets are not very good.
-            //    // Consider using a third-party library such as ImPlot: https://github.com/epezent/implot
-            //    // (see others https://github.com/ocornut/imgui/wiki/Useful-Extensions)
-            //    IMGUI_DEMO_MARKER("Widgets/Plotting");
-            //    if (Imgui.TreeNode("Plotting"))
-            //    {
-            //        static bool animate = true;
-            //        Imgui.Checkbox("Animate", &animate);
-            //
-            //        // Plot as lines and plot as histogram
-            //        IMGUI_DEMO_MARKER("Widgets/Plotting/PlotLines, PlotHistogram");
-            //        static float arr[] = { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
-            //        Imgui.PlotLines("Frame Times", arr, IM_ARRAYSIZE(arr));
-            //        Imgui.PlotHistogram("Histogram", arr, IM_ARRAYSIZE(arr), 0, NULL, 0.0f, 1.0f, ImVec2(0, 80.0f));
-            //
-            //        // Fill an array of contiguous float values to plot
-            //        // Tip: If your float aren't contiguous but part of a structure, you can pass a pointer to your first float
-            //        // and the sizeof() of your structure in the "stride" parameter.
-            //        static float values[90] = {};
-            //        static int values_offset = 0;
-            //        static double refresh_time = 0.0;
-            //        if (!animate || refresh_time == 0.0)
-            //            refresh_time = Imgui.GetTime();
-            //        while (refresh_time < Imgui.GetTime()) // Create data at fixed 60 Hz rate for the demo
-            //        {
-            //            static float phase = 0.0f;
-            //            values[values_offset] = cosf(phase);
-            //            values_offset = (values_offset + 1) % IM_ARRAYSIZE(values);
-            //            phase += 0.10f * values_offset;
-            //            refresh_time += 1.0f / 60.0f;
-            //        }
-            //
-            //        // Plots can display overlay texts
-            //        // (in this example, we will display an average value)
-            //        {
-            //            float average = 0.0f;
-            //            for (int n = 0; n < IM_ARRAYSIZE(values); n++)
-            //                average += values[n];
-            //            average /= (float)IM_ARRAYSIZE(values);
-            //            char overlay[32];
-            //            sprintf(overlay, "avg %f", average);
-            //            Imgui.PlotLines("Lines", values, IM_ARRAYSIZE(values), values_offset, overlay, -1.0f, 1.0f, ImVec2(0, 80.0f));
-            //        }
-            //
-            //        // Use functions to generate output
-            //        // FIXME: This is rather awkward because current plot API only pass in indices.
-            //        // We probably want an API passing floats and user provide sample rate/count.
-            //        struct Funcs
-            //        {
-            //            static float Sin(void*, int i) { return sinf(i * 0.1f); }
-            //            static float Saw(void*, int i) { return (i & 1) ? 1.0f : -1.0f; }
-            //        };
-            //        static int func_type = 0, display_count = 70;
-            //        Imgui.Separator();
-            //        Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
-            //        Imgui.Combo("func", &func_type, "Sin\0Saw\0");
-            //        Imgui.SameLine();
-            //        Imgui.SliderInt("Sample count", &display_count, 1, 400);
-            //        float (*func)(void*, int) = (func_type == 0) ? Funcs::Sin : Funcs::Saw;
-            //        Imgui.PlotLines("Lines", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
-            //        Imgui.PlotHistogram("Histogram", func, NULL, display_count, 0, NULL, -1.0f, 1.0f, ImVec2(0, 80));
-            //        Imgui.Separator();
-            //
-            //        // Animate a simple progress bar
-            //        IMGUI_DEMO_MARKER("Widgets/Plotting/ProgressBar");
-            //        static float progress = 0.0f, progress_dir = 1.0f;
-            //        if (animate)
-            //        {
-            //            progress += progress_dir * 0.4f * Imgui.GetIO().DeltaTime;
-            //            if (progress >= +1.1f) { progress = +1.1f; progress_dir *= -1.0f; }
-            //            if (progress <= -0.1f) { progress = -0.1f; progress_dir *= -1.0f; }
-            //        }
-            //
-            //        // Typically we would use ImVec2(-1.0f,0.0f) or ImVec2(-FLT_MIN,0.0f) to use all available width,
-            //        // or ImVec2(width,0.0f) for a specified width. ImVec2(0.0f,0.0f) uses ItemWidth.
-            //        Imgui.ProgressBar(progress, ImVec2(0.0f, 0.0f));
-            //        Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.x);
-            //        Imgui.Text("Progress Bar");
-            //
-            //        float progress_saturated = IM_CLAMP(progress, 0.0f, 1.0f);
-            //        char buf[32];
-            //        sprintf(buf, "%d/%d", (int)(progress_saturated * 1753), 1753);
-            //        Imgui.ProgressBar(progress, ImVec2(0.f, 0.f), buf);
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Plotting"))
+            {
+                _ = Imgui.Checkbox("Animate", s_animate);
+
+                var arr = new[] { 0.6f, 0.1f, 1.0f, 0.5f, 0.92f, 0.1f, 0.2f };
+                Imgui.PlotLines("Frame Times", arr);
+                Imgui.PlotHistogram("Histogram", arr, 0, null, 0.0f, 1.0f, new(0, 80.0f));
+
+                if (!s_animate || s_refreshTime == 0.0)
+                {
+                    s_refreshTime = Imgui.GetTime();
+                }
+
+                while (s_refreshTime < Imgui.GetTime())
+                {
+                    s_values[s_valuesOffset] = (float)Math.Cos(s_phase);
+                    s_valuesOffset = (s_valuesOffset + 1) % s_values.Length;
+                    s_phase += 0.10f * s_valuesOffset;
+                    s_refreshTime += 1.0f / 60.0f;
+                }
+
+                {
+                    var average = 0.0f;
+                    for (var n = 0; n < s_values.Length; n++)
+                    {
+                        average += s_values[n];
+                    }
+
+                    average /= s_values.Length;
+                    Imgui.PlotLines("Lines", s_values, s_valuesOffset, $"avg {average:F6}", -1.0f, 1.0f, new(0, 80.0f));
+                }
+
+                static float Sin(int i) => (float)Math.Sin(i * 0.1F);
+                static float Saw(int i) => ((i & 1) == 1) ? 1.0f : -1.0f;
+
+                Imgui.Separator();
+                Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
+                _ = Imgui.Combo("func", s_funcType, "Sin\0Saw\0");
+                Imgui.SameLine();
+                _ = Imgui.Slider("Sample count", s_displayCount, 1, 400);
+                Func<int, float> func = s_funcType == 0 ? Sin : Saw;
+                Imgui.PlotLines("Lines", func, s_displayCount, 0, null, -1.0f, 1.0f, new(0, 80));
+                Imgui.PlotHistogram("Histogram", func, s_displayCount, 0, null, -1.0f, 1.0f, new(0, 80));
+                Imgui.Separator();
+
+                // Animate a simple progress bar
+                if (s_animate)
+                {
+                    s_progress += s_progressDir * 0.4f * Imgui.GetIo().DeltaTime;
+                    if (s_progress >= +1.1f)
+                    {
+                        s_progress = +1.1f;
+                        s_progressDir *= -1.0f;
+                    }
+
+                    if (s_progress <= -0.1f)
+                    {
+                        s_progress = -0.1f;
+                        s_progressDir *= -1.0f;
+                    }
+                }
+
+                Imgui.ProgressBar(s_progress, new(0.0f, 0.0f));
+                Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.Width);
+                Imgui.Text("Progress Bar");
+
+                var progress_saturated = Math.Clamp(s_progress, 0.0f, 1.0f);
+                Imgui.ProgressBar(s_progress, new(0.0f, 0.0f), $"{(int)(progress_saturated * 1753)}/{1753}");
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Color");
             //    if (Imgui.TreeNode("Color/Picker Widgets"))
             //    {
