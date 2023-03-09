@@ -1,4 +1,6 @@
-﻿using ImguiSharp;
+﻿using System.Numerics;
+
+using ImguiSharp;
 
 using static ImguiSharp.Native;
 
@@ -427,6 +429,13 @@ namespace SampleApp
         private static readonly StateText s_buf9 = new(64, "");
         private static int s_editCount;
         private static readonly StateText s_myStr = new(1, "");
+        private static readonly StateOption<TabBarOptions> s_tabBarOptions = new(TabBarOptions.Reorderable);
+        private static readonly StateVector<bool> s_opened = new(4, new[] { true, true, true, true });
+        private static readonly List<int> s_activeTabs = new();
+        private static int s_nextTabId;
+        private static readonly State<bool> s_showLeadingButton = new(true);
+        private static readonly State<bool> s_showTrailingButton = new(true);
+        private static readonly StateOption<TabBarOptions> s_tabBarOptions2 = new(TabBarOptions.AutoSelectNewTabs | TabBarOptions.Reorderable | TabBarOptions.FittingPolicyResizeDown);
 
         private static void ShowDemoWindowWidgets()
         {
@@ -1258,149 +1267,163 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    // Tabs
-            //    IMGUI_DEMO_MARKER("Widgets/Tabs");
-            //    if (Imgui.TreeNode("Tabs"))
-            //    {
-            //        IMGUI_DEMO_MARKER("Widgets/Tabs/Basic");
-            //        if (Imgui.TreeNode("Basic"))
-            //        {
-            //            ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-            //            if (Imgui.BeginTabBar("MyTabBar", tab_bar_flags))
-            //            {
-            //                if (Imgui.BeginTabItem("Avocado"))
-            //                {
-            //                    Imgui.Text("This is the Avocado tab!\nblah blah blah blah blah");
-            //                    Imgui.EndTabItem();
-            //                }
-            //                if (Imgui.BeginTabItem("Broccoli"))
-            //                {
-            //                    Imgui.Text("This is the Broccoli tab!\nblah blah blah blah blah");
-            //                    Imgui.EndTabItem();
-            //                }
-            //                if (Imgui.BeginTabItem("Cucumber"))
-            //                {
-            //                    Imgui.Text("This is the Cucumber tab!\nblah blah blah blah blah");
-            //                    Imgui.EndTabItem();
-            //                }
-            //                Imgui.EndTabBar();
-            //            }
-            //            Imgui.Separator();
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Tabs/Advanced & Close Button");
-            //        if (Imgui.TreeNode("Advanced & Close Button"))
-            //        {
-            //            // Expose a couple of the available flags. In most cases you may just call BeginTabBar() with no flags (0).
-            //            static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-            //            Imgui.CheckboxFlags("ImGuiTabBarFlags_Reorderable", &tab_bar_flags, ImGuiTabBarFlags_Reorderable);
-            //            Imgui.CheckboxFlags("ImGuiTabBarFlags_AutoSelectNewTabs", &tab_bar_flags, ImGuiTabBarFlags_AutoSelectNewTabs);
-            //            Imgui.CheckboxFlags("ImGuiTabBarFlags_TabListPopupButton", &tab_bar_flags, ImGuiTabBarFlags_TabListPopupButton);
-            //            Imgui.CheckboxFlags("ImGuiTabBarFlags_NoCloseWithMiddleMouseButton", &tab_bar_flags, ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
-            //            if ((tab_bar_flags & ImGuiTabBarFlags_FittingPolicyMask_) == 0)
-            //                tab_bar_flags |= ImGuiTabBarFlags_FittingPolicyDefault_;
-            //            if (Imgui.CheckboxFlags("ImGuiTabBarFlags_FittingPolicyResizeDown", &tab_bar_flags, ImGuiTabBarFlags_FittingPolicyResizeDown))
-            //                tab_bar_flags &= ~(ImGuiTabBarFlags_FittingPolicyMask_ ^ ImGuiTabBarFlags_FittingPolicyResizeDown);
-            //            if (Imgui.CheckboxFlags("ImGuiTabBarFlags_FittingPolicyScroll", &tab_bar_flags, ImGuiTabBarFlags_FittingPolicyScroll))
-            //                tab_bar_flags &= ~(ImGuiTabBarFlags_FittingPolicyMask_ ^ ImGuiTabBarFlags_FittingPolicyScroll);
-            //
-            //            // Tab Bar
-            //            const char* names[4] = { "Artichoke", "Beetroot", "Celery", "Daikon" };
-            //            static bool opened[4] = { true, true, true, true }; // Persistent user state
-            //            for (int n = 0; n < IM_ARRAYSIZE(opened); n++)
-            //            {
-            //                if (n > 0) { Imgui.SameLine(); }
-            //                Imgui.Checkbox(names[n], &opened[n]);
-            //            }
-            //
-            //            // Passing a bool* to BeginTabItem() is similar to passing one to Begin():
-            //            // the underlying bool will be set to false when the tab is closed.
-            //            if (Imgui.BeginTabBar("MyTabBar", tab_bar_flags))
-            //            {
-            //                for (int n = 0; n < IM_ARRAYSIZE(opened); n++)
-            //                    if (opened[n] && Imgui.BeginTabItem(names[n], &opened[n], ImGuiTabItemFlags_None))
-            //                    {
-            //                        Imgui.Text("This is the %s tab!", names[n]);
-            //                        if (n & 1)
-            //                            Imgui.Text("I am an odd tab.");
-            //                        Imgui.EndTabItem();
-            //                    }
-            //                Imgui.EndTabBar();
-            //            }
-            //            Imgui.Separator();
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Tabs/TabItemButton & Leading-Trailing flags");
-            //        if (Imgui.TreeNode("TabItemButton & Leading/Trailing flags"))
-            //        {
-            //            static ImVector<int> active_tabs;
-            //            static int next_tab_id = 0;
-            //            if (next_tab_id == 0) // Initialize with some default tabs
-            //                for (int i = 0; i < 3; i++)
-            //                    active_tabs.push_back(next_tab_id++);
-            //
-            //            // TabItemButton() and Leading/Trailing flags are distinct features which we will demo together.
-            //            // (It is possible to submit regular tabs with Leading/Trailing flags, or TabItemButton tabs without Leading/Trailing flags...
-            //            // but they tend to make more sense together)
-            //            static bool show_leading_button = true;
-            //            static bool show_trailing_button = true;
-            //            Imgui.Checkbox("Show Leading TabItemButton()", &show_leading_button);
-            //            Imgui.Checkbox("Show Trailing TabItemButton()", &show_trailing_button);
-            //
-            //            // Expose some other flags which are useful to showcase how they interact with Leading/Trailing tabs
-            //            static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_FittingPolicyResizeDown;
-            //            Imgui.CheckboxFlags("ImGuiTabBarFlags_TabListPopupButton", &tab_bar_flags, ImGuiTabBarFlags_TabListPopupButton);
-            //            if (Imgui.CheckboxFlags("ImGuiTabBarFlags_FittingPolicyResizeDown", &tab_bar_flags, ImGuiTabBarFlags_FittingPolicyResizeDown))
-            //                tab_bar_flags &= ~(ImGuiTabBarFlags_FittingPolicyMask_ ^ ImGuiTabBarFlags_FittingPolicyResizeDown);
-            //            if (Imgui.CheckboxFlags("ImGuiTabBarFlags_FittingPolicyScroll", &tab_bar_flags, ImGuiTabBarFlags_FittingPolicyScroll))
-            //                tab_bar_flags &= ~(ImGuiTabBarFlags_FittingPolicyMask_ ^ ImGuiTabBarFlags_FittingPolicyScroll);
-            //
-            //            if (Imgui.BeginTabBar("MyTabBar", tab_bar_flags))
-            //            {
-            //                // Demo a Leading TabItemButton(): click the "?" button to open a menu
-            //                if (show_leading_button)
-            //                    if (Imgui.TabItemButton("?", ImGuiTabItemFlags_Leading | ImGuiTabItemFlags_NoTooltip))
-            //                        Imgui.OpenPopup("MyHelpMenu");
-            //                if (Imgui.BeginPopup("MyHelpMenu"))
-            //                {
-            //                    Imgui.Selectable("Hello!");
-            //                    Imgui.EndPopup();
-            //                }
-            //
-            //                // Demo Trailing Tabs: click the "+" button to add a new tab (in your app you may want to use a font icon instead of the "+")
-            //                // Note that we submit it before the regular tabs, but because of the ImGuiTabItemFlags_Trailing flag it will always appear at the end.
-            //                if (show_trailing_button)
-            //                    if (Imgui.TabItemButton("+", ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_NoTooltip))
-            //                        active_tabs.push_back(next_tab_id++); // Add new tab
-            //
-            //                // Submit our regular tabs
-            //                for (int n = 0; n < active_tabs.Size; )
-            //                {
-            //                    bool open = true;
-            //                    char name[16];
-            //                    snprintf(name, IM_ARRAYSIZE(name), "%04d", active_tabs[n]);
-            //                    if (Imgui.BeginTabItem(name, &open, ImGuiTabItemFlags_None))
-            //                    {
-            //                        Imgui.Text("This is the %s tab!", name);
-            //                        Imgui.EndTabItem();
-            //                    }
-            //
-            //                    if (!open)
-            //                        active_tabs.erase(active_tabs.Data + n);
-            //                    else
-            //                        n++;
-            //                }
-            //
-            //                Imgui.EndTabBar();
-            //            }
-            //            Imgui.Separator();
-            //            Imgui.TreePop();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Tabs"))
+            {
+                if (Imgui.TreeNode("Basic"))
+                {
+                    var tab_bar_flags = TabBarOptions.None;
+                    if (Imgui.BeginTabBar("MyTabBar", tab_bar_flags))
+                    {
+                        if (Imgui.BeginTabItem("Avocado"))
+                        {
+                            Imgui.Text("This is the Avocado tab!\nblah blah blah blah blah");
+                            Imgui.EndTabItem();
+                        }
+                        if (Imgui.BeginTabItem("Broccoli"))
+                        {
+                            Imgui.Text("This is the Broccoli tab!\nblah blah blah blah blah");
+                            Imgui.EndTabItem();
+                        }
+                        if (Imgui.BeginTabItem("Cucumber"))
+                        {
+                            Imgui.Text("This is the Cucumber tab!\nblah blah blah blah blah");
+                            Imgui.EndTabItem();
+                        }
+                        Imgui.EndTabBar();
+                    }
+                    Imgui.Separator();
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Advanced & Close Button"))
+                {
+                    _ = Imgui.CheckboxFlags("TabBarOptions.Reorderable", s_tabBarOptions, TabBarOptions.Reorderable);
+                    _ = Imgui.CheckboxFlags("TabBarOptions.AutoSelectNewTabs", s_tabBarOptions, TabBarOptions.AutoSelectNewTabs);
+                    _ = Imgui.CheckboxFlags("TabBarOptions.TabListPopupButton", s_tabBarOptions, TabBarOptions.TabListPopupButton);
+                    _ = Imgui.CheckboxFlags("TabBarOptions.NoCloseWithMiddleMouseButton", s_tabBarOptions, TabBarOptions.NoCloseWithMiddleMouseButton);
+                    if ((s_tabBarOptions & TabBarOptions.FittingPolicyMask) == 0)
+                    {
+                        s_tabBarOptions.Value |= TabBarOptions.FittingPolicyDefault;
+                    }
+
+                    if (Imgui.CheckboxFlags("TabBarOptions.FittingPolicyResizeDown", s_tabBarOptions, TabBarOptions.FittingPolicyResizeDown))
+                    {
+                        s_tabBarOptions.Value &= ~(TabBarOptions.FittingPolicyMask ^ TabBarOptions.FittingPolicyResizeDown);
+                    }
+
+                    if (Imgui.CheckboxFlags("TabBarOptions.FittingPolicyScroll", s_tabBarOptions, TabBarOptions.FittingPolicyScroll))
+                    {
+                        s_tabBarOptions.Value &= ~(TabBarOptions.FittingPolicyMask ^ TabBarOptions.FittingPolicyScroll);
+                    }
+
+                    var names = new[] { "Artichoke", "Beetroot", "Celery", "Daikon" };
+                    for (var n = 0; n < s_opened.Length; n++)
+                    {
+                        if (n > 0)
+                        {
+                            Imgui.SameLine();
+                        }
+                        _ = Imgui.Checkbox(names[n], s_opened.GetStateOfElement(n));
+                    }
+
+                    if (Imgui.BeginTabBar("MyTabBar", s_tabBarOptions))
+                    {
+                        for (var n = 0; n < s_opened.Length; n++)
+                        {
+                            if (s_opened[n] && Imgui.BeginTabItem(names[n], s_opened.GetStateOfElement(n), TabItemOptions.None))
+                            {
+                                Imgui.Text($"This is the {names[n]} tab!");
+                                if ((n & 1) == 1)
+                                {
+                                    Imgui.Text("I am an odd tab.");
+                                }
+
+                                Imgui.EndTabItem();
+                            }
+                        }
+
+                        Imgui.EndTabBar();
+                    }
+                    Imgui.Separator();
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("TabItemButton & Leading/Trailing flags"))
+                {
+                    if (s_nextTabId == 0)
+                    {
+                        for (var i = 0; i < 3; i++)
+                        {
+                            s_activeTabs.Add(s_nextTabId++);
+                        }
+                    }
+
+                    _ = Imgui.Checkbox("Show Leading TabItemButton()", s_showLeadingButton);
+                    _ = Imgui.Checkbox("Show Trailing TabItemButton()", s_showTrailingButton);
+
+                    _ = Imgui.CheckboxFlags("TabBarOptions.TabListPopupButton", s_tabBarOptions2, TabBarOptions.TabListPopupButton);
+                    if (Imgui.CheckboxFlags("TabBarOptions.FittingPolicyResizeDown", s_tabBarOptions2, TabBarOptions.FittingPolicyResizeDown))
+                    {
+                        s_tabBarOptions2.Value &= ~(TabBarOptions.FittingPolicyMask ^ TabBarOptions.FittingPolicyResizeDown);
+                    }
+
+                    if (Imgui.CheckboxFlags("TabBarOptions.FittingPolicyScroll", s_tabBarOptions2, TabBarOptions.FittingPolicyScroll))
+                    {
+                        s_tabBarOptions2.Value &= ~(TabBarOptions.FittingPolicyMask ^ TabBarOptions.FittingPolicyScroll);
+                    }
+
+                    if (Imgui.BeginTabBar("MyTabBar", s_tabBarOptions2))
+                    {
+                        if (s_showLeadingButton)
+                        {
+                            if (Imgui.TabItemButton("?", TabItemOptions.Leading | TabItemOptions.NoTooltip))
+                            {
+                                Imgui.OpenPopup("MyHelpMenu");
+                            }
+                        }
+
+                        if (Imgui.BeginPopup("MyHelpMenu"))
+                        {
+                            _ = Imgui.Selectable("Hello!");
+                            Imgui.EndPopup();
+                        }
+
+                        if (s_showTrailingButton)
+                        {
+                            if (Imgui.TabItemButton("+", TabItemOptions.Trailing | TabItemOptions.NoTooltip))
+                            {
+                                s_activeTabs.Add(s_nextTabId++);
+                            }
+                        }
+
+                        // Submit our regular tabs
+                        for (var n = 0; n < s_activeTabs.Count;)
+                        {
+                            State<bool> open = new(true);
+                            if (Imgui.BeginTabItem($"{s_activeTabs[n]:D4}", open, TabItemOptions.None))
+                            {
+                                Imgui.Text($"This is the {s_activeTabs[n]:D4} tab!");
+                                Imgui.EndTabItem();
+                            }
+
+                            if (!open)
+                            {
+                                _ = s_activeTabs.Remove(n);
+                            }
+                            else
+                            {
+                                n++;
+                            }
+                        }
+
+                        Imgui.EndTabBar();
+                    }
+                    Imgui.Separator();
+                    Imgui.TreePop();
+                }
+                Imgui.TreePop();
+            }
+
             //    // Plot/Graph widgets are not very good.
             //    // Consider using a third-party library such as ImPlot: https://github.com/epezent/implot
             //    // (see others https://github.com/ocornut/imgui/wiki/Useful-Extensions)

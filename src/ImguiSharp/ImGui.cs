@@ -1246,7 +1246,7 @@ namespace ImguiSharp
 
         public static void EndTabBar() => Native.ImGui_EndTabBar();
 
-        public static bool BeginTabItem(string label, State<bool>? open, TabItemOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginTabItem(labelPtr, open.ToNative(), (Native.ImGuiTabItemFlags)options));
+        public static bool BeginTabItem(string label, State<bool>? open = default, TabItemOptions options = default) => Native.StringToUtf8Func(label, labelPtr => Native.ImGui_BeginTabItem(labelPtr, open.ToNative(), (Native.ImGuiTabItemFlags)options));
 
         public static void EndTabItem() => Native.ImGui_EndTabItem();
 
