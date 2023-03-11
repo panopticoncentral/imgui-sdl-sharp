@@ -913,11 +913,12 @@ namespace ImguiSharp
 
         public static bool ColorPicker(string label, State<ColorF> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        public static bool ColorPickerAlpha(string label, State<ColorF> color, ColorEditOptions options = default, ColorF referenceColor = default)
+        public static bool ColorPickerAlpha(string label, State<ColorF> color, ColorEditOptions options = default, ColorF? referenceColor = default)
         {
             fixed (byte* labelPtr = Native.StringToUtf8(label))
             {
-                return Native.ImGui_ColorPicker4(labelPtr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options, (float*)&referenceColor);
+                var referenceColorLocal = referenceColor ?? default;
+                return Native.ImGui_ColorPicker4(labelPtr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options, (float*)(referenceColor == null ? null : &referenceColorLocal));
             }
         }
 
