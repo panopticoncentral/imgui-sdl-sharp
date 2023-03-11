@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-using ImguiSharp;
+﻿using ImguiSharp;
 
 using static ImguiSharp.Native;
 
@@ -377,8 +375,8 @@ namespace SampleApp
         private enum Element { Fire, Earth, Air, Water, Count };
         private static readonly State<int> s_elem = new((int)Element.Fire);
         private static readonly string[] s_elemNames = { "Fire", "Earth", "Air", "Water" };
-        private static readonly StateVector<float> s_col1 = new(3, new[] { 1.0f, 0.0f, 0.2f });
-        private static readonly StateVector<float> s_col2 = new(4, new[] { 0.4f, 0.7f, 0.0f, 0.5f });
+        private static readonly State<ColorF> s_col1 = new(new(1.0f, 0.0f, 0.2f));
+        private static readonly State<ColorF> s_col2 = new(new(0.4f, 0.7f, 0.0f, 0.5f));
         private static readonly State<int> s_itemCurrent2 = new(1);
         private static readonly StateOption<TreeNodeOptions> s_baseFlags = new(TreeNodeOptions.OpenOnArrow | TreeNodeOptions.OpenOnDoubleClick | TreeNodeOptions.SpanAvailWidth);
         private static readonly State<bool> s_alignLabelWithCurrentXPosition = new(false);
@@ -445,6 +443,24 @@ namespace SampleApp
         private static readonly State<int> s_displayCount = new(70);
         private static float s_progress;
         private static float s_progressDir = 1.0f;
+        private static readonly State<ColorF> color = new(new(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f));
+        private static readonly State<bool> alpha_preview = new(true);
+        private static readonly State<bool> alpha_half_preview = new(false);
+        private static readonly State<bool> drag_and_drop = new(true);
+        private static readonly State<bool> options_menu = new(true);
+        private static readonly State<bool> hdr = new(false);
+        private static bool saved_palette_init = true;
+        private static readonly ColorF[] saved_palette = new ColorF[32];
+        private static ColorF backup_color;
+        private static readonly State<bool> no_border = new(false);
+        private static readonly State<bool> alpha = new(true);
+        private static readonly State<bool> alpha_bar = new(true);
+        private static readonly State<bool> side_preview = new(true);
+        private static readonly State<bool> ref_color = new(false);
+        private static readonly State<ColorF> ref_color_v = new(new(1.0f, 0.0f, 1.0f, 0.5f));
+        private static readonly State<int> display_mode = new(0);
+        private static readonly State<int> picker_mode = new(0);
+        private static readonly State<ColorF> color_hsv = new(new(0.23f, 1.0f, 1.0f, 1.0f));
 
         private static void ShowDemoWindowWidgets()
         {
@@ -1504,196 +1520,231 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Color");
-            //    if (Imgui.TreeNode("Color/Picker Widgets"))
-            //    {
-            //        static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
-            //
-            //        static bool alpha_preview = true;
-            //        static bool alpha_half_preview = false;
-            //        static bool drag_and_drop = true;
-            //        static bool options_menu = true;
-            //        static bool hdr = false;
-            //        Imgui.Checkbox("With Alpha Preview", &alpha_preview);
-            //        Imgui.Checkbox("With Half Alpha Preview", &alpha_half_preview);
-            //        Imgui.Checkbox("With Drag and Drop", &drag_and_drop);
-            //        Imgui.Checkbox("With Options Menu", &options_menu); Imgui.SameLine(); HelpMarker("Right-click on the individual color widget to show options.");
-            //        Imgui.Checkbox("With HDR", &hdr); Imgui.SameLine(); HelpMarker("Currently all this does is to lift the 0..1 limits on dragging widgets.");
-            //        ImGuiColorEditFlags misc_flags = (hdr ? ImGuiColorEditFlags_HDR : 0) | (drag_and_drop ? 0 : ImGuiColorEditFlags_NoDragDrop) | (alpha_half_preview ? ImGuiColorEditFlags_AlphaPreviewHalf : (alpha_preview ? ImGuiColorEditFlags_AlphaPreview : 0)) | (options_menu ? 0 : ImGuiColorEditFlags_NoOptions);
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorEdit");
-            //        Imgui.Text("Color widget:");
-            //        Imgui.SameLine(); HelpMarker(
-            //            "Click on the color square to open a color picker.\n"
-            //            "CTRL+click on individual component to input value.\n");
-            //        Imgui.ColorEdit3("MyColor##1", (float*)&color, misc_flags);
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorEdit (HSV, with Alpha)");
-            //        Imgui.Text("Color widget HSV with Alpha:");
-            //        Imgui.ColorEdit4("MyColor##2", (float*)&color, ImGuiColorEditFlags_DisplayHSV | misc_flags);
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorEdit (float display)");
-            //        Imgui.Text("Color widget with Float Display:");
-            //        Imgui.ColorEdit4("MyColor##2f", (float*)&color, ImGuiColorEditFlags_Float | misc_flags);
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorButton (with Picker)");
-            //        Imgui.Text("Color button with Picker:");
-            //        Imgui.SameLine(); HelpMarker(
-            //            "With the ImGuiColorEditFlags_NoInputs flag you can hide all the slider/text inputs.\n"
-            //            "With the ImGuiColorEditFlags_NoLabel flag you can pass a non-empty label which will only "
-            //            "be used for the tooltip and picker popup.");
-            //        Imgui.ColorEdit4("MyColor##3", (float*)&color, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | misc_flags);
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorButton (with custom Picker popup)");
-            //        Imgui.Text("Color button with Custom Picker Popup:");
-            //
-            //        // Generate a default palette. The palette will persist and can be edited.
-            //        static bool saved_palette_init = true;
-            //        static ImVec4 saved_palette[32] = {};
-            //        if (saved_palette_init)
-            //        {
-            //            for (int n = 0; n < IM_ARRAYSIZE(saved_palette); n++)
-            //            {
-            //                Imgui.ColorConvertHSVtoRGB(n / 31.0f, 0.8f, 0.8f,
-            //                    saved_palette[n].x, saved_palette[n].y, saved_palette[n].z);
-            //                saved_palette[n].w = 1.0f; // Alpha
-            //            }
-            //            saved_palette_init = false;
-            //        }
-            //
-            //        static ImVec4 backup_color;
-            //        bool open_popup = Imgui.ColorButton("MyColor##3b", color, misc_flags);
-            //        Imgui.SameLine(0, Imgui.GetStyle().ItemInnerSpacing.x);
-            //        open_popup |= Imgui.Button("Palette");
-            //        if (open_popup)
-            //        {
-            //            Imgui.OpenPopup("mypicker");
-            //            backup_color = color;
-            //        }
-            //        if (Imgui.BeginPopup("mypicker"))
-            //        {
-            //            Imgui.Text("MY CUSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
-            //            Imgui.Separator();
-            //            Imgui.ColorPicker4("##picker", (float*)&color, misc_flags | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoSmallPreview);
-            //            Imgui.SameLine();
-            //
-            //            Imgui.BeginGroup(); // Lock X position
-            //            Imgui.Text("Current");
-            //            Imgui.ColorButton("##current", color, ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_AlphaPreviewHalf, ImVec2(60, 40));
-            //            Imgui.Text("Previous");
-            //            if (Imgui.ColorButton("##previous", backup_color, ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_AlphaPreviewHalf, ImVec2(60, 40)))
-            //                color = backup_color;
-            //            Imgui.Separator();
-            //            Imgui.Text("Palette");
-            //            for (int n = 0; n < IM_ARRAYSIZE(saved_palette); n++)
-            //            {
-            //                Imgui.PushID(n);
-            //                if ((n % 8) != 0)
-            //                    Imgui.SameLine(0.0f, Imgui.GetStyle().ItemSpacing.y);
-            //
-            //                ImGuiColorEditFlags palette_button_flags = ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip;
-            //                if (Imgui.ColorButton("##palette", saved_palette[n], palette_button_flags, ImVec2(20, 20)))
-            //                    color = ImVec4(saved_palette[n].x, saved_palette[n].y, saved_palette[n].z, color.w); // Preserve alpha!
-            //
-            //                // Allow user to drop colors into each palette entry. Note that ColorButton() is already a
-            //                // drag source by default, unless specifying the ImGuiColorEditFlags_NoDragDrop flag.
-            //                if (Imgui.BeginDragDropTarget())
-            //                {
-            //                    if (const ImGuiPayload* payload = Imgui.AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_3F))
-            //                        memcpy((float*)&saved_palette[n], payload->Data, sizeof(float) * 3);
-            //                    if (const ImGuiPayload* payload = Imgui.AcceptDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_4F))
-            //                        memcpy((float*)&saved_palette[n], payload->Data, sizeof(float) * 4);
-            //                    Imgui.EndDragDropTarget();
-            //                }
-            //
-            //                Imgui.PopID();
-            //            }
-            //            Imgui.EndGroup();
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorButton (simple)");
-            //        Imgui.Text("Color button only:");
-            //        static bool no_border = false;
-            //        Imgui.Checkbox("ImGuiColorEditFlags_NoBorder", &no_border);
-            //        Imgui.ColorButton("MyColor##3c", *(ImVec4*)&color, misc_flags | (no_border ? ImGuiColorEditFlags_NoBorder : 0), ImVec2(80, 80));
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Color/ColorPicker");
-            //        Imgui.Text("Color picker:");
-            //        static bool alpha = true;
-            //        static bool alpha_bar = true;
-            //        static bool side_preview = true;
-            //        static bool ref_color = false;
-            //        static ImVec4 ref_color_v(1.0f, 0.0f, 1.0f, 0.5f);
-            //        static int display_mode = 0;
-            //        static int picker_mode = 0;
-            //        Imgui.Checkbox("With Alpha", &alpha);
-            //        Imgui.Checkbox("With Alpha Bar", &alpha_bar);
-            //        Imgui.Checkbox("With Side Preview", &side_preview);
-            //        if (side_preview)
-            //        {
-            //            Imgui.SameLine();
-            //            Imgui.Checkbox("With Ref Color", &ref_color);
-            //            if (ref_color)
-            //            {
-            //                Imgui.SameLine();
-            //                Imgui.ColorEdit4("##RefColor", &ref_color_v.x, ImGuiColorEditFlags_NoInputs | misc_flags);
-            //            }
-            //        }
-            //        Imgui.Combo("Display Mode", &display_mode, "Auto/Current\0None\0RGB Only\0HSV Only\0Hex Only\0");
-            //        Imgui.SameLine(); HelpMarker(
-            //            "ColorEdit defaults to displaying RGB inputs if you don't specify a display mode, "
-            //            "but the user can change it with a right-click on those inputs.\n\nColorPicker defaults to displaying RGB+HSV+Hex "
-            //            "if you don't specify a display mode.\n\nYou can change the defaults using SetColorEditOptions().");
-            //        Imgui.SameLine(); HelpMarker("When not specified explicitly (Auto/Current mode), user can right-click the picker to change mode.");
-            //        ImGuiColorEditFlags flags = misc_flags;
-            //        if (!alpha)            flags |= ImGuiColorEditFlags_NoAlpha;        // This is by default if you call ColorPicker3() instead of ColorPicker4()
-            //        if (alpha_bar)         flags |= ImGuiColorEditFlags_AlphaBar;
-            //        if (!side_preview)     flags |= ImGuiColorEditFlags_NoSidePreview;
-            //        if (picker_mode == 1)  flags |= ImGuiColorEditFlags_PickerHueBar;
-            //        if (picker_mode == 2)  flags |= ImGuiColorEditFlags_PickerHueWheel;
-            //        if (display_mode == 1) flags |= ImGuiColorEditFlags_NoInputs;       // Disable all RGB/HSV/Hex displays
-            //        if (display_mode == 2) flags |= ImGuiColorEditFlags_DisplayRGB;     // Override display mode
-            //        if (display_mode == 3) flags |= ImGuiColorEditFlags_DisplayHSV;
-            //        if (display_mode == 4) flags |= ImGuiColorEditFlags_DisplayHex;
-            //        Imgui.ColorPicker4("MyColor##4", (float*)&color, flags, ref_color ? &ref_color_v.x : NULL);
-            //
-            //        Imgui.Text("Set defaults in code:");
-            //        Imgui.SameLine(); HelpMarker(
-            //            "SetColorEditOptions() is designed to allow you to set boot-time default.\n"
-            //            "We don't have Push/Pop functions because you can force options on a per-widget basis if needed,"
-            //            "and the user can change non-forced ones with the options menu.\nWe don't have a getter to avoid"
-            //            "encouraging you to persistently save values that aren't forward-compatible.");
-            //        if (Imgui.Button("Default: Uint8 + HSV + Hue Bar"))
-            //            Imgui.SetColorEditOptions(ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_PickerHueBar);
-            //        if (Imgui.Button("Default: Float + HDR + Hue Wheel"))
-            //            Imgui.SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_PickerHueWheel);
-            //
-            //        // Always both a small version of both types of pickers (to make it more visible in the demo to people who are skimming quickly through it)
-            //        Imgui.Text("Both types:");
-            //        float w = (Imgui.GetContentRegionAvail().x - Imgui.GetStyle().ItemSpacing.y) * 0.40f;
-            //        Imgui.SetNextItemWidth(w);
-            //        Imgui.ColorPicker3("##MyColor##5", (float*)&color, ImGuiColorEditFlags_PickerHueBar | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
-            //        Imgui.SameLine();
-            //        Imgui.SetNextItemWidth(w);
-            //        Imgui.ColorPicker3("##MyColor##6", (float*)&color, ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoAlpha);
-            //
-            //        // HSV encoded support (to avoid RGB<>HSV round trips and singularities when S==0 or V==0)
-            //        static ImVec4 color_hsv(0.23f, 1.0f, 1.0f, 1.0f); // Stored as HSV!
-            //        Imgui.Spacing();
-            //        Imgui.Text("HSV encoded colors");
-            //        Imgui.SameLine(); HelpMarker(
-            //            "By default, colors are given to ColorEdit and ColorPicker in RGB, but ImGuiColorEditFlags_InputHSV"
-            //            "allows you to store colors as HSV and pass them to ColorEdit and ColorPicker as HSV. This comes with the"
-            //            "added benefit that you can manipulate hue values with the picker even when saturation or value are zero.");
-            //        Imgui.Text("Color widget with InputHSV:");
-            //        Imgui.ColorEdit4("HSV shown as RGB##1", (float*)&color_hsv, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputHSV | ImGuiColorEditFlags_Float);
-            //        Imgui.ColorEdit4("HSV shown as HSV##1", (float*)&color_hsv, ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_InputHSV | ImGuiColorEditFlags_Float);
-            //        Imgui.DragFloat4("Raw HSV values", (float*)&color_hsv, 0.01f, 0.0f, 1.0f);
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Color/Picker Widgets"))
+            {
+                _ = Imgui.Checkbox("With Alpha Preview", alpha_preview);
+                _ = Imgui.Checkbox("With Half Alpha Preview", alpha_half_preview);
+                _ = Imgui.Checkbox("With Drag and Drop", drag_and_drop);
+                _ = Imgui.Checkbox("With Options Menu", options_menu);
+                Imgui.SameLine();
+                HelpMarker("Right-click on the individual color widget to show options.");
+                _ = Imgui.Checkbox("With HDR", hdr);
+                Imgui.SameLine();
+                HelpMarker("Currently all this does is to lift the 0..1 limits on dragging widgets.");
+                var misc_flags = (hdr ? ColorEditOptions.HDR : 0) | (drag_and_drop ? 0 : ColorEditOptions.NoDragDrop) | (alpha_half_preview ? ColorEditOptions.AlphaPreviewHalf : (alpha_preview ? ColorEditOptions.AlphaPreview : 0)) | (options_menu ? 0 : ColorEditOptions.NoOptions);
+
+                Imgui.Text("Color widget:");
+                Imgui.SameLine();
+                HelpMarker(
+                    "Click on the color square to open a color picker.\n" +
+                    "CTRL+click on individual component to input value.\n");
+                _ = Imgui.ColorEdit("MyColor##1", color, misc_flags);
+
+                Imgui.Text("Color widget HSV with Alpha:");
+                _ = Imgui.ColorEditAlpha("MyColor##2", color, ColorEditOptions.DisplayHSV | misc_flags);
+
+                Imgui.Text("Color widget with Float Display:");
+                _ = Imgui.ColorEditAlpha("MyColor##2f", color, ColorEditOptions.Float | misc_flags);
+
+                Imgui.Text("Color button with Picker:");
+                Imgui.SameLine(); HelpMarker(
+                    "With the ColorEditOptions.NoInputs flag you can hide all the slider/text inputs.\n" +
+                    "With the ColorEditOptions.NoLabel flag you can pass a non-empty label which will only " +
+                    "be used for the tooltip and picker popup.");
+                _ = Imgui.ColorEditAlpha("MyColor##3", color, ColorEditOptions.NoInputs | ColorEditOptions.NoLabel | misc_flags);
+
+                Imgui.Text("Color button with Custom Picker Popup:");
+
+                if (saved_palette_init)
+                {
+                    for (var n = 0; n < saved_palette.Length; n++)
+                    {
+                        saved_palette[n] = Imgui.ColorConvertHsvToRgb(n / 31.0f, 0.8f, 0.8f);
+                    }
+                    saved_palette_init = false;
+                }
+
+                var open_popup = Imgui.ColorButton("MyColor##3b", color, misc_flags);
+                Imgui.SameLine(0, Imgui.GetStyle().ItemInnerSpacing.Width);
+                open_popup |= Imgui.Button("Palette");
+                if (open_popup)
+                {
+                    Imgui.OpenPopup("mypicker");
+                    backup_color = color;
+                }
+                if (Imgui.BeginPopup("mypicker"))
+                {
+                    Imgui.Text("MY CUSTOM COLOR PICKER WITH AN AMAZING PALETTE!");
+                    Imgui.Separator();
+                    _ = Imgui.ColorPickerAlpha("##picker", color, misc_flags | ColorEditOptions.NoSidePreview | ColorEditOptions.NoSmallPreview);
+                    Imgui.SameLine();
+
+                    Imgui.BeginGroup();
+                    Imgui.Text("Current");
+                    _ = Imgui.ColorButton("##current", color, ColorEditOptions.NoPicker | ColorEditOptions.AlphaPreviewHalf, new(60, 40));
+                    Imgui.Text("Previous");
+                    if (Imgui.ColorButton("##previous", backup_color, ColorEditOptions.NoPicker | ColorEditOptions.AlphaPreviewHalf, new(60, 40)))
+                    {
+                        color.Value = backup_color;
+                    }
+
+                    Imgui.Separator();
+                    Imgui.Text("Palette");
+                    for (var n = 0; n < saved_palette.Length; n++)
+                    {
+                        Imgui.PushId(n);
+                        if ((n % 8) != 0)
+                        {
+                            Imgui.SameLine(0.0f, Imgui.GetStyle().ItemSpacing.Height);
+                        }
+
+                        var palette_button_flags = ColorEditOptions.NoAlpha | ColorEditOptions.NoPicker | ColorEditOptions.NoTooltip;
+                        if (Imgui.ColorButton("##palette", saved_palette[n], palette_button_flags, new(20, 20)))
+                        {
+                            color.Value = new(saved_palette[n].Red, saved_palette[n].Green, saved_palette[n].Blue, color.Value.Alpha);
+                        }
+
+                        // Allow user to drop colors into each palette entry. Note that ColorButton() is already a
+                        // drag source by default, unless specifying the ColorEditOptions.NoDragDrop flag.
+                        if (Imgui.BeginDragDropTarget())
+                        {
+                            var payload = Imgui.AcceptDragDropPayload(Payload.ColorType);
+                            if (payload != null)
+                            {
+                                var data = payload.Value.GetData<float>();
+                                saved_palette[n] = new(data[0], data[1], data[2]);
+                            }
+                            payload = Imgui.AcceptDragDropPayload(Payload.ColorAlphaType);
+                            if (payload != null)
+                            {
+                                var data = payload.Value.GetData<float>();
+                                saved_palette[n] = new(data[0], data[1], data[2], data[3]);
+                            }
+                            Imgui.EndDragDropTarget();
+                        }
+
+                        Imgui.PopId();
+                    }
+                    Imgui.EndGroup();
+                    Imgui.EndPopup();
+                }
+
+
+                Imgui.Text("Color button only:");
+                _ = Imgui.Checkbox("ColorEditOptions.NoBorder", no_border);
+                _ = Imgui.ColorButton("MyColor##3c", color, misc_flags | (no_border ? ColorEditOptions.NoBorder : 0), new(80, 80));
+
+                Imgui.Text("Color picker:");
+                _ = Imgui.Checkbox("With Alpha", alpha);
+                _ = Imgui.Checkbox("With Alpha Bar", alpha_bar);
+                _ = Imgui.Checkbox("With Side Preview", side_preview);
+                if (side_preview)
+                {
+                    Imgui.SameLine();
+                    _ = Imgui.Checkbox("With Ref Color", ref_color);
+                    if (ref_color)
+                    {
+                        Imgui.SameLine();
+                        _ = Imgui.ColorEditAlpha("##RefColor", ref_color_v, ColorEditOptions.NoInputs | misc_flags);
+                    }
+                }
+                _ = Imgui.Combo("Display Mode", display_mode, "Auto/Current\0None\0RGB Only\0HSV Only\0Hex Only\0");
+                Imgui.SameLine();
+                HelpMarker(
+                    "ColorEdit defaults to displaying RGB inputs if you don't specify a display mode, " +
+                    "but the user can change it with a right-click on those inputs.\n\nColorPicker defaults to displaying RGB+HSV+Hex " +
+                    "if you don't specify a display mode.\n\nYou can change the defaults using SetColorEditOptions().");
+                Imgui.SameLine();
+                HelpMarker("When not specified explicitly (Auto/Current mode), user can right-click the picker to change mode.");
+                var flags = misc_flags;
+                if (!alpha)
+                {
+                    flags |= ColorEditOptions.NoAlpha;        // This is by default if you call ColorPicker3() instead of ColorPicker4()
+                }
+
+                if (alpha_bar)
+                {
+                    flags |= ColorEditOptions.AlphaBar;
+                }
+
+                if (!side_preview)
+                {
+                    flags |= ColorEditOptions.NoSidePreview;
+                }
+
+                if (picker_mode == 1)
+                {
+                    flags |= ColorEditOptions.PickerHueBar;
+                }
+
+                if (picker_mode == 2)
+                {
+                    flags |= ColorEditOptions.PickerHueWheel;
+                }
+
+                if (display_mode == 1)
+                {
+                    flags |= ColorEditOptions.NoInputs;       // Disable all RGB/HSV/Hex displays
+                }
+
+                if (display_mode == 2)
+                {
+                    flags |= ColorEditOptions.DisplayRGB;     // Override display mode
+                }
+
+                if (display_mode == 3)
+                {
+                    flags |= ColorEditOptions.DisplayHSV;
+                }
+
+                if (display_mode == 4)
+                {
+                    flags |= ColorEditOptions.DisplayHex;
+                }
+
+                Imgui.ColorPickerAlpha("MyColor##4", color, flags, ref_color ? ref_color_v : null);
+
+                Imgui.Text("Set defaults in code:");
+                Imgui.SameLine();
+                HelpMarker(
+                    "SetColorEditOptions() is designed to allow you to set boot-time default.\n" +
+                    "We don't have Push/Pop functions because you can force options on a per-widget basis if needed," +
+                    "and the user can change non-forced ones with the options menu.\nWe don't have a getter to avoid" +
+                    "encouraging you to persistently save values that aren't forward-compatible.");
+                if (Imgui.Button("Default: Uint8 + HSV + Hue Bar"))
+                {
+                    Imgui.SetColorEditOptions(ColorEditOptions.Uint8 | ColorEditOptions.DisplayHSV | ColorEditOptions.PickerHueBar);
+                }
+
+                if (Imgui.Button("Default: Float + HDR + Hue Wheel"))
+                {
+                    Imgui.SetColorEditOptions(ColorEditOptions.Float | ColorEditOptions.HDR | ColorEditOptions.PickerHueWheel);
+                }
+
+                // Always both a small version of both types of pickers (to make it more visible in the demo to people who are skimming quickly through it)
+                Imgui.Text("Both types:");
+                var w = (Imgui.GetContentRegionAvailable().Width - Imgui.GetStyle().ItemSpacing.Height) * 0.40f;
+                Imgui.SetNextItemWidth(w);
+                _ = Imgui.ColorPicker("##MyColor##5", color, ColorEditOptions.PickerHueBar | ColorEditOptions.NoSidePreview | ColorEditOptions.NoInputs | ColorEditOptions.NoAlpha);
+                Imgui.SameLine();
+                Imgui.SetNextItemWidth(w);
+                _ = Imgui.ColorPicker("##MyColor##6", color, ColorEditOptions.PickerHueWheel | ColorEditOptions.NoSidePreview | ColorEditOptions.NoInputs | ColorEditOptions.NoAlpha);
+
+                Imgui.Spacing();
+                Imgui.Text("HSV encoded colors");
+                Imgui.SameLine();
+                HelpMarker(
+                    "By default, colors are given to ColorEdit and ColorPicker in RGB, but ColorEditOptions.InputHSV" +
+                    "allows you to store colors as HSV and pass them to ColorEdit and ColorPicker as HSV. This comes with the" +
+                    "added benefit that you can manipulate hue values with the picker even when saturation or value are zero.");
+                Imgui.Text("Color widget with InputHSV:");
+                _ = Imgui.ColorEditAlpha("HSV shown as RGB##1", color_hsv, ColorEditOptions.DisplayRGB | ColorEditOptions.InputHSV | ColorEditOptions.Float);
+                _ = Imgui.ColorEditAlpha("HSV shown as HSV##1", color_hsv, ColorEditOptions.DisplayHSV | ColorEditOptions.InputHSV | ColorEditOptions.Float);
+                Imgui.Drag("Raw HSV values", (float*)&color_hsv, 0.01f, 0.0f, 1.0f);
+
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Drag and Slider Flags");
             //    if (Imgui.TreeNode("Drag/Slider Flags"))
             //    {
@@ -1997,7 +2048,7 @@ namespace SampleApp
             //                "Brianna", "Barry", "Bernard",
             //                "Bibi", "Blaine", "Bryn"
             //            };
-            //            for (int n = 0; n < IM_ARRAYSIZE(names); n++)
+            //            for (int n = 0; n < names.Length; n++)
             //            {
             //                Imgui.PushID(n);
             //                if ((n % 3) != 0)
@@ -2054,7 +2105,7 @@ namespace SampleApp
             //                "We don't use the drag and drop api at all here! "
             //                "Instead we query when the item is held but not hovered, and order items accordingly.");
             //            static const char* item_names[] = { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
-            //            for (int n = 0; n < IM_ARRAYSIZE(item_names); n++)
+            //            for (int n = 0; n < item_names.Length; n++)
             //            {
             //                const char* item = item_names[n];
             //                Imgui.Selectable(item);
@@ -2062,7 +2113,7 @@ namespace SampleApp
             //                if (Imgui.IsItemActive() && !Imgui.IsItemHovered())
             //                {
             //                    int n_next = n + (Imgui.GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-            //                    if (n_next >= 0 && n_next < IM_ARRAYSIZE(item_names))
+            //                    if (n_next >= 0 && n_next < item_names.Length)
             //                    {
             //                        item_names[n] = item_names[n_next];
             //                        item_names[n_next] = item;
@@ -2087,7 +2138,7 @@ namespace SampleApp
             //        };
             //        static int item_type = 4;
             //        static bool item_disabled = false;
-            //        Imgui.Combo("Item Type", &item_type, item_names, IM_ARRAYSIZE(item_names), IM_ARRAYSIZE(item_names));
+            //        Imgui.Combo("Item Type", &item_type, item_names, item_names.Length, item_names.Length);
             //        Imgui.SameLine();
             //        HelpMarker("Testing how various types of items are interacting with the IsItemXXX functions. Note that the bool return value of most ImGui function is generally equivalent to calling Imgui.IsItemHovered().");
             //        Imgui.Checkbox("Item Disabled",  &item_disabled);
@@ -2104,8 +2155,8 @@ namespace SampleApp
             //        if (item_type == 2) { Imgui.PushButtonRepeat(true); ret = Imgui.Button("ITEM: Button"); Imgui.PopButtonRepeat(); } // Testing button (with repeater)
             //        if (item_type == 3) { ret = Imgui.Checkbox("ITEM: Checkbox", &b); }                            // Testing checkbox
             //        if (item_type == 4) { ret = Imgui.SliderFloat("ITEM: SliderFloat", &col4f[0], 0.0f, 1.0f); }   // Testing basic item
-            //        if (item_type == 5) { ret = Imgui.InputText("ITEM: InputText", &str[0], IM_ARRAYSIZE(str)); }  // Testing input text (which handles tabbing)
-            //        if (item_type == 6) { ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", &str[0], IM_ARRAYSIZE(str)); } // Testing input text (which uses a child window)
+            //        if (item_type == 5) { ret = Imgui.InputText("ITEM: InputText", &str[0], str.Length); }  // Testing input text (which handles tabbing)
+            //        if (item_type == 6) { ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", &str[0], str.Length); } // Testing input text (which uses a child window)
             //        if (item_type == 7) { ret = Imgui.InputFloat("ITEM: InputFloat", col4f, 1.0f); }               // Testing +/- buttons on scalar input
             //        if (item_type == 8) { ret = Imgui.InputFloat3("ITEM: InputFloat3", col4f); }                   // Testing multi-component items (IsItemXXX flags are reported merged)
             //        if (item_type == 9) { ret = Imgui.ColorEdit4("ITEM: ColorEdit4", col4f); }                     // Testing multi-component items (IsItemXXX flags are reported merged)
@@ -2113,8 +2164,8 @@ namespace SampleApp
             //        if (item_type == 11){ ret = Imgui.MenuItem("ITEM: MenuItem"); }                                // Testing menu item (they use ImGuiButtonFlags_PressedOnRelease button policy)
             //        if (item_type == 12){ ret = Imgui.TreeNode("ITEM: TreeNode"); if (ret) Imgui.TreePop(); }     // Testing tree node
             //        if (item_type == 13){ ret = Imgui.TreeNodeEx("ITEM: TreeNode w/ ImGuiTreeNodeFlags_OpenOnDoubleClick", ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_NoTreePushOnOpen); } // Testing tree node with ImGuiButtonFlags_PressedOnDoubleClick button policy.
-            //        if (item_type == 14){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.Combo("ITEM: Combo", &current, items, IM_ARRAYSIZE(items)); }
-            //        if (item_type == 15){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.ListBox("ITEM: ListBox", &current, items, IM_ARRAYSIZE(items), IM_ARRAYSIZE(items)); }
+            //        if (item_type == 14){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.Combo("ITEM: Combo", &current, items, items.Length); }
+            //        if (item_type == 15){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.ListBox("ITEM: ListBox", &current, items, items.Length, items.Length); }
             //
             //        bool hovered_delay_none = Imgui.IsItemHovered();
             //        bool hovered_delay_short = Imgui.IsItemHovered(ImGuiHoveredFlags_DelayShort);
@@ -2171,7 +2222,7 @@ namespace SampleApp
             //            Imgui.EndDisabled();
             //
             //        char buf[1] = "";
-            //        Imgui.InputText("unused", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_ReadOnly);
+            //        Imgui.InputText("unused", buf, buf.Length, ImGuiInputTextFlags_ReadOnly);
             //        Imgui.SameLine();
             //        HelpMarker("This widget is only here to be able to tab-out of the widgets above and see e.g. Deactivated() status.");
             //
@@ -2287,7 +2338,7 @@ namespace SampleApp
             //            "  \"-xxx\"     hide lines containing \"xxx\"");
             //        filter.Draw();
             //        const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-            //        for (int i = 0; i < IM_ARRAYSIZE(lines); i++)
+            //        for (int i = 0; i < lines.Length; i++)
             //            if (filter.PassFilter(lines[i]))
             //                Imgui.BulletText("%s", lines[i]);
             //        Imgui.TreePop();
@@ -2511,7 +2562,7 @@ namespace SampleApp
             //        Imgui.PushItemWidth(80);
             //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD" };
             //        static int item = -1;
-            //        Imgui.Combo("Combo", &item, items, IM_ARRAYSIZE(items)); Imgui.SameLine();
+            //        Imgui.Combo("Combo", &item, items, items.Length); Imgui.SameLine();
             //        Imgui.SliderFloat("X", &f0, 0.0f, 5.0f); Imgui.SameLine();
             //        Imgui.SliderFloat("Y", &f1, 0.0f, 5.0f); Imgui.SameLine();
             //        Imgui.SliderFloat("Z", &f2, 0.0f, 5.0f);
@@ -2524,7 +2575,7 @@ namespace SampleApp
             //        {
             //            if (i > 0) Imgui.SameLine();
             //            Imgui.PushID(i);
-            //            Imgui.ListBox("", &selection[i], items, IM_ARRAYSIZE(items));
+            //            Imgui.ListBox("", &selection[i], items, items.Length);
             //            Imgui.PopID();
             //            //if (Imgui.IsItemHovered()) Imgui.SetTooltip("ListBox %d hovered", i);
             //        }
@@ -2585,7 +2636,7 @@ namespace SampleApp
             //        // Capture the group size and create widgets using the same size
             //        ImVec2 size = Imgui.GetItemRectSize();
             //        const float values[5] = { 0.5f, 0.20f, 0.80f, 0.60f, 0.25f };
-            //        Imgui.PlotHistogram("##values", values, IM_ARRAYSIZE(values), 0, NULL, 0.0f, 1.0f, size);
+            //        Imgui.PlotHistogram("##values", values, values.Length, 0, NULL, 0.0f, 1.0f, size);
             //
             //        Imgui.Button("ACTION", ImVec2((size.x - Imgui.GetStyle().ItemSpacing.x) * 0.5f, size.y));
             //        Imgui.SameLine();
@@ -3121,7 +3172,7 @@ namespace SampleApp
             //        {
             //            Imgui.Text("Aquarium");
             //            Imgui.Separator();
-            //            for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+            //            for (int i = 0; i < names.Length; i++)
             //                if (Imgui.Selectable(names[i]))
             //                    selected_fish = i;
             //            Imgui.EndPopup();
@@ -3132,7 +3183,7 @@ namespace SampleApp
             //            Imgui.OpenPopup("my_toggle_popup");
             //        if (Imgui.BeginPopup("my_toggle_popup"))
             //        {
-            //            for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+            //            for (int i = 0; i < names.Length; i++)
             //                Imgui.MenuItem(names[i], "", &toggles[i]);
             //            if (Imgui.BeginMenu("Sub-menu"))
             //            {
@@ -3149,7 +3200,7 @@ namespace SampleApp
             //                Imgui.OpenPopup("another popup");
             //            if (Imgui.BeginPopup("another popup"))
             //            {
-            //                for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+            //                for (int i = 0; i < names.Length; i++)
             //                    Imgui.MenuItem(names[i], "", &toggles[i]);
             //                if (Imgui.BeginMenu("Sub-menu"))
             //                {
@@ -3272,7 +3323,7 @@ namespace SampleApp
             //            if (Imgui.BeginPopupContextItem())
             //            {
             //                Imgui.Text("Edit name:");
-            //                Imgui.InputText("##edit", name, IM_ARRAYSIZE(name));
+            //                Imgui.InputText("##edit", name, name.Length);
             //                if (Imgui.Button("Close"))
             //                    Imgui.CloseCurrentPopup();
             //                Imgui.EndPopup();
@@ -3467,13 +3518,13 @@ namespace SampleApp
         //        { ImGuiTableFlags_SizingStretchSame,  "ImGuiTableFlags_SizingStretchSame",  "Columns default to _WidthStretch with same weights." }
         //    };
         //    int idx;
-        //    for (idx = 0; idx < IM_ARRAYSIZE(policies); idx++)
+        //    for (idx = 0; idx < policies.Length; idx++)
         //        if (policies[idx].Value == (*p_flags & ImGuiTableFlags_SizingMask_))
         //            break;
-        //    const char* preview_text = (idx < IM_ARRAYSIZE(policies)) ? policies[idx].Name + (idx > 0 ? strlen("ImGuiTableFlags") : 0) : "";
+        //    const char* preview_text = (idx < policies.Length) ? policies[idx].Name + (idx > 0 ? strlen("ImGuiTableFlags") : 0) : "";
         //    if (Imgui.BeginCombo("Sizing Policy", preview_text))
         //    {
-        //        for (int n = 0; n < IM_ARRAYSIZE(policies); n++)
+        //        for (int n = 0; n < policies.Length; n++)
         //            if (Imgui.Selectable(policies[n].Name, idx == n))
         //                *p_flags = (*p_flags & ~ImGuiTableFlags_SizingMask_) | policies[n].Value;
         //        Imgui.EndCombo();
@@ -3484,7 +3535,7 @@ namespace SampleApp
         //    {
         //        Imgui.BeginTooltip();
         //        Imgui.PushTextWrapPos(Imgui.GetFontSize() * 50.0f);
-        //        for (int m = 0; m < IM_ARRAYSIZE(policies); m++)
+        //        for (int m = 0; m < policies.Length; m++)
         //        {
         //            Imgui.Separator();
         //            Imgui.Text("%s:", policies[m].Name);
@@ -4079,7 +4130,7 @@ namespace SampleApp
             //                case CT_ShowWidth:  Imgui.Text("W: %.1f", Imgui.GetContentRegionAvail().x); break;
             //                case CT_Button:     Imgui.Button(label); break;
             //                case CT_FillButton: Imgui.Button(label, ImVec2(-FLT_MIN, 0.0f)); break;
-            //                case CT_InputText:  Imgui.SetNextItemWidth(-FLT_MIN); Imgui.InputText("##", text_buf, IM_ARRAYSIZE(text_buf)); break;
+            //                case CT_InputText:  Imgui.SetNextItemWidth(-FLT_MIN); Imgui.InputText("##", text_buf, text_buf.Length); break;
             //                }
             //                Imgui.PopID();
             //            }
@@ -4869,7 +4920,7 @@ namespace SampleApp
             //            items.resize(50, MyItem());
             //            for (int n = 0; n < items.Size; n++)
             //            {
-            //                const int template_n = n % IM_ARRAYSIZE(template_items_names);
+            //                const int template_n = n % template_items_names.Length;
             //                MyItem& item = items[n];
             //                item.ID = n;
             //                item.Name = template_items_names[template_n];
@@ -4962,7 +5013,7 @@ namespace SampleApp
             //        const char* contents_type_names[] = { "Text", "Button", "SmallButton", "FillButton", "Selectable", "Selectable (span row)" };
             //        static int freeze_cols = 1;
             //        static int freeze_rows = 1;
-            //        static int items_count = IM_ARRAYSIZE(template_items_names) * 2;
+            //        static int items_count = template_items_names.Length * 2;
             //        static ImVec2 outer_size_value = ImVec2(0.0f, TEXT_BASE_HEIGHT * 12);
             //        static float row_min_height = 0.0f; // Auto
             //        static float inner_width_with_scroll = 0.0f; // Auto-extend
@@ -5072,7 +5123,7 @@ namespace SampleApp
             //                Imgui.SameLine(); HelpMarker("Specify height of the Selectable item.");
             //
             //                Imgui.DragInt("items_count", &items_count, 0.1f, 0, 9999);
-            //                Imgui.Combo("items_type (first column)", &contents_type, contents_type_names, IM_ARRAYSIZE(contents_type_names));
+            //                Imgui.Combo("items_type (first column)", &contents_type, contents_type_names, contents_type_names.Length);
             //                //filter.Draw("filter");
             //                Imgui.TreePop();
             //            }
@@ -5092,7 +5143,7 @@ namespace SampleApp
             //            items.resize(items_count, MyItem());
             //            for (int n = 0; n < items_count; n++)
             //            {
-            //                const int template_n = n % IM_ARRAYSIZE(template_items_names);
+            //                const int template_n = n % template_items_names.Length;
             //                MyItem& item = items[n];
             //                item.ID = n;
             //                item.Name = template_items_names[template_n];
@@ -5540,7 +5591,7 @@ namespace SampleApp
             //                Imgui.SetNextItemWidth(Imgui.GetFontSize() * 15);
             //                Imgui.SliderInt("SetNextFrameWantCaptureKeyboard() on hover", &capture_override_keyboard, -1, +1, capture_override_desc[capture_override_keyboard + 1], ImGuiSliderFlags_AlwaysClamp);
             //
-            //                Imgui.ColorButton("##panel", ImVec4(0.7f, 0.1f, 0.7f, 1.0f), ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoDragDrop, ImVec2(128.0f, 96.0f)); // Dummy item
+            //                Imgui.ColorButton("##panel", ImVec4(0.7f, 0.1f, 0.7f, 1.0f), ColorEditOptions.NoTooltip | ColorEditOptions.NoDragDrop, ImVec2(128.0f, 96.0f)); // Dummy item
             //                if (Imgui.IsItemHovered() && capture_override_mouse != -1)
             //                    Imgui.SetNextFrameWantCaptureMouse(capture_override_mouse == 1);
             //                if (Imgui.IsItemHovered() && capture_override_keyboard != -1)
@@ -5556,7 +5607,7 @@ namespace SampleApp
             //        if (Imgui.TreeNode("Mouse Cursors"))
             //        {
             //            const char* mouse_cursors_names[] = { "Arrow", "TextInput", "ResizeAll", "ResizeNS", "ResizeEW", "ResizeNESW", "ResizeNWSE", "Hand", "NotAllowed" };
-            //            IM_ASSERT(IM_ARRAYSIZE(mouse_cursors_names) == ImGuiMouseCursor_COUNT);
+            //            IM_ASSERT(mouse_cursors_names.Length == ImGuiMouseCursor_COUNT);
             //
             //            ImGuiMouseCursor current = Imgui.GetMouseCursor();
             //            Imgui.Text("Current mouse cursor = %d: %s", current, mouse_cursors_names[current]);
@@ -5585,14 +5636,14 @@ namespace SampleApp
             //        {
             //            Imgui.Text("Use TAB/SHIFT+TAB to cycle through keyboard editable fields.");
             //            static char buf[32] = "hello";
-            //            Imgui.InputText("1", buf, IM_ARRAYSIZE(buf));
-            //            Imgui.InputText("2", buf, IM_ARRAYSIZE(buf));
-            //            Imgui.InputText("3", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("1", buf, buf.Length);
+            //            Imgui.InputText("2", buf, buf.Length);
+            //            Imgui.InputText("3", buf, buf.Length);
             //            Imgui.PushAllowKeyboardFocus(false);
-            //            Imgui.InputText("4 (tab skip)", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("4 (tab skip)", buf, buf.Length);
             //            Imgui.SameLine(); HelpMarker("Item won't be cycled through when using TAB or Shift+Tab.");
             //            Imgui.PopAllowKeyboardFocus();
-            //            Imgui.InputText("5", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("5", buf, buf.Length);
             //            Imgui.TreePop();
             //        }
             //
@@ -5606,16 +5657,16 @@ namespace SampleApp
             //            static char buf[128] = "click on a button to set focus";
             //
             //            if (focus_1) Imgui.SetKeyboardFocusHere();
-            //            Imgui.InputText("1", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("1", buf, buf.Length);
             //            if (Imgui.IsItemActive()) has_focus = 1;
             //
             //            if (focus_2) Imgui.SetKeyboardFocusHere();
-            //            Imgui.InputText("2", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("2", buf, buf.Length);
             //            if (Imgui.IsItemActive()) has_focus = 2;
             //
             //            Imgui.PushAllowKeyboardFocus(false);
             //            if (focus_3) Imgui.SetKeyboardFocusHere();
-            //            Imgui.InputText("3 (tab skip)", buf, IM_ARRAYSIZE(buf));
+            //            Imgui.InputText("3 (tab skip)", buf, buf.Length);
             //            if (Imgui.IsItemActive()) has_focus = 3;
             //            Imgui.SameLine(); HelpMarker("Item won't be cycled through when using TAB or Shift+Tab.");
             //            Imgui.PopAllowKeyboardFocus();
@@ -5974,9 +6025,9 @@ namespace SampleApp
             //            filter.Draw("Filter colors", Imgui.GetFontSize() * 16);
             //
             //            static ImGuiColorEditFlags alpha_flags = 0;
-            //            if (Imgui.RadioButton("Opaque", alpha_flags == ImGuiColorEditFlags_None))             { alpha_flags = ImGuiColorEditFlags_None; } Imgui.SameLine();
-            //            if (Imgui.RadioButton("Alpha",  alpha_flags == ImGuiColorEditFlags_AlphaPreview))     { alpha_flags = ImGuiColorEditFlags_AlphaPreview; } Imgui.SameLine();
-            //            if (Imgui.RadioButton("Both",   alpha_flags == ImGuiColorEditFlags_AlphaPreviewHalf)) { alpha_flags = ImGuiColorEditFlags_AlphaPreviewHalf; } Imgui.SameLine();
+            //            if (Imgui.RadioButton("Opaque", alpha_flags == ColorEditOptions.None))             { alpha_flags = ColorEditOptions.None; } Imgui.SameLine();
+            //            if (Imgui.RadioButton("Alpha",  alpha_flags == ColorEditOptions.AlphaPreview))     { alpha_flags = ColorEditOptions.AlphaPreview; } Imgui.SameLine();
+            //            if (Imgui.RadioButton("Both",   alpha_flags == ColorEditOptions.AlphaPreviewHalf)) { alpha_flags = ColorEditOptions.AlphaPreviewHalf; } Imgui.SameLine();
             //            HelpMarker(
             //                "In the color list:\n"
             //                "Left-click on color square to open color picker,\n"
@@ -5990,7 +6041,7 @@ namespace SampleApp
             //                if (!filter.PassFilter(name))
             //                    continue;
             //                Imgui.PushID(i);
-            //                Imgui.ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
+            //                Imgui.ColorEdit4("##color", (float*)&style.Colors[i], ColorEditOptions.AlphaBar | alpha_flags);
             //                if (memcmp(&style.Colors[i], &ref->Colors[i], sizeof(ImVec4)) != 0)
             //                {
             //                    // Tips: in a real user application, you may want to merge and use an icon font into the main font,
@@ -6291,8 +6342,8 @@ namespace SampleApp
         //        char buf[1024];
         //        va_list args;
         //        va_start(args, fmt);
-        //        vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
-        //        buf[IM_ARRAYSIZE(buf)-1] = 0;
+        //        vsnprintf(buf, buf.Length, fmt, args);
+        //        buf[buf.Length-1] = 0;
         //        va_end(args);
         //        Items.push_back(Strdup(buf));
         //    }
@@ -6420,7 +6471,7 @@ namespace SampleApp
         //        // Command-line
         //        bool reclaim_focus = false;
         //        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-        //        if (Imgui.InputText("Input", InputBuf, IM_ARRAYSIZE(InputBuf), input_text_flags, &TextEditCallbackStub, (void*)this))
+        //        if (Imgui.InputText("Input", InputBuf, InputBuf.Length, input_text_flags, &TextEditCallbackStub, (void*)this))
         //        {
         //            char* s = InputBuf;
         //            Strtrim(s);
@@ -6739,8 +6790,8 @@ namespace SampleApp
             //        const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
             //        for (int n = 0; n < 5; n++)
             //        {
-            //            const char* category = categories[counter % IM_ARRAYSIZE(categories)];
-            //            const char* word = words[counter % IM_ARRAYSIZE(words)];
+            //            const char* category = categories[counter % categories.Length];
+            //            const char* word = words[counter % words.Length];
             //            log.AddLog("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
             //                Imgui.GetFrameCount(), category, Imgui.GetTime(), word);
             //            counter++;
@@ -7027,7 +7078,7 @@ namespace SampleApp
             //            // Display a dummy viewport (in your real app you would likely use ImageButton() to display a texture.
             //            ImVec2 avail_size = Imgui.GetContentRegionAvail();
             //            ImVec2 pos = Imgui.GetCursorScreenPos();
-            //            Imgui.ColorButton("viewport", ImVec4(0.5f, 0.2f, 0.5f, 1.0f), ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoDragDrop, avail_size);
+            //            Imgui.ColorButton("viewport", ImVec4(0.5f, 0.2f, 0.5f, 1.0f), ColorEditOptions.NoTooltip | ColorEditOptions.NoDragDrop, avail_size);
             //            Imgui.SetCursorScreenPos(ImVec2(pos.x + 10, pos.y + 10));
             //            Imgui.Text("%.2f x %.2f", avail_size.x, avail_size.y);
             //        }
@@ -7038,7 +7089,7 @@ namespace SampleApp
             //            if (Imgui.Button("Set 500x500")) { Imgui.SetWindowSize(ImVec2(500, 500)); } Imgui.SameLine();
             //            if (Imgui.Button("Set 800x200")) { Imgui.SetWindowSize(ImVec2(800, 200)); }
             //            Imgui.SetNextItemWidth(Imgui.GetFontSize() * 20);
-            //            Imgui.Combo("Constraint", &type, test_desc, IM_ARRAYSIZE(test_desc));
+            //            Imgui.Combo("Constraint", &type, test_desc, test_desc.Length);
             //            Imgui.SetNextItemWidth(Imgui.GetFontSize() * 20);
             //            Imgui.DragInt("Lines", &display_lines, 0.2f, 1, 100);
             //            Imgui.Checkbox("Auto-resize", &auto_resize);

@@ -907,27 +907,17 @@ namespace ImguiSharp
 
         #region Widgets: Color Editor/Picker
 
-        public static bool ColorEdit(string label, StateVector<float> color, ColorEditOptions options = default) =>
-            color.Length switch
-            {
-                3 => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options)),
-                4 => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit4(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options)),
-                _ => throw new InvalidOperationException()
-            };
+        public static bool ColorEdit(string label, State<ColorF> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit3(ptr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        public static bool ColorPicker(string label, StateVector<float> color, ColorEditOptions options = default) => color.Length != 3 ? throw new InvalidOperationException() : Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, color.ToNative(), (Native.ImGuiColorEditFlags)options));
+        public static bool ColorEditAlpha(string label, State<ColorF> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorEdit4(ptr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options));
 
-        public static bool ColorPicker(string label, StateVector<float> color, ColorEditOptions options = default, Span<float> referenceColor = default)
+        public static bool ColorPicker(string label, State<ColorF> color, ColorEditOptions options = default) => Native.StringToUtf8Func(label, ptr => Native.ImGui_ColorPicker3(ptr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options));
+
+        public static bool ColorPickerAlpha(string label, State<ColorF> color, ColorEditOptions options = default, ColorF referenceColor = default)
         {
-            if (color.Length != 4)
-            {
-                throw new InvalidOperationException();
-            }
-
             fixed (byte* labelPtr = Native.StringToUtf8(label))
-            fixed (float* referencePtr = referenceColor)
             {
-                return Native.ImGui_ColorPicker4(labelPtr, color.ToNative(), (Native.ImGuiColorEditFlags)options, referencePtr);
+                return Native.ImGui_ColorPicker4(labelPtr, (float*)color.ToNative(), (Native.ImGuiColorEditFlags)options, (float*)&referenceColor);
             }
         }
 
@@ -1415,18 +1405,18 @@ namespace ImguiSharp
 
         public static uint ColorConvert(ColorF c) => Native.ImGui_ColorConvertFloat4ToU32(c.ToNative());
 
-        public static (float H, float S, float V) ColorConvertRgbToHsv(float r, float g, float b)
+        public static ColorF ColorConvertRgbToHsv(float r, float g, float b)
         {
             float h, s, v;
             Native.ImGui_ColorConvertRGBtoHSV(r, g, b, &h, &s, &v);
-            return (h, s, v);
+            return new(h, s, v);
         }
 
-        public static (float R, float G, float B) ColorConvertHsvToRgb(float h, float s, float v)
+        public static ColorF ColorConvertHsvToRgb(float h, float s, float v)
         {
             float r, g, b;
             Native.ImGui_ColorConvertHSVtoRGB(h, s, v, &r, &g, &b);
-            return (r, g, b);
+            return new(r, g, b);
         }
 
         #endregion

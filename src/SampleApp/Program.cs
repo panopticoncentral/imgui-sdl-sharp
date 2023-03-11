@@ -45,7 +45,7 @@ namespace SampleApp
             var showDemoWindow = new State<bool>(true);
             var showManagedDemoWindow = new State<bool>(true);
             var showAnotherWindow = new State<bool>(false);
-            var clearColor = new StateVector<float>(3, new[] { 0.45f, 0.55f, 0.60f });
+            var clearColor = new State<ColorF>(new(0.45f, 0.55f, 0.60f));
             var f = new State<float>(0.0f);
             var counter = 0;
 
@@ -109,7 +109,7 @@ namespace SampleApp
 
                 Imgui.Render();
 
-                renderer.DrawColor = new((byte)(clearColor[0] * 255), (byte)(clearColor[1] * 255), (byte)(clearColor[2] * 255), 255);
+                renderer.DrawColor = new((byte)(clearColor.Value.Red * 255), (byte)(clearColor.Value.Green * 255), (byte)(clearColor.Value.Blue * 255), 255);
                 renderer.Clear();
                 var drawData = Imgui.GetDrawData();
                 if (drawData != null)
