@@ -466,6 +466,8 @@ namespace SampleApp
         private static readonly State<int> drag_i = new(50);
         private static readonly State<float> slider_f = new(0.5f);
         private static readonly State<int> slider_i = new(50);
+        private static readonly State<float> begin = new(10), end = new(90);
+        private static readonly State<int> begin_i = new(100), end_i = new(1000);
 
         private static void ShowDemoWindowWidgets()
         {
@@ -1777,17 +1779,14 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Range Widgets");
-            //    if (Imgui.TreeNode("Range Widgets"))
-            //    {
-            //        static float begin = 10, end = 90;
-            //        static int begin_i = 100, end_i = 1000;
-            //        Imgui.DragFloatRange2("range float", &begin, &end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%", SliderOptions.AlwaysClamp);
-            //        Imgui.DragIntRange2("range int", &begin_i, &end_i, 5, 0, 1000, "Min: %d units", "Max: %d units");
-            //        Imgui.DragIntRange2("range int (no bounds)", &begin_i, &end_i, 5, 0, 0, "Min: %d units", "Max: %d units");
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Range Widgets"))
+            {
+                _ = Imgui.DragRange("range float", begin, end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%", SliderOptions.AlwaysClamp);
+                _ = Imgui.DragRange("range int", begin_i, end_i, 5, 0, 1000, "Min: %d units", "Max: %d units");
+                _ = Imgui.DragRange("range int (no bounds)", begin_i, end_i, 5, 0, 0, "Min: %d units", "Max: %d units");
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Data Types");
             //    if (Imgui.TreeNode("Data Types"))
             //    {
