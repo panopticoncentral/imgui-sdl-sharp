@@ -203,8 +203,8 @@ namespace ImguiSharp.Platform.Sdl
             Mouse.Wheel += static (s, e) =>
             {
                 var io = Imgui.GetIo();
-                var wheelX = (e.Location.X > 0) ? 1.0f : (e.Location.X < 0) ? -1.0f : 0.0f;
-                var wheelY = (e.Location.Y > 0) ? 1.0f : (e.Location.Y < 0) ? -1.0f : 0.0f;
+                var wheelX = (e.Scroll.X > 0) ? 1.0f : (e.Scroll.X < 0) ? -1.0f : 0.0f;
+                var wheelY = (e.Scroll.Y > 0) ? 1.0f : (e.Scroll.Y < 0) ? -1.0f : 0.0f;
                 io.AddMouseWheelEvent(new(wheelX, wheelY));
             };
 
