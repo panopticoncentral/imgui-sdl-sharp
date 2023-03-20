@@ -459,25 +459,34 @@ namespace SampleApp
         private static readonly State<int> s_displayMode = new(0);
         private static readonly State<int> s_pickerMode = new(0);
         private static readonly State<ColorF> s_colorHsv = new(new(0.23f, 1.0f, 1.0f, 1.0f));
-        private static readonly StateOption<SliderOptions> flags = new(SliderOptions.None);
-        private static readonly State<float> drag_f = new(0.5f);
-        private static readonly State<int> drag_i = new(50);
-        private static readonly State<float> slider_f = new(0.5f);
-        private static readonly State<int> slider_i = new(50);
-        private static readonly State<float> begin = new(10), end = new(90);
-        private static readonly State<int> begin_i = new(100), end_i = new(1000);
-        private static readonly State<sbyte> s8_v = new(127);
-        private static readonly State<byte> u8_v = new(255);
-        private static readonly State<short> s16_v = new(32767);
-        private static readonly State<ushort> u16_v = new(65535);
-        private static readonly State<int> s32_v = new(-1);
-        private static readonly State<uint> u32_v = new(0xFFFFFFFF);
-        private static readonly State<long> s64_v = new(-1);
-        private static readonly State<ulong> u64_v = new(0xFFFFFFFFFFFFFFFF);
-        private static readonly State<float> f32_v = new(0.123f);
-        private static readonly State<double> f64_v = new(90000.01234567890123456789);
-        private static readonly State<bool> drag_clamp = new(false);
-        private static readonly State<bool> inputs_step = new(true);
+        private static readonly StateOption<SliderOptions> s_flags3 = new(SliderOptions.None);
+        private static readonly State<float> s_dragF = new(0.5f);
+        private static readonly State<int> s_dragI = new(50);
+        private static readonly State<float> s_sliderF = new(0.5f);
+        private static readonly State<int> s_sliderI = new(50);
+        private static readonly State<float> s_begin = new(10), s_end = new(90);
+        private static readonly State<int> s_beginI = new(100), s_endI = new(1000);
+        private static readonly State<sbyte> s_sbyteValue = new(127);
+        private static readonly State<byte> s_byteValue = new(255);
+        private static readonly State<short> s_shortValue = new(32767);
+        private static readonly State<ushort> s_ushortValue = new(65535);
+        private static readonly State<int> s_intValue = new(-1);
+        private static readonly State<uint> s_uintValue = new(0xFFFFFFFF);
+        private static readonly State<long> s_longValue = new(-1);
+        private static readonly State<ulong> s_ulongValue = new(0xFFFFFFFFFFFFFFFF);
+        private static readonly State<float> s_singleValue = new(0.123f);
+        private static readonly State<double> s_doubleValue = new(90000.01234567890123456789);
+        private static readonly State<bool> s_dragClamp = new(false);
+        private static readonly State<bool> s_inputsStep = new(true);
+        private static readonly StateVector<float> s_vec2F = new(2, new[] { 0.10f, 0.20f });
+        private static readonly StateVector<int> s_vec2I = new(2, new[] { 1, 5 });
+        private static readonly StateVector<float> s_vec3F = new(3, new[] { 0.10f, 0.20f, 0.30f });
+        private static readonly StateVector<int> s_vec3I = new(3, new[] { 1, 5, 100 });
+        private static readonly StateVector<float> s_vec4F = new(4, new[] { 0.10f, 0.20f, 0.30f, 0.44f });
+        private static readonly StateVector<int> s_vec4I = new(4, new[] { 1, 5, 100, 255 });
+        private static readonly State<int> s_intValue2 = new(0);
+        private static readonly StateVector<float> s_values2 = new(7, new[] { 0.0f, 0.60f, 0.35f, 0.9f, 0.70f, 0.20f, 0.0f });
+        private static readonly StateVector<float> s_values3 = new(4, new[] { 0.20f, 0.80f, 0.40f, 0.25f });
 
         private static void ShowDemoWindowWidgets()
         {
@@ -946,7 +955,7 @@ namespace SampleApp
 
                     if (i > 0)
                     {
-                        Imgui.PopStyleVar();
+                        Imgui.PopStyleVariable();
                     }
 
                     Imgui.PopId();
@@ -1177,7 +1186,7 @@ namespace SampleApp
 
                     if (winning_state)
                     {
-                        Imgui.PopStyleVar();
+                        Imgui.PopStyleVariable();
                     }
 
                     Imgui.TreePop();
@@ -1200,7 +1209,7 @@ namespace SampleApp
 
                             Imgui.PushStyleVariable(StyleVariable.SelectableTextAlign, alignment);
                             _ = Imgui.Selectable($"({alignment.X:F1},{alignment.Y:F1})", s_selected7.GetStateOfElement((3 * y) + x), SelectableOptions.None, new(80, 80));
-                            Imgui.PopStyleVar();
+                            Imgui.PopStyleVariable();
                         }
                     }
                     Imgui.TreePop();
@@ -1764,223 +1773,220 @@ namespace SampleApp
 
             if (Imgui.TreeNode("Drag/Slider Flags"))
             {
-                _ = Imgui.CheckboxFlags("SliderOptions.AlwaysClamp", flags, SliderOptions.AlwaysClamp);
+                _ = Imgui.CheckboxFlags("SliderOptions.AlwaysClamp", s_flags3, SliderOptions.AlwaysClamp);
                 Imgui.SameLine(); HelpMarker("Always clamp value to min/max bounds (if any) when input manually with CTRL+Click.");
-                _ = Imgui.CheckboxFlags("SliderOptions.Logarithmic", flags, SliderOptions.Logarithmic);
+                _ = Imgui.CheckboxFlags("SliderOptions.Logarithmic", s_flags3, SliderOptions.Logarithmic);
                 Imgui.SameLine(); HelpMarker("Enable logarithmic editing (more precision for small values).");
-                _ = Imgui.CheckboxFlags("SliderOptions.NoRoundToFormat", flags, SliderOptions.NoRoundToFormat);
+                _ = Imgui.CheckboxFlags("SliderOptions.NoRoundToFormat", s_flags3, SliderOptions.NoRoundToFormat);
                 Imgui.SameLine(); HelpMarker("Disable rounding underlying value to match precision of the format string (e.g. %.3f values are rounded to those 3 digits).");
-                _ = Imgui.CheckboxFlags("SliderOptions.NoInput", flags, SliderOptions.NoInput);
+                _ = Imgui.CheckboxFlags("SliderOptions.NoInput", s_flags3, SliderOptions.NoInput);
                 Imgui.SameLine(); HelpMarker("Disable CTRL+Click or Enter key allowing to input text directly into the widget.");
 
                 // Drags
-                Imgui.Text($"Underlying float value: {drag_f.Value}");
-                _ = Imgui.Drag("DragFloat (0 -> 1)", drag_f, 0.005f, 0.0f, 1.0f, "%.3f", flags);
-                _ = Imgui.Drag("DragFloat (0 -> +inf)", drag_f, 0.005f, 0.0f, float.MaxValue, "%.3f", flags);
-                _ = Imgui.Drag("DragFloat (-inf -> 1)", drag_f, 0.005f, -float.MaxValue, 1.0f, "%.3f", flags);
-                _ = Imgui.Drag("DragFloat (-inf -> +inf)", drag_f, 0.005f, -float.MaxValue, +float.MaxValue, "%.3f", flags);
-                _ = Imgui.Drag("DragInt (0 -> 100)", drag_i, 0.5f, 0, 100, "%d", flags);
+                Imgui.Text($"Underlying float value: {s_dragF.Value}");
+                _ = Imgui.Drag("DragFloat (0 -> 1)", s_dragF, 0.005f, 0.0f, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Drag("DragFloat (0 -> +inf)", s_dragF, 0.005f, 0.0f, float.MaxValue, "%.3f", s_flags3);
+                _ = Imgui.Drag("DragFloat (-inf -> 1)", s_dragF, 0.005f, -float.MaxValue, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Drag("DragFloat (-inf -> +inf)", s_dragF, 0.005f, -float.MaxValue, +float.MaxValue, "%.3f", s_flags3);
+                _ = Imgui.Drag("DragInt (0 -> 100)", s_dragI, 0.5f, 0, 100, "%d", s_flags3);
 
                 // Sliders
-                Imgui.Text($"Underlying float value: {slider_f.Value}");
-                _ = Imgui.Slider("SliderFloat (0 -> 1)", slider_f, 0.0f, 1.0f, "%.3f", flags);
-                _ = Imgui.Slider("SliderInt (0 -> 100)", slider_i, 0, 100, "%d", flags);
+                Imgui.Text($"Underlying float value: {s_sliderF.Value}");
+                _ = Imgui.Slider("SliderFloat (0 -> 1)", s_sliderF, 0.0f, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Slider("SliderInt (0 -> 100)", s_sliderI, 0, 100, "%d", s_flags3);
 
                 Imgui.TreePop();
             }
 
             if (Imgui.TreeNode("Range Widgets"))
             {
-                _ = Imgui.DragRange("range float", begin, end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%", SliderOptions.AlwaysClamp);
-                _ = Imgui.DragRange("range int", begin_i, end_i, 5, 0, 1000, "Min: %d units", "Max: %d units");
-                _ = Imgui.DragRange("range int (no bounds)", begin_i, end_i, 5, 0, 0, "Min: %d units", "Max: %d units");
+                _ = Imgui.DragRange("range float", s_begin, s_end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%", SliderOptions.AlwaysClamp);
+                _ = Imgui.DragRange("range int", s_beginI, s_endI, 5, 0, 1000, "Min: %d units", "Max: %d units");
+                _ = Imgui.DragRange("range int (no bounds)", s_beginI, s_endI, 5, 0, 0, "Min: %d units", "Max: %d units");
                 Imgui.TreePop();
             }
 
             if (Imgui.TreeNode("Data Types"))
             {
-                //sbyte s8_zero = 0, s8_one = 1, s8_fifty = 50, s8_min = -128, s8_max = 127;
-                //byte u8_zero = 0, u8_one = 1, u8_fifty = 50, u8_min = 0, u8_max = 255;
-                //short s16_zero = 0, s16_one = 1, s16_fifty = 50, s16_min = -32768, s16_max = 32767;
-                //ushort u16_zero = 0, u16_one = 1, u16_fifty = 50, u16_min = 0, u16_max = 65535;
-                //int s32_zero = 0, s32_one = 1, s32_fifty = 50, s32_min = int.MinValue / 2, s32_max = int.MaxValue / 2, s32_hi_a = int.MaxValue / 2 - 100, s32_hi_b = int.MaxValue / 2;
-                //uint u32_zero = 0, u32_one = 1, u32_fifty = 50, u32_min = 0, u32_max = uint.MaxValue / 2, u32_hi_a = uint.MaxValue / 2 - 100, u32_hi_b = uint.MaxValue / 2;
-                //long s64_zero = 0, s64_one = 1, s64_fifty = 50, s64_min = long.MinValue / 2, s64_max = long.MaxValue / 2, s64_hi_a = long.MaxValue / 2 - 100, s64_hi_b = long.MaxValue / 2;
-                //ulong u64_zero = 0, u64_one = 1, u64_fifty = 50, u64_min = 0, u64_max = ulong.MaxValue / 2, u64_hi_a = ulong.MaxValue / 2 - 100, u64_hi_b = ulong.MaxValue / 2;
-                //float f32_zero = 0.0f, f32_one = 1.0f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
-                //double f64_zero = 0.0, f64_one = 1.0, f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
-
-                // State
-
                 const float DragSpeed = 0.2f;
                 Imgui.Text("Drags:");
-                _ = Imgui.Checkbox("Clamp integers to 0..50", drag_clamp);
+                _ = Imgui.Checkbox("Clamp integers to 0..50", s_dragClamp);
                 Imgui.SameLine();
                 HelpMarker(
                     "As with every widget in dear imgui, we never modify values unless there is a user interaction.\n" +
                     "You can override the clamping limits by using CTRL+Click to input a value.");
-                _ = Imgui.Drag("drag s8", s8_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null);
-                _ = Imgui.Drag("drag u8", u8_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null, "%u ms");
-                _ = Imgui.Drag("drag s16", s16_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null);
-                _ = Imgui.Drag("drag u16", u16_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null, "%u ms");
-                _ = Imgui.Drag("drag s32", s32_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null);
-                _ = Imgui.Drag("drag s32 hex", s32_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null, "0x%08X");
-                _ = Imgui.Drag("drag u32", u32_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null, "%u ms");
-                _ = Imgui.Drag("drag s64", s64_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null);
-                _ = Imgui.Drag("drag u64", u64_v, DragSpeed, drag_clamp ? 0 : null, drag_clamp ? 50 : null);
-                _ = Imgui.Drag("drag float", f32_v, 0.005f, 0, 1, "%f");
-                _ = Imgui.Drag("drag float log", f32_v, 0.005f, 0, 1, "%f", SliderOptions.Logarithmic);
-                _ = Imgui.Drag("drag double", f64_v, 0.0005f, 0, null, "%.10f grams");
-                _ = Imgui.Drag("drag double log", f64_v, 0.0005f, 0, 1, "0 < %.10f < 1", SliderOptions.Logarithmic);
+                _ = Imgui.Drag("drag s8", s_sbyteValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null);
+                _ = Imgui.Drag("drag u8", s_byteValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null, "%u ms");
+                _ = Imgui.Drag("drag s16", s_shortValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null);
+                _ = Imgui.Drag("drag u16", s_ushortValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null, "%u ms");
+                _ = Imgui.Drag("drag s32", s_intValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null);
+                _ = Imgui.Drag("drag s32 hex", s_intValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null, "0x%08X");
+                _ = Imgui.Drag("drag u32", s_uintValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null, "%u ms");
+                _ = Imgui.Drag("drag s64", s_longValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null);
+                _ = Imgui.Drag("drag u64", s_ulongValue, DragSpeed, s_dragClamp ? 0 : null, s_dragClamp ? 50 : null);
+                _ = Imgui.Drag("drag float", s_singleValue, 0.005f, 0, 1, "%f");
+                _ = Imgui.Drag("drag float log", s_singleValue, 0.005f, 0, 1, "%f", SliderOptions.Logarithmic);
+                _ = Imgui.Drag("drag double", s_doubleValue, 0.0005f, 0, null, "%.10f grams");
+                _ = Imgui.Drag("drag double log", s_doubleValue, 0.0005f, 0, 1, "0 < %.10f < 1", SliderOptions.Logarithmic);
 
                 Imgui.Text("Sliders");
-                _ = Imgui.Slider("slider s8 full", s8_v, sbyte.MinValue, sbyte.MaxValue, "%d");
-                _ = Imgui.Slider("slider u8 full", u8_v, byte.MinValue, byte.MaxValue, "%u");
-                _ = Imgui.Slider("slider s16 full", s16_v, short.MinValue, short.MaxValue, "%d");
-                _ = Imgui.Slider("slider u16 full", u16_v, ushort.MinValue, ushort.MaxValue, "%u");
-                _ = Imgui.Slider("slider s32 low", s32_v, 0, 50, "%d");
-                _ = Imgui.Slider("slider s32 high", s32_v, (int.MaxValue / 2) - 100, int.MaxValue / 2, "%d");
-                _ = Imgui.Slider("slider s32 full", s32_v, int.MinValue / 2, int.MaxValue / 2, "%d");
-                _ = Imgui.Slider("slider s32 hex", s32_v, 0, 50, "0x%04X");
-                _ = Imgui.Slider("slider u32 low", u32_v, 0, 50, "%u");
-                _ = Imgui.Slider("slider u32 high", u32_v, (uint.MaxValue / 2) - 100, uint.MaxValue / 2, "%u");
-                _ = Imgui.Slider("slider u32 full", u32_v, uint.MinValue, uint.MaxValue / 2, "%u");
-                _ = Imgui.Slider("slider s64 low", s64_v, 0, 50, "%I64d");
-                _ = Imgui.Slider("slider s64 high", s64_v, (long.MaxValue / 2) - 100, long.MaxValue / 2, "%I64d");
-                _ = Imgui.Slider("slider s64 full", s64_v, long.MinValue / 2, long.MaxValue / 2, "%I64d");
-                _ = Imgui.Slider("slider u64 low", u64_v, 0, 50, "%I64u ms");
-                _ = Imgui.Slider("slider u64 high", u64_v, (ulong.MaxValue / 2) - 100, ulong.MaxValue / 2, "%I64u ms");
-                _ = Imgui.Slider("slider u64 full", u64_v, ulong.MinValue / 2, ulong.MaxValue / 2, "%I64u ms");
-                _ = Imgui.Slider("slider float low", f32_v, 0, 1);
-                _ = Imgui.Slider("slider float low log", f32_v, 0, 1, "%.10f", SliderOptions.Logarithmic);
-                _ = Imgui.Slider("slider float high", f32_v, -10000000000.0f, +10000000000.0f, "%e");
-                _ = Imgui.Slider("slider double low", f64_v, 0, 1, "%.10f grams");
-                _ = Imgui.Slider("slider double low log", f64_v, 0, 1, "%.10f", SliderOptions.Logarithmic);
-                _ = Imgui.Slider("slider double high", f64_v, -1000000000000000.0, +1000000000000000.0, "%e grams");
+                _ = Imgui.Slider("slider s8 full", s_sbyteValue, sbyte.MinValue, sbyte.MaxValue, "%d");
+                _ = Imgui.Slider("slider u8 full", s_byteValue, byte.MinValue, byte.MaxValue, "%u");
+                _ = Imgui.Slider("slider s16 full", s_shortValue, short.MinValue, short.MaxValue, "%d");
+                _ = Imgui.Slider("slider u16 full", s_ushortValue, ushort.MinValue, ushort.MaxValue, "%u");
+                _ = Imgui.Slider("slider s32 low", s_intValue, 0, 50, "%d");
+                _ = Imgui.Slider("slider s32 high", s_intValue, (int.MaxValue / 2) - 100, int.MaxValue / 2, "%d");
+                _ = Imgui.Slider("slider s32 full", s_intValue, int.MinValue / 2, int.MaxValue / 2, "%d");
+                _ = Imgui.Slider("slider s32 hex", s_intValue, 0, 50, "0x%04X");
+                _ = Imgui.Slider("slider u32 low", s_uintValue, 0, 50, "%u");
+                _ = Imgui.Slider("slider u32 high", s_uintValue, (uint.MaxValue / 2) - 100, uint.MaxValue / 2, "%u");
+                _ = Imgui.Slider("slider u32 full", s_uintValue, uint.MinValue, uint.MaxValue / 2, "%u");
+                _ = Imgui.Slider("slider s64 low", s_longValue, 0, 50, "%I64d");
+                _ = Imgui.Slider("slider s64 high", s_longValue, (long.MaxValue / 2) - 100, long.MaxValue / 2, "%I64d");
+                _ = Imgui.Slider("slider s64 full", s_longValue, long.MinValue / 2, long.MaxValue / 2, "%I64d");
+                _ = Imgui.Slider("slider u64 low", s_ulongValue, 0, 50, "%I64u ms");
+                _ = Imgui.Slider("slider u64 high", s_ulongValue, (ulong.MaxValue / 2) - 100, ulong.MaxValue / 2, "%I64u ms");
+                _ = Imgui.Slider("slider u64 full", s_ulongValue, ulong.MinValue / 2, ulong.MaxValue / 2, "%I64u ms");
+                _ = Imgui.Slider("slider float low", s_singleValue, 0, 1);
+                _ = Imgui.Slider("slider float low log", s_singleValue, 0, 1, "%.10f", SliderOptions.Logarithmic);
+                _ = Imgui.Slider("slider float high", s_singleValue, -10000000000.0f, +10000000000.0f, "%e");
+                _ = Imgui.Slider("slider double low", s_doubleValue, 0, 1, "%.10f grams");
+                _ = Imgui.Slider("slider double low log", s_doubleValue, 0, 1, "%.10f", SliderOptions.Logarithmic);
+                _ = Imgui.Slider("slider double high", s_doubleValue, -1000000000000000.0, +1000000000000000.0, "%e grams");
 
                 Imgui.Text("Sliders (reverse)");
-                _ = Imgui.Slider("slider s8 reverse", s8_v, sbyte.MaxValue, sbyte.MinValue, "%d");
-                _ = Imgui.Slider("slider u8 reverse", u8_v, byte.MaxValue, byte.MinValue, "%u");
-                _ = Imgui.Slider("slider s32 reverse", s32_v, 50, 0, "%d");
-                _ = Imgui.Slider("slider u32 reverse", u32_v, 50, 0, "%u");
-                _ = Imgui.Slider("slider s64 reverse", s64_v, 50, 0, "%I64d");
-                _ = Imgui.Slider("slider u64 reverse", u64_v, 50, 0, "%I64u ms");
+                _ = Imgui.Slider("slider s8 reverse", s_sbyteValue, sbyte.MaxValue, sbyte.MinValue, "%d");
+                _ = Imgui.Slider("slider u8 reverse", s_byteValue, byte.MaxValue, byte.MinValue, "%u");
+                _ = Imgui.Slider("slider s32 reverse", s_intValue, 50, 0, "%d");
+                _ = Imgui.Slider("slider u32 reverse", s_uintValue, 50, 0, "%u");
+                _ = Imgui.Slider("slider s64 reverse", s_longValue, 50, 0, "%I64d");
+                _ = Imgui.Slider("slider u64 reverse", s_ulongValue, 50, 0, "%I64u ms");
 
                 Imgui.Text("Inputs");
-                _ = Imgui.Checkbox("Show step buttons", inputs_step);
-                _ = Imgui.Input("input s8", s8_v, inputs_step ? (sbyte)1 : (sbyte)0, 0, "%d");
-                _ = Imgui.Input("input u8", u8_v, inputs_step ? (byte)1 : (byte)0, 0, "%u");
-                _ = Imgui.Input("input s16", s16_v, inputs_step ? (short)1 : (short)0, 0, "%d");
-                _ = Imgui.Input("input u16", u16_v, inputs_step ? (ushort)1 : (ushort)0, 0, "%u");
-                _ = Imgui.Input("input s32", s32_v, inputs_step ? 1 : 0, 0, "%d");
-                _ = Imgui.Input("input s32 hex", s32_v, inputs_step ? 1 : 0, 0, "%04X");
-                _ = Imgui.Input("input u32", u32_v, inputs_step ? 1 : (uint)0, 0, "%u");
-                _ = Imgui.Input("input u32 hex", u32_v, inputs_step ? 1 : (uint)0, 0, "%08X");
-                _ = Imgui.Input("input s64", s64_v, inputs_step ? 1 : 0);
-                _ = Imgui.Input("input u64", u64_v, inputs_step ? 1 : (ulong)0);
-                _ = Imgui.Input("input float", f32_v, inputs_step ? 1 : 0);
-                _ = Imgui.Input("input double", f64_v, inputs_step ? 1 : 0);
+                _ = Imgui.Checkbox("Show step buttons", s_inputsStep);
+                _ = Imgui.Input("input s8", s_sbyteValue, s_inputsStep ? (sbyte)1 : (sbyte)0, 0, "%d");
+                _ = Imgui.Input("input u8", s_byteValue, s_inputsStep ? (byte)1 : (byte)0, 0, "%u");
+                _ = Imgui.Input("input s16", s_shortValue, s_inputsStep ? (short)1 : (short)0, 0, "%d");
+                _ = Imgui.Input("input u16", s_ushortValue, s_inputsStep ? (ushort)1 : (ushort)0, 0, "%u");
+                _ = Imgui.Input("input s32", s_intValue, s_inputsStep ? 1 : 0, 0, "%d");
+                _ = Imgui.Input("input s32 hex", s_intValue, s_inputsStep ? 1 : 0, 0, "%04X");
+                _ = Imgui.Input("input u32", s_uintValue, s_inputsStep ? 1 : (uint)0, 0, "%u");
+                _ = Imgui.Input("input u32 hex", s_uintValue, s_inputsStep ? 1 : (uint)0, 0, "%08X");
+                _ = Imgui.Input("input s64", s_longValue, s_inputsStep ? 1 : 0);
+                _ = Imgui.Input("input u64", s_ulongValue, s_inputsStep ? 1 : (ulong)0);
+                _ = Imgui.Input("input float", s_singleValue, s_inputsStep ? 1 : 0);
+                _ = Imgui.Input("input double", s_doubleValue, s_inputsStep ? 1 : 0);
 
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Multi-component Widgets");
-            //    if (Imgui.TreeNode("Multi-component Widgets"))
-            //    {
-            //        static float vec4f[4] = { 0.10f, 0.20f, 0.30f, 0.44f };
-            //        static int vec4i[4] = { 1, 5, 100, 255 };
-            //
-            //        Imgui.InputFloat2("input float2", vec4f);
-            //        Imgui.DragFloat2("drag float2", vec4f, 0.01f, 0.0f, 1.0f);
-            //        Imgui.SliderFloat2("slider float2", vec4f, 0.0f, 1.0f);
-            //        Imgui.InputInt2("input int2", vec4i);
-            //        Imgui.DragInt2("drag int2", vec4i, 1, 0, 255);
-            //        Imgui.SliderInt2("slider int2", vec4i, 0, 255);
-            //        Imgui.Spacing();
-            //
-            //        Imgui.InputFloat3("input float3", vec4f);
-            //        Imgui.DragFloat3("drag float3", vec4f, 0.01f, 0.0f, 1.0f);
-            //        Imgui.SliderFloat3("slider float3", vec4f, 0.0f, 1.0f);
-            //        Imgui.InputInt3("input int3", vec4i);
-            //        Imgui.DragInt3("drag int3", vec4i, 1, 0, 255);
-            //        Imgui.SliderInt3("slider int3", vec4i, 0, 255);
-            //        Imgui.Spacing();
-            //
-            //        Imgui.InputFloat4("input float4", vec4f);
-            //        Imgui.DragFloat4("drag float4", vec4f, 0.01f, 0.0f, 1.0f);
-            //        Imgui.SliderFloat4("slider float4", vec4f, 0.0f, 1.0f);
-            //        Imgui.InputInt4("input int4", vec4i);
-            //        Imgui.DragInt4("drag int4", vec4i, 1, 0, 255);
-            //        Imgui.SliderInt4("slider int4", vec4i, 0, 255);
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/Vertical Sliders");
-            //    if (Imgui.TreeNode("Vertical Sliders"))
-            //    {
-            //        const float spacing = 4;
-            //        Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(spacing, spacing));
-            //
-            //        static int int_value = 0;
-            //        Imgui.VSliderInt("##int", ImVec2(18, 160), &int_value, 0, 5);
-            //        Imgui.SameLine();
-            //
-            //        static float values[7] = { 0.0f, 0.60f, 0.35f, 0.9f, 0.70f, 0.20f, 0.0f };
-            //        Imgui.PushID("set1");
-            //        for (int i = 0; i < 7; i++)
-            //        {
-            //            if (i > 0) Imgui.SameLine();
-            //            Imgui.PushID(i);
-            //            Imgui.PushStyleColor(ImGuiCol_FrameBg, (ImVec4)ImColor::HSV(i / 7.0f, 0.5f, 0.5f));
-            //            Imgui.PushStyleColor(ImGuiCol_FrameBgHovered, (ImVec4)ImColor::HSV(i / 7.0f, 0.6f, 0.5f));
-            //            Imgui.PushStyleColor(ImGuiCol_FrameBgActive, (ImVec4)ImColor::HSV(i / 7.0f, 0.7f, 0.5f));
-            //            Imgui.PushStyleColor(ImGuiCol_SliderGrab, (ImVec4)ImColor::HSV(i / 7.0f, 0.9f, 0.9f));
-            //            Imgui.VSliderFloat("##v", ImVec2(18, 160), &values[i], 0.0f, 1.0f, "");
-            //            if (Imgui.IsItemActive() || Imgui.IsItemHovered())
-            //                Imgui.SetTooltip("%.3f", values[i]);
-            //            Imgui.PopStyleColor(4);
-            //            Imgui.PopID();
-            //        }
-            //        Imgui.PopID();
-            //
-            //        Imgui.SameLine();
-            //        Imgui.PushID("set2");
-            //        static float values2[4] = { 0.20f, 0.80f, 0.40f, 0.25f };
-            //        const int rows = 3;
-            //        const ImVec2 small_slider_size(18, (float)(int)((160.0f - (rows - 1) * spacing) / rows));
-            //        for (int nx = 0; nx < 4; nx++)
-            //        {
-            //            if (nx > 0) Imgui.SameLine();
-            //            Imgui.BeginGroup();
-            //            for (int ny = 0; ny < rows; ny++)
-            //            {
-            //                Imgui.PushID(nx * rows + ny);
-            //                Imgui.VSliderFloat("##v", small_slider_size, &values2[nx], 0.0f, 1.0f, "");
-            //                if (Imgui.IsItemActive() || Imgui.IsItemHovered())
-            //                    Imgui.SetTooltip("%.3f", values2[nx]);
-            //                Imgui.PopID();
-            //            }
-            //            Imgui.EndGroup();
-            //        }
-            //        Imgui.PopID();
-            //
-            //        Imgui.SameLine();
-            //        Imgui.PushID("set3");
-            //        for (int i = 0; i < 4; i++)
-            //        {
-            //            if (i > 0) Imgui.SameLine();
-            //            Imgui.PushID(i);
-            //            Imgui.PushStyleVar(ImGuiStyleVar_GrabMinSize, 40);
-            //            Imgui.VSliderFloat("##v", ImVec2(40, 160), &values[i], 0.0f, 1.0f, "%.2f\nsec");
-            //            Imgui.PopStyleVar();
-            //            Imgui.PopID();
-            //        }
-            //        Imgui.PopID();
-            //        Imgui.PopStyleVar();
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Multi-component Widgets"))
+            {
+                _ = Imgui.Input("input float2", s_vec2F);
+                _ = Imgui.Drag("drag float2", s_vec2F, 0.01f, 0.0f, 1.0f);
+                _ = Imgui.Slider("slider float2", s_vec2F, 0.0f, 1.0f);
+                _ = Imgui.Input("input int2", s_vec2I);
+                _ = Imgui.Drag("drag int2", s_vec2I, 1, 0, 255);
+                _ = Imgui.Slider("slider int2", s_vec2I, 0, 255);
+                Imgui.Spacing();
+
+                _ = Imgui.Input("input float3", s_vec3F);
+                _ = Imgui.Drag("drag float3", s_vec3F, 0.01f, 0.0f, 1.0f);
+                _ = Imgui.Slider("slider float3", s_vec3F, 0.0f, 1.0f);
+                _ = Imgui.Input("input int3", s_vec3I);
+                _ = Imgui.Drag("drag int3", s_vec3I, 1, 0, 255);
+                _ = Imgui.Slider("slider int3", s_vec3I, 0, 255);
+                Imgui.Spacing();
+
+                _ = Imgui.Input("input float4", s_vec4F);
+                _ = Imgui.Drag("drag float4", s_vec4F, 0.01f, 0.0f, 1.0f);
+                _ = Imgui.Slider("slider float4", s_vec4F, 0.0f, 1.0f);
+                _ = Imgui.Input("input int4", s_vec4I);
+                _ = Imgui.Drag("drag int4", s_vec4I, 1, 0, 255);
+                _ = Imgui.Slider("slider int4", s_vec4I, 0, 255);
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Vertical Sliders"))
+            {
+                const float Spacing = 4;
+                Imgui.PushStyleVariable(StyleVariable.ItemSpacing, new SizeF(Spacing, Spacing));
+
+                _ = Imgui.VerticalSlider("##int", new(18, 160), s_intValue2, 0, 5);
+                Imgui.SameLine();
+
+                Imgui.PushId("set1");
+                for (var i = 0; i < 7; i++)
+                {
+                    if (i > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.PushId(i);
+                    Imgui.PushStyleColor(StyleColor.FrameBackground, ColorF.FromHsv(i / 7.0f, 0.5f, 0.5f));
+                    Imgui.PushStyleColor(StyleColor.FrameBackgroundHovered, ColorF.FromHsv(i / 7.0f, 0.6f, 0.5f));
+                    Imgui.PushStyleColor(StyleColor.FrameBackgroundActive, ColorF.FromHsv(i / 7.0f, 0.7f, 0.5f));
+                    Imgui.PushStyleColor(StyleColor.SliderGrab, ColorF.FromHsv(i / 7.0f, 0.9f, 0.9f));
+                    _ = Imgui.VerticalSlider("##v", new SizeF(18, 160), s_values2.GetStateOfElement(i), 0.0f, 1.0f, "");
+                    if (Imgui.IsItemActive() || Imgui.IsItemHovered())
+                    {
+                        Imgui.SetTooltip($"{s_values2[i]:F3}");
+                    }
+
+                    Imgui.PopStyleColor(4);
+                    Imgui.PopId();
+                }
+                Imgui.PopId();
+
+                Imgui.SameLine();
+                Imgui.PushId("set2");
+                const int Rows = 3;
+                SizeF small_slider_size = new(18, (int)((160.0f - ((Rows - 1) * Spacing)) / Rows));
+                for (var nx = 0; nx < 4; nx++)
+                {
+                    if (nx > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.BeginGroup();
+                    for (var ny = 0; ny < Rows; ny++)
+                    {
+                        Imgui.PushId((nx * Rows) + ny);
+                        _ = Imgui.VerticalSlider("##v", small_slider_size, s_values3.GetStateOfElement(nx), 0.0f, 1.0f, "");
+                        if (Imgui.IsItemActive() || Imgui.IsItemHovered())
+                        {
+                            Imgui.SetTooltip($"{s_values3[nx]:F3}");
+                        }
+
+                        Imgui.PopId();
+                    }
+                    Imgui.EndGroup();
+                }
+                Imgui.PopId();
+
+                Imgui.SameLine();
+                Imgui.PushId("set3");
+                for (var i = 0; i < 4; i++)
+                {
+                    if (i > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.PushId(i);
+                    Imgui.PushStyleVariable(StyleVariable.GrabMinSize, 40);
+                    _ = Imgui.VerticalSlider("##v", new SizeF(40, 160), s_values2.GetStateOfElement(i), 0.0f, 1.0f, "%.2f\nsec");
+                    Imgui.PopStyleVariable();
+                    Imgui.PopId();
+                }
+                Imgui.PopId();
+                Imgui.PopStyleVariable();
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Drag and drop");
             //    if (Imgui.TreeNode("Drag and Drop"))
             //    {

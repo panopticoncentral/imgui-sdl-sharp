@@ -235,9 +235,9 @@ namespace ImguiSharp
 
         public static void PushStyleVariable(StyleVariable variable, PositionF value) => Native.ImGui_PushStyleVarImVec2((Native.ImGuiStyleVar)variable, value.ToNative());
 
-        public static void PopStyleVar() => Native.ImGui_PopStyleVar();
+        public static void PopStyleVariable() => Native.ImGui_PopStyleVar();
 
-        public static void PopStyleVar(int count) => Native.ImGui_PopStyleVarEx(count);
+        public static void PopStyleVariable(int count) => Native.ImGui_PopStyleVarEx(count);
 
         public static void PushAllowKeyboardFocus(bool allowFocus) => Native.ImGui_PushAllowKeyboardFocus(allowFocus);
 
