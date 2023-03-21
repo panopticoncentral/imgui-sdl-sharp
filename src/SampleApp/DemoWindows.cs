@@ -497,7 +497,18 @@ namespace SampleApp
         };
         private static Mode mode = Mode.Copy;
         private static string[] names = new[] { "Bobby", "Beatrice", "Betty", "Brianna", "Barry", "Bernard", "Bibi", "Blaine", "Bryn" };
-        private static string[] item_names = new [] { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
+        private static string[] item_names = new[] { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
+        private static State<int> item_type = new(4);
+        private static State<bool> item_disabled = new(false);
+        private static State<bool> b = new(false);
+        private static StateVector<float> col4f = new(4, new[] { 1.0f, 0.5f, 0.0f, 1.0f });
+        private static State<ColorF> col4f2 = new(new(1.0f, 0.5f, 0.0f, 1.0f));
+        private static StateText str = new(16);
+        private static State<int> current = new(1);
+        private static State<int> current2 = new(1);
+        private static StateText empty = new(1);
+        private static State<bool> embed_all_inside_a_child_window = new(false);
+        private static State<bool> test_window = new(false);
 
         private static void ShowDemoWindowWidgets()
         {
@@ -2106,190 +2117,191 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Querying Item Status (Edited,Active,Hovered etc.)");
-            //    if (Imgui.TreeNode("Querying Item Status (Edited/Active/Hovered etc.)"))
-            //    {
-            //        // Select an item type
-            //        const char* item_names[] =
-            //        {
-            //            "Text", "Button", "Button (w/ repeat)", "Checkbox", "SliderFloat", "InputText", "InputTextMultiline", "InputFloat",
-            //            "InputFloat3", "ColorEdit4", "Selectable", "MenuItem", "TreeNode", "TreeNode (w/ double-click)", "Combo", "ListBox"
-            //        };
-            //        static int item_type = 4;
-            //        static bool item_disabled = false;
-            //        Imgui.Combo("Item Type", &item_type, item_names, item_names.Length, item_names.Length);
-            //        Imgui.SameLine();
-            //        HelpMarker("Testing how various types of items are interacting with the IsItemXXX functions. Note that the bool return value of most ImGui function is generally equivalent to calling Imgui.IsItemHovered().");
-            //        Imgui.Checkbox("Item Disabled",  &item_disabled);
-            //
-            //        // Submit selected items so we can query their status in the code following it.
-            //        bool ret = false;
-            //        static bool b = false;
-            //        static float col4f[4] = { 1.0f, 0.5, 0.0f, 1.0f };
-            //        static char str[16] = {};
-            //        if (item_disabled)
-            //            Imgui.BeginDisabled(true);
-            //        if (item_type == 0) { Imgui.Text("ITEM: Text"); }                                              // Testing text items with no identifier/interaction
-            //        if (item_type == 1) { ret = Imgui.Button("ITEM: Button"); }                                    // Testing button
-            //        if (item_type == 2) { Imgui.PushButtonRepeat(true); ret = Imgui.Button("ITEM: Button"); Imgui.PopButtonRepeat(); } // Testing button (with repeater)
-            //        if (item_type == 3) { ret = Imgui.Checkbox("ITEM: Checkbox", &b); }                            // Testing checkbox
-            //        if (item_type == 4) { ret = Imgui.SliderFloat("ITEM: SliderFloat", &col4f[0], 0.0f, 1.0f); }   // Testing basic item
-            //        if (item_type == 5) { ret = Imgui.InputText("ITEM: InputText", &str[0], str.Length); }  // Testing input text (which handles tabbing)
-            //        if (item_type == 6) { ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", &str[0], str.Length); } // Testing input text (which uses a child window)
-            //        if (item_type == 7) { ret = Imgui.InputFloat("ITEM: InputFloat", col4f, 1.0f); }               // Testing +/- buttons on scalar input
-            //        if (item_type == 8) { ret = Imgui.InputFloat3("ITEM: InputFloat3", col4f); }                   // Testing multi-component items (IsItemXXX flags are reported merged)
-            //        if (item_type == 9) { ret = Imgui.ColorEdit4("ITEM: ColorEdit4", col4f); }                     // Testing multi-component items (IsItemXXX flags are reported merged)
-            //        if (item_type == 10){ ret = Imgui.Selectable("ITEM: Selectable"); }                            // Testing selectable item
-            //        if (item_type == 11){ ret = Imgui.MenuItem("ITEM: MenuItem"); }                                // Testing menu item (they use ImGuiButtonFlags_PressedOnRelease button policy)
-            //        if (item_type == 12){ ret = Imgui.TreeNode("ITEM: TreeNode"); if (ret) Imgui.TreePop(); }     // Testing tree node
-            //        if (item_type == 13){ ret = Imgui.TreeNodeEx("ITEM: TreeNode w/ ImGuiTreeNodeFlags_OpenOnDoubleClick", ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_NoTreePushOnOpen); } // Testing tree node with ImGuiButtonFlags_PressedOnDoubleClick button policy.
-            //        if (item_type == 14){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.Combo("ITEM: Combo", &current, items, items.Length); }
-            //        if (item_type == 15){ const char* items[] = { "Apple", "Banana", "Cherry", "Kiwi" }; static int current = 1; ret = Imgui.ListBox("ITEM: ListBox", &current, items, items.Length, items.Length); }
-            //
-            //        bool hovered_delay_none = Imgui.IsItemHovered();
-            //        bool hovered_delay_short = Imgui.IsItemHovered(ImGuiHoveredFlags_DelayShort);
-            //        bool hovered_delay_normal = Imgui.IsItemHovered(ImGuiHoveredFlags_DelayNormal);
-            //
-            //        // Display the values of IsItemHovered() and other common item state functions.
-            //        // Note that the ImGuiHoveredFlags_XXX flags can be combined.
-            //        // Because BulletText is an item itself and that would affect the output of IsItemXXX functions,
-            //        // we query every state in a single call to avoid storing them and to simplify the code.
-            //        Imgui.BulletText(
-            //            "Return value = %d\n"
-            //            "IsItemFocused() = %d\n"
-            //            "IsItemHovered() = %d\n"
-            //            "IsItemHovered(_AllowWhenBlockedByPopup) = %d\n"
-            //            "IsItemHovered(_AllowWhenBlockedByActiveItem) = %d\n"
-            //            "IsItemHovered(_AllowWhenOverlapped) = %d\n"
-            //            "IsItemHovered(_AllowWhenDisabled) = %d\n"
-            //            "IsItemHovered(_RectOnly) = %d\n"
-            //            "IsItemActive() = %d\n"
-            //            "IsItemEdited() = %d\n"
-            //            "IsItemActivated() = %d\n"
-            //            "IsItemDeactivated() = %d\n"
-            //            "IsItemDeactivatedAfterEdit() = %d\n"
-            //            "IsItemVisible() = %d\n"
-            //            "IsItemClicked() = %d\n"
-            //            "IsItemToggledOpen() = %d\n"
-            //            "GetItemRectMin() = (%.1f, %.1f)\n"
-            //            "GetItemRectMax() = (%.1f, %.1f)\n"
-            //            "GetItemRectSize() = (%.1f, %.1f)",
-            //            ret,
-            //            Imgui.IsItemFocused(),
-            //            Imgui.IsItemHovered(),
-            //            Imgui.IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup),
-            //            Imgui.IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem),
-            //            Imgui.IsItemHovered(ImGuiHoveredFlags_AllowWhenOverlapped),
-            //            Imgui.IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled),
-            //            Imgui.IsItemHovered(ImGuiHoveredFlags_RectOnly),
-            //            Imgui.IsItemActive(),
-            //            Imgui.IsItemEdited(),
-            //            Imgui.IsItemActivated(),
-            //            Imgui.IsItemDeactivated(),
-            //            Imgui.IsItemDeactivatedAfterEdit(),
-            //            Imgui.IsItemVisible(),
-            //            Imgui.IsItemClicked(),
-            //            Imgui.IsItemToggledOpen(),
-            //            Imgui.GetItemRectMin().x, Imgui.GetItemRectMin().y,
-            //            Imgui.GetItemRectMax().x, Imgui.GetItemRectMax().y,
-            //            Imgui.GetItemRectSize().x, Imgui.GetItemRectSize().y
-            //        );
-            //        Imgui.BulletText(
-            //            "w/ Hovering Delay: None = %d, Fast %d, Normal = %d", hovered_delay_none, hovered_delay_short, hovered_delay_normal);
-            //
-            //        if (item_disabled)
-            //            Imgui.EndDisabled();
-            //
-            //        char buf[1] = "";
-            //        Imgui.InputText("unused", buf, buf.Length, ImGuiInputTextFlags_ReadOnly);
-            //        Imgui.SameLine();
-            //        HelpMarker("This widget is only here to be able to tab-out of the widgets above and see e.g. Deactivated() status.");
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Widgets/Querying Window Status (Focused,Hovered etc.)");
-            //    if (Imgui.TreeNode("Querying Window Status (Focused/Hovered etc.)"))
-            //    {
-            //        static bool embed_all_inside_a_child_window = false;
-            //        Imgui.Checkbox("Embed everything inside a child window for testing _RootWindow flag.", &embed_all_inside_a_child_window);
-            //        if (embed_all_inside_a_child_window)
-            //            Imgui.BeginChild("outer_child", ImVec2(0, Imgui.GetFontSize() * 20.0f), true);
-            //
-            //        // Testing IsWindowFocused() function with its various flags.
-            //        Imgui.BulletText(
-            //            "IsWindowFocused() = %d\n"
-            //            "IsWindowFocused(_ChildWindows) = %d\n"
-            //            "IsWindowFocused(_ChildWindows|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowFocused(_ChildWindows|_RootWindow) = %d\n"
-            //            "IsWindowFocused(_ChildWindows|_RootWindow|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowFocused(_RootWindow) = %d\n"
-            //            "IsWindowFocused(_RootWindow|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowFocused(_AnyWindow) = %d\n",
-            //            Imgui.IsWindowFocused(),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_ChildWindows),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_RootWindow),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowFocused(ImGuiFocusedFlags_AnyWindow));
-            //
-            //        // Testing IsWindowHovered() function with its various flags.
-            //        Imgui.BulletText(
-            //            "IsWindowHovered() = %d\n"
-            //            "IsWindowHovered(_AllowWhenBlockedByPopup) = %d\n"
-            //            "IsWindowHovered(_AllowWhenBlockedByActiveItem) = %d\n"
-            //            "IsWindowHovered(_ChildWindows) = %d\n"
-            //            "IsWindowHovered(_ChildWindows|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowHovered(_ChildWindows|_RootWindow) = %d\n"
-            //            "IsWindowHovered(_ChildWindows|_RootWindow|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowHovered(_RootWindow) = %d\n"
-            //            "IsWindowHovered(_RootWindow|_NoPopupHierarchy) = %d\n"
-            //            "IsWindowHovered(_ChildWindows|_AllowWhenBlockedByPopup) = %d\n"
-            //            "IsWindowHovered(_AnyWindow) = %d\n",
-            //            Imgui.IsWindowHovered(),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_ChildWindows),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_RootWindow),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_RootWindow),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_NoPopupHierarchy),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_ChildWindows | ImGuiHoveredFlags_AllowWhenBlockedByPopup),
-            //            Imgui.IsWindowHovered(ImGuiHoveredFlags_AnyWindow));
-            //
-            //        Imgui.BeginChild("child", ImVec2(0, 50), true);
-            //        Imgui.Text("This is another child window for testing the _ChildWindows flag.");
-            //        Imgui.EndChild();
-            //        if (embed_all_inside_a_child_window)
-            //            Imgui.EndChild();
-            //
-            //        // Calling IsItemHovered() after begin returns the hovered status of the title bar.
-            //        // This is useful in particular if you want to create a context menu associated to the title bar of a window.
-            //        static bool test_window = false;
-            //        Imgui.Checkbox("Hovered/Active tests after Begin() for title bar testing", &test_window);
-            //        if (test_window)
-            //        {
-            //            Imgui.Begin("Title bar Hovered/Active tests", &test_window);
-            //            if (Imgui.BeginPopupContextItem()) // <-- This is using IsItemHovered()
-            //            {
-            //                if (Imgui.MenuItem("Close")) { test_window = false; }
-            //                Imgui.EndPopup();
-            //            }
-            //            Imgui.Text(
-            //                "IsItemHovered() after begin = %d (== is title bar hovered)\n"
-            //                "IsItemActive() after begin = %d (== is window being clicked/moved)\n",
-            //                Imgui.IsItemHovered(), Imgui.IsItemActive());
-            //            Imgui.End();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
+            if (Imgui.TreeNode("Querying Item Status (Edited/Active/Hovered etc.)"))
+            {
+                var item_names = new[]
+                {
+                    "Text", "Button", "Button (w/ repeat)", "Checkbox", "SliderFloat", "InputText", "InputTextMultiline", "InputFloat",
+                    "InputFloat3", "ColorEdit4", "Selectable", "MenuItem", "TreeNode", "TreeNode (w/ double-click)", "Combo", "ListBox"
+                };
+                _ = Imgui.Combo("Item Type", item_type, item_names, item_names.Length);
+                Imgui.SameLine();
+                HelpMarker("Testing how various types of items are interacting with the IsItemXXX functions. Note that the bool return value of most ImGui function is generally equivalent to calling Imgui.IsItemHovered().");
+                _ = Imgui.Checkbox("Item Disabled", item_disabled);
 
-            // Demonstrate BeginDisabled/EndDisabled using a checkbox located at the bottom of the section (which is a bit odd:
-            // logically we'd have this checkbox at the top of the section, but we don't want this feature to steal that space)
+                // Submit selected items so we can query their status in the code following it.
+                var ret = false;
+                if (item_disabled)
+                {
+                    Imgui.BeginDisabled(true);
+                }
+
+                switch (item_type)
+                {
+                    case 0:
+                        Imgui.Text("ITEM: Text");
+                        break;
+                    case 1:
+                        ret = Imgui.Button("ITEM: Button");
+                        break;
+                    case 2:
+                        Imgui.PushButtonRepeat(true);
+                        ret = Imgui.Button("ITEM: Button");
+                        Imgui.PopButtonRepeat();
+                        break;
+                    case 3:
+                        ret = Imgui.Checkbox("ITEM: Checkbox", b);
+                        break;
+                    case 4:
+                        ret = Imgui.Slider("ITEM: Slider", col4f.GetStateOfElement(0), 0.0f, 1.0f);
+                        break;
+                    case 5:
+                        ret = Imgui.InputText("ITEM: InputText", str);
+                        break;
+                    case 6:
+                        ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", str);
+                        break;
+                    case 7:
+                        ret = Imgui.Input("ITEM: InputFloat", col4f.GetStateOfElement(0), 1.0f);
+                        break;
+                    case 8:
+                        ret = Imgui.Input("ITEM: InputFloat4", col4f);
+                        break;
+                    case 9:
+                        ret = Imgui.ColorEditAlpha("ITEM: ColorEdit4", col4f2);
+                        break;
+                    case 10:
+                        ret = Imgui.Selectable("ITEM: Selectable");
+                        break;
+                    case 11:
+                        ret = Imgui.MenuItem("ITEM: MenuItem");
+                        break;
+                    case 12:
+                        ret = Imgui.TreeNode("ITEM: TreeNode");
+                        if (ret)
+                        {
+                            Imgui.TreePop();
+                        }
+                        break;
+                    case 13:
+                        ret = Imgui.TreeNode("ITEM: TreeNode w/ TreeNodeOptions.OpenOnDoubleClick", TreeNodeOptions.OpenOnDoubleClick | TreeNodeOptions.NoTreePushOnOpen);
+                        break;
+                    case 14:
+                        {
+                            var items = new[] { "Apple", "Banana", "Cherry", "Kiwi" };
+                            ret = Imgui.Combo("ITEM: Combo", current, items);
+                        }
+                        break;
+                    case 15:
+                        {
+                            var items = new[] { "Apple", "Banana", "Cherry", "Kiwi" };
+                            ret = Imgui.ListBox("ITEM: ListBox", current2, items, items.Length);
+                        }
+                        break;
+                }
+
+                var hovered_delay_none = Imgui.IsItemHovered();
+                var hovered_delay_short = Imgui.IsItemHovered(HoveredOptions.DelayShort);
+                var hovered_delay_normal = Imgui.IsItemHovered(HoveredOptions.DelayNormal);
+
+                Imgui.BulletText(
+                    $"Return value = {ret}\n" +
+                    $"IsItemFocused() = {Imgui.IsItemFocused()}\n" +
+                    $"IsItemHovered() = {Imgui.IsItemHovered()}\n" +
+                    $"IsItemHovered(AllowWhenBlockedByPopup) = {Imgui.IsItemHovered(HoveredOptions.AllowWhenBlockedByPopup)}\n" +
+                    $"IsItemHovered(AllowWhenBlockedByActiveItem) = {Imgui.IsItemHovered(HoveredOptions.AllowWhenBlockedByActiveItem)}\n" +
+                    $"IsItemHovered(AllowWhenOverlapped) = {Imgui.IsItemHovered(HoveredOptions.AllowWhenOverlapped)}\n" +
+                    $"IsItemHovered(AllowWhenDisabled) = {Imgui.IsItemHovered(HoveredOptions.AllowWhenDisabled)}\n" +
+                    $"IsItemHovered(RectOnly) = {Imgui.IsItemHovered(HoveredOptions.RectOnly)}\n" +
+                    $"IsItemActive() = {Imgui.IsItemActive()}\n" +
+                    $"IsItemEdited() = {Imgui.IsItemEdited()}\n" +
+                    $"IsItemActivated() = {Imgui.IsItemActivated()}\n" +
+                    $"IsItemDeactivated() = {Imgui.IsItemDeactivated()}\n" +
+                    $"IsItemDeactivatedAfterEdit() = {Imgui.IsItemDeactivatedAfterEdit()}\n" +
+                    $"IsItemVisible() = {Imgui.IsItemVisible()}\n" +
+                    $"IsItemClicked() = {Imgui.IsItemClicked()}\n" +
+                    $"IsItemToggledOpen() = {Imgui.IsItemToggledOpen()}\n" +
+                    $"GetItemRectMin() = ({Imgui.GetItemRectangle().Min.X:F1}, {Imgui.GetItemRectangle().Min.Y:F1})\n" +
+                    $"GetItemRectMax() = ({Imgui.GetItemRectangle().Max.X:F1}, {Imgui.GetItemRectangle().Max.Y:F1})\n" +
+                    $"GetItemRectSize() = ({Imgui.GetItemRectangleSize().Width:F1}, {Imgui.GetItemRectangleSize().Height:F1})"
+                );
+                Imgui.BulletText($"w/ Hovering Delay: None = {hovered_delay_none}, Fast {hovered_delay_short}, Normal = {hovered_delay_normal}");
+
+                if (item_disabled)
+                {
+                    Imgui.EndDisabled();
+                }
+
+                _ = Imgui.InputText("unused", empty, InputTextOptions.ReadOnly);
+                Imgui.SameLine();
+                HelpMarker("This widget is only here to be able to tab-out of the widgets above and see e.g. Deactivated() status.");
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Querying Window Status (Focused/Hovered etc.)"))
+            {
+                _ = Imgui.Checkbox("Embed everything inside a child window for testing RootWindow flag.", embed_all_inside_a_child_window);
+                if (embed_all_inside_a_child_window)
+                {
+                    _ = Imgui.BeginChild("outer_child", new(0, Imgui.GetFontSize() * 20.0f), true);
+                }
+
+                Imgui.BulletText(
+                    $"IsWindowFocused() = {Imgui.IsWindowFocused()}\n" +
+                    $"IsWindowFocused(ChildWindows) = {Imgui.IsWindowFocused(FocusedOptions.ChildWindows)}\n" +
+                    $"IsWindowFocused(ChildWindows|NoPopupHierarchy) = {Imgui.IsWindowFocused(FocusedOptions.ChildWindows | FocusedOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowFocused(ChildWindows|RootWindow) = {Imgui.IsWindowFocused(FocusedOptions.ChildWindows | FocusedOptions.RootWindow)}\n" +
+                    $"IsWindowFocused(ChildWindows|RootWindow|NoPopupHierarchy) = {Imgui.IsWindowFocused(FocusedOptions.ChildWindows | FocusedOptions.RootWindow | FocusedOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowFocused(RootWindow) = {Imgui.IsWindowFocused(FocusedOptions.RootWindow)}\n" +
+                    $"IsWindowFocused(RootWindow|NoPopupHierarchy) = {Imgui.IsWindowFocused(FocusedOptions.RootWindow | FocusedOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowFocused(AnyWindow) = {Imgui.IsWindowFocused(FocusedOptions.AnyWindow)}\n"
+                    );
+
+                Imgui.BulletText(
+                    $"IsWindowHovered() = {Imgui.IsWindowHovered()}\n" +
+                    $"IsWindowHovered(AllowWhenBlockedByPopup) = {Imgui.IsWindowHovered(HoveredOptions.AllowWhenBlockedByPopup)}\n" +
+                    $"IsWindowHovered(AllowWhenBlockedByActiveItem) = {Imgui.IsWindowHovered(HoveredOptions.AllowWhenBlockedByActiveItem)}\n" +
+                    $"IsWindowHovered(ChildWindows) = {Imgui.IsWindowHovered(HoveredOptions.ChildWindows)}\n" +
+                    $"IsWindowHovered(ChildWindows|NoPopupHierarchy) = {Imgui.IsWindowHovered(HoveredOptions.ChildWindows | HoveredOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowHovered(ChildWindows|RootWindow) = {Imgui.IsWindowHovered(HoveredOptions.ChildWindows | HoveredOptions.RootWindow)}\n" +
+                    $"IsWindowHovered(ChildWindows|RootWindow|NoPopupHierarchy) = {Imgui.IsWindowHovered(HoveredOptions.ChildWindows | HoveredOptions.RootWindow | HoveredOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowHovered(RootWindow) = {Imgui.IsWindowHovered(HoveredOptions.RootWindow)}\n" +
+                    $"IsWindowHovered(RootWindow|NoPopupHierarchy) = {Imgui.IsWindowHovered(HoveredOptions.RootWindow | HoveredOptions.NoPopupHierarchy)}\n" +
+                    $"IsWindowHovered(ChildWindows|AllowWhenBlockedByPopup) = {Imgui.IsWindowHovered(HoveredOptions.ChildWindows | HoveredOptions.AllowWhenBlockedByPopup)}\n" +
+                    $"IsWindowHovered(AnyWindow) = {Imgui.IsWindowHovered(HoveredOptions.AnyWindow)}\n"
+                    );
+
+                _ = Imgui.BeginChild("child", new(0, 50), true);
+                Imgui.Text("This is another child window for testing the ChildWindows flag.");
+                Imgui.EndChild();
+                if (embed_all_inside_a_child_window)
+                {
+                    Imgui.EndChild();
+                }
+
+                _ = Imgui.Checkbox("Hovered/Active tests after Begin() for title bar testing", test_window);
+                if (test_window)
+                {
+                    _ = Imgui.Begin("Title bar Hovered/Active tests", test_window);
+                    if (Imgui.BeginPopupContextItem())
+                    {
+                        if (Imgui.MenuItem("Close"))
+                        {
+                            test_window.Value = false;
+                        }
+                        Imgui.EndPopup();
+                    }
+                    Imgui.Text(
+                        $"IsItemHovered() after begin = {Imgui.IsItemHovered()} (== is title bar hovered)\n" +
+                        $"IsItemActive() after begin = {Imgui.IsItemActive()} (== is window being clicked/moved)\n"
+                        );
+                    Imgui.End();
+                }
+
+                Imgui.TreePop();
+            }
+
             if (s_disableAll)
             {
                 Imgui.EndDisabled();
@@ -3117,7 +3129,7 @@ namespace SampleApp
             //    // - Unless modal, they can be closed by clicking anywhere outside them, or by pressing ESCAPE.
             //    // - Their visibility state (~bool) is held internally by Dear ImGui instead of being held by the programmer as
             //    //   we are used to with regular Begin() calls. User can manipulate the visibility state by calling OpenPopup().
-            //    // (*) One can use IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup) to bypass it and detect hovering even
+            //    // (*) One can use IsItemHovered(HoveredOptions.AllowWhenBlockedByPopup) to bypass it and detect hovering even
             //    //     when normally blocked by a popup.
             //    // Those three properties are connected. The library needs to hold their visibility state BECAUSE it can close
             //    // popups at any time.
