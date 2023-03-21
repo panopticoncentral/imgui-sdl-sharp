@@ -487,6 +487,17 @@ namespace SampleApp
         private static readonly State<int> s_intValue2 = new(0);
         private static readonly StateVector<float> s_values2 = new(7, new[] { 0.0f, 0.60f, 0.35f, 0.9f, 0.70f, 0.20f, 0.0f });
         private static readonly StateVector<float> s_values3 = new(4, new[] { 0.20f, 0.80f, 0.40f, 0.25f });
+        private static readonly State<ColorF> col1 = new(new(1.0f, 0.0f, 0.2f));
+        private static readonly State<ColorF> col2 = new(new(0.4f, 0.7f, 0.0f, 0.5f));
+        private enum Mode
+        {
+            Copy,
+            Move,
+            Swap
+        };
+        private static Mode mode = Mode.Copy;
+        private static string[] names = new[] { "Bobby", "Beatrice", "Betty", "Brianna", "Barry", "Bernard", "Bibi", "Blaine", "Bryn" };
+        private static string[] item_names = new [] { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
 
         private static void ShowDemoWindowWidgets()
         {
@@ -741,7 +752,7 @@ namespace SampleApp
 
                             if (s_testDragAndDrop && Imgui.BeginDragDropSource())
                             {
-                                _ = Imgui.SetDragDropPayload("_TREENODE", null, 0);
+                                _ = Imgui.SetDragDropPayload<byte>("_TREENODE", null, 0);
                                 Imgui.Text("This is a drag and drop source");
                                 Imgui.EndDragDropSource();
                             }
@@ -762,7 +773,7 @@ namespace SampleApp
 
                             if (s_testDragAndDrop && Imgui.BeginDragDropSource())
                             {
-                                _ = Imgui.SetDragDropPayload("_TREENODE", null, 0);
+                                _ = Imgui.SetDragDropPayload<byte>("_TREENODE", null, 0);
                                 Imgui.Text("This is a drag and drop source");
                                 Imgui.EndDragDropSource();
                             }
@@ -1987,122 +1998,114 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Drag and drop");
-            //    if (Imgui.TreeNode("Drag and Drop"))
-            //    {
-            //        IMGUI_DEMO_MARKER("Widgets/Drag and drop/Standard widgets");
-            //        if (Imgui.TreeNode("Drag and drop in standard widgets"))
-            //        {
-            //            // ColorEdit widgets automatically act as drag source and drag target.
-            //            // They are using standardized payload strings IMGUI_PAYLOAD_TYPE_COLOR_3F and IMGUI_PAYLOAD_TYPE_COLOR_4F
-            //            // to allow your own widgets to use colors in their drag and drop interaction.
-            //            // Also see 'Demo->Widgets->Color/Picker Widgets->Palette' demo.
-            //            HelpMarker("You can drag from the color squares.");
-            //            static float col1[3] = { 1.0f, 0.0f, 0.2f };
-            //            static float col2[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
-            //            Imgui.ColorEdit3("color 1", col1);
-            //            Imgui.ColorEdit4("color 2", col2);
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Drag and drop/Copy-swap items");
-            //        if (Imgui.TreeNode("Drag and drop to copy/swap items"))
-            //        {
-            //            enum Mode
-            //            {
-            //                Mode_Copy,
-            //                Mode_Move,
-            //                Mode_Swap
-            //            };
-            //            static int mode = 0;
-            //            if (Imgui.RadioButton("Copy", mode == Mode_Copy)) { mode = Mode_Copy; } Imgui.SameLine();
-            //            if (Imgui.RadioButton("Move", mode == Mode_Move)) { mode = Mode_Move; } Imgui.SameLine();
-            //            if (Imgui.RadioButton("Swap", mode == Mode_Swap)) { mode = Mode_Swap; }
-            //            static const char* names[9] =
-            //            {
-            //                "Bobby", "Beatrice", "Betty",
-            //                "Brianna", "Barry", "Bernard",
-            //                "Bibi", "Blaine", "Bryn"
-            //            };
-            //            for (int n = 0; n < names.Length; n++)
-            //            {
-            //                Imgui.PushID(n);
-            //                if ((n % 3) != 0)
-            //                    Imgui.SameLine();
-            //                Imgui.Button(names[n], ImVec2(60, 60));
-            //
-            //                // Our buttons are both drag sources and drag targets here!
-            //                if (Imgui.BeginDragDropSource(ImGuiDragDropFlags_None))
-            //                {
-            //                    // Set payload to carry the index of our item (could be anything)
-            //                    Imgui.SetDragDropPayload("DND_DEMO_CELL", &n, sizeof(int));
-            //
-            //                    // Display preview (could be anything, e.g. when dragging an image we could decide to display
-            //                    // the filename and a small preview of the image, etc.)
-            //                    if (mode == Mode_Copy) { Imgui.Text("Copy %s", names[n]); }
-            //                    if (mode == Mode_Move) { Imgui.Text("Move %s", names[n]); }
-            //                    if (mode == Mode_Swap) { Imgui.Text("Swap %s", names[n]); }
-            //                    Imgui.EndDragDropSource();
-            //                }
-            //                if (Imgui.BeginDragDropTarget())
-            //                {
-            //                    if (const ImGuiPayload* payload = Imgui.AcceptDragDropPayload("DND_DEMO_CELL"))
-            //                    {
-            //                        IM_ASSERT(payload->DataSize == sizeof(int));
-            //                        int payload_n = *(const int*)payload->Data;
-            //                        if (mode == Mode_Copy)
-            //                        {
-            //                            names[n] = names[payload_n];
-            //                        }
-            //                        if (mode == Mode_Move)
-            //                        {
-            //                            names[n] = names[payload_n];
-            //                            names[payload_n] = "";
-            //                        }
-            //                        if (mode == Mode_Swap)
-            //                        {
-            //                            const char* tmp = names[n];
-            //                            names[n] = names[payload_n];
-            //                            names[payload_n] = tmp;
-            //                        }
-            //                    }
-            //                    Imgui.EndDragDropTarget();
-            //                }
-            //                Imgui.PopID();
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        IMGUI_DEMO_MARKER("Widgets/Drag and Drop/Drag to reorder items (simple)");
-            //        if (Imgui.TreeNode("Drag to reorder items (simple)"))
-            //        {
-            //            // Simple reordering
-            //            HelpMarker(
-            //                "We don't use the drag and drop api at all here! "
-            //                "Instead we query when the item is held but not hovered, and order items accordingly.");
-            //            static const char* item_names[] = { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
-            //            for (int n = 0; n < item_names.Length; n++)
-            //            {
-            //                const char* item = item_names[n];
-            //                Imgui.Selectable(item);
-            //
-            //                if (Imgui.IsItemActive() && !Imgui.IsItemHovered())
-            //                {
-            //                    int n_next = n + (Imgui.GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-            //                    if (n_next >= 0 && n_next < item_names.Length)
-            //                    {
-            //                        item_names[n] = item_names[n_next];
-            //                        item_names[n_next] = item;
-            //                        Imgui.ResetMouseDragDelta();
-            //                    }
-            //                }
-            //            }
-            //            Imgui.TreePop();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (Imgui.TreeNode("Drag and Drop"))
+            {
+                if (Imgui.TreeNode("Drag and drop in standard widgets"))
+                {
+                    HelpMarker("You can drag from the color squares.");
+                    _ = Imgui.ColorEdit("color 1", col1);
+                    _ = Imgui.ColorEditAlpha("color 2", col2);
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Drag and drop to copy/swap items"))
+                {
+                    if (Imgui.RadioButton("Copy", mode == Mode.Copy))
+                    {
+                        mode = Mode.Copy;
+                    }
+                    Imgui.SameLine();
+                    if (Imgui.RadioButton("Move", mode == Mode.Move))
+                    {
+                        mode = Mode.Move;
+                    }
+                    Imgui.SameLine();
+                    if (Imgui.RadioButton("Swap", mode == Mode.Swap))
+                    {
+                        mode = Mode.Swap;
+                    }
+                    for (var n = 0; n < names.Length; n++)
+                    {
+                        Imgui.PushId(n);
+                        if ((n % 3) != 0)
+                        {
+                            Imgui.SameLine();
+                        }
+
+                        _ = Imgui.Button(names[n], new(60, 60));
+
+                        if (Imgui.BeginDragDropSource(DragDropOptions.None))
+                        {
+                            _ = Imgui.SetDragDropPayload("DND_DEMO_CELL", new Span<int>(ref n));
+
+                            if (mode == Mode.Copy)
+                            {
+                                Imgui.Text($"Copy {names[n]}");
+                            }
+                            if (mode == Mode.Move)
+                            {
+                                Imgui.Text($"Move {names[n]}");
+                            }
+                            if (mode == Mode.Swap)
+                            {
+                                Imgui.Text($"Swap {names[n]}");
+                            }
+                            Imgui.EndDragDropSource();
+                        }
+                        if (Imgui.BeginDragDropTarget())
+                        {
+                            var payload = Imgui.AcceptDragDropPayload("DND_DEMO_CELL");
+                            if (payload != null)
+                            {
+                                var payload_n = payload.Value.GetData<int>()[0];
+                                if (mode == Mode.Copy)
+                                {
+                                    names[n] = names[payload_n];
+                                }
+                                if (mode == Mode.Move)
+                                {
+                                    names[n] = names[payload_n];
+                                    names[payload_n] = "";
+                                }
+                                if (mode == Mode.Swap)
+                                {
+                                    (names[payload_n], names[n]) = (names[n], names[payload_n]);
+                                }
+                            }
+                            Imgui.EndDragDropTarget();
+                        }
+                        Imgui.PopId();
+                    }
+                    Imgui.TreePop();
+                }
+
+                if (Imgui.TreeNode("Drag to reorder items (simple)"))
+                {
+                    HelpMarker(
+                        "We don't use the drag and drop api at all here! " +
+                        "Instead we query when the item is held but not hovered, and order items accordingly.");
+                    for (var n = 0; n < item_names.Length; n++)
+                    {
+                        var item = item_names[n];
+                        _ = Imgui.Selectable(item);
+
+                        if (Imgui.IsItemActive() && !Imgui.IsItemHovered())
+                        {
+                            var n_next = n + (Imgui.GetMouseDragDelta(0).Height < 0.0f ? -1 : 1);
+                            if (n_next >= 0 && n_next < item_names.Length)
+                            {
+                                item_names[n] = item_names[n_next];
+                                item_names[n_next] = item;
+                                Imgui.ResetMouseDragDelta();
+                            }
+                        }
+                    }
+                    Imgui.TreePop();
+                }
+
+                Imgui.TreePop();
+            }
+
             //    IMGUI_DEMO_MARKER("Widgets/Querying Item Status (Edited,Active,Hovered etc.)");
             //    if (Imgui.TreeNode("Querying Item Status (Edited/Active/Hovered etc.)"))
             //    {

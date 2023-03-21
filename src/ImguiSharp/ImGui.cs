@@ -1410,12 +1410,13 @@ namespace ImguiSharp
 
         public static bool BeginDragDropSource(DragDropOptions options = default) => Native.ImGui_BeginDragDropSource((Native.ImGuiDragDropFlags)options);
 
-        public static bool SetDragDropPayload(string type, Span<byte> data, Condition cond = default)
+        public static bool SetDragDropPayload<T>(string type, Span<T> data, Condition cond = default)
+            where T : unmanaged
         {
             fixed (byte* typePtr = Native.StringToUtf8(type))
-            fixed (byte* dataPtr = data)
+            fixed (T* dataPtr = data)
             {
-                return Native.ImGui_SetDragDropPayload(typePtr, dataPtr, (nuint)data.Length, (Native.ImGuiCond)cond);
+                return Native.ImGui_SetDragDropPayload(typePtr, dataPtr, (nuint)(data.Length * sizeof(T)), (Native.ImGuiCond)cond);
             }
         }
 
