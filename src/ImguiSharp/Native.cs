@@ -2669,7 +2669,30 @@ namespace ImguiSharp
         public const char IM_UNICODE_CODEPOINT_INVALID = (char)0xFFFD;
         public const char IM_UNICODE_CODEPOINT_MAX = (char)0xFFFF;
 
-        // ImGuiTextFilter is internal
+        public struct ImGuiTextFilter
+        {
+            private fixed byte _inputBuf[256];
+            private readonly int _filtersSize;
+            private readonly int _filtersCapacity;
+            private readonly void* _filtersData;
+            private readonly int _countGrep;
+        }
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiTextFilter_Draw(ImGuiTextFilter* self, byte* label /* = "Filter (inc,-exc)" */, float width /* = 0.0f */);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiTextFilter_PassFilter(ImGuiTextFilter* self, byte* text, byte* text_end = null);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiTextFilter_Build(ImGuiTextFilter* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ImGuiTextFilter_Clear(ImGuiTextFilter* self);
+
+        [DllImport(ImguiLibrary, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool ImGuiTextFilter_IsActive(ImGuiTextFilter* self);
+
 
         // StringBuilder should be used instead of ImGuiTextBuffer
 

@@ -509,6 +509,7 @@ namespace SampleApp
         private static StateText empty = new(1);
         private static State<bool> embed_all_inside_a_child_window = new(false);
         private static State<bool> test_window = new(false);
+        private static TextFilter filter = new();
 
         private static void ShowDemoWindowWidgets()
         {
@@ -2315,25 +2316,26 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    IMGUI_DEMO_MARKER("Widgets/Text Filter");
-            //    if (Imgui.TreeNode("Text Filter"))
-            //    {
-            //        // Helper class to easy setup a text filter.
-            //        // You may want to implement a more feature-full filtering scheme in your own application.
-            //        HelpMarker("Not a widget per-se, but ImGuiTextFilter is a helper to perform simple filtering on text strings.");
-            //        static ImGuiTextFilter filter;
-            //        Imgui.Text("Filter usage:\n"
-            //            "  \"\"         display all lines\n"
-            //            "  \"xxx\"      display lines containing \"xxx\"\n"
-            //            "  \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n"
-            //            "  \"-xxx\"     hide lines containing \"xxx\"");
-            //        filter.Draw();
-            //        const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-            //        for (int i = 0; i < lines.Length; i++)
-            //            if (filter.PassFilter(lines[i]))
-            //                Imgui.BulletText("%s", lines[i]);
-            //        Imgui.TreePop();
-            //    }
+            if (Imgui.TreeNode("Text Filter"))
+            {
+                HelpMarker("Not a widget per-se, but ImGuiTextFilter is a helper to perform simple filtering on text strings.");
+                Imgui.Text("Filter usage:\n" +
+                    "  \"\"         display all lines\n" +
+                    "  \"xxx\"      display lines containing \"xxx\"\n" +
+                    "  \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n" +
+                    "  \"-xxx\"     hide lines containing \"xxx\"");
+                _ = filter.Draw();
+                var lines = new[] { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
+                for (var i = 0; i < lines.Length; i++)
+                {
+                    if (filter.PassFilter(lines[i]))
+                    {
+                        Imgui.BulletText(lines[i]);
+                    }
+                }
+
+                Imgui.TreePop();
+            }
         }
 
         private static void ShowDemoWindowLayout()
