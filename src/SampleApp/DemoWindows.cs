@@ -487,29 +487,29 @@ namespace SampleApp
         private static readonly State<int> s_intValue2 = new(0);
         private static readonly StateVector<float> s_values2 = new(7, new[] { 0.0f, 0.60f, 0.35f, 0.9f, 0.70f, 0.20f, 0.0f });
         private static readonly StateVector<float> s_values3 = new(4, new[] { 0.20f, 0.80f, 0.40f, 0.25f });
-        private static readonly State<ColorF> col1 = new(new(1.0f, 0.0f, 0.2f));
-        private static readonly State<ColorF> col2 = new(new(0.4f, 0.7f, 0.0f, 0.5f));
+        private static readonly State<ColorF> s_col3 = new(new(1.0f, 0.0f, 0.2f));
+        private static readonly State<ColorF> s_col4 = new(new(0.4f, 0.7f, 0.0f, 0.5f));
         private enum Mode
         {
             Copy,
             Move,
             Swap
         };
-        private static Mode mode = Mode.Copy;
-        private static string[] names = new[] { "Bobby", "Beatrice", "Betty", "Brianna", "Barry", "Bernard", "Bibi", "Blaine", "Bryn" };
-        private static string[] item_names = new[] { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
-        private static State<int> item_type = new(4);
-        private static State<bool> item_disabled = new(false);
-        private static State<bool> b = new(false);
-        private static StateVector<float> col4f = new(4, new[] { 1.0f, 0.5f, 0.0f, 1.0f });
-        private static State<ColorF> col4f2 = new(new(1.0f, 0.5f, 0.0f, 1.0f));
-        private static StateText str = new(16);
-        private static State<int> current = new(1);
-        private static State<int> current2 = new(1);
-        private static StateText empty = new(1);
-        private static State<bool> embed_all_inside_a_child_window = new(false);
-        private static State<bool> test_window = new(false);
-        private static TextFilter filter = new();
+        private static Mode s_mode = Mode.Copy;
+        private static readonly string[] s_names = new[] { "Bobby", "Beatrice", "Betty", "Brianna", "Barry", "Bernard", "Bibi", "Blaine", "Bryn" };
+        private static readonly string[] s_itemNames = new[] { "Item One", "Item Two", "Item Three", "Item Four", "Item Five" };
+        private static readonly State<int> s_itemType = new(4);
+        private static readonly State<bool> s_itemDisabled = new(false);
+        private static readonly State<bool> s_b = new(false);
+        private static readonly StateVector<float> s_col4f = new(4, new[] { 1.0f, 0.5f, 0.0f, 1.0f });
+        private static readonly State<ColorF> s_col4f2 = new(new(1.0f, 0.5f, 0.0f, 1.0f));
+        private static readonly StateText s_str = new(16);
+        private static readonly State<int> s_current = new(1);
+        private static readonly State<int> s_current2 = new(1);
+        private static readonly StateText s_empty = new(1);
+        private static readonly State<bool> s_embedAllInsideAChildWindow = new(false);
+        private static readonly State<bool> s_testWindow = new(false);
+        private static readonly TextFilter s_filter = new();
 
         private static void ShowDemoWindowWidgets()
         {
@@ -2015,28 +2015,28 @@ namespace SampleApp
                 if (Imgui.TreeNode("Drag and drop in standard widgets"))
                 {
                     HelpMarker("You can drag from the color squares.");
-                    _ = Imgui.ColorEdit("color 1", col1);
-                    _ = Imgui.ColorEditAlpha("color 2", col2);
+                    _ = Imgui.ColorEdit("color 1", s_col3);
+                    _ = Imgui.ColorEditAlpha("color 2", s_col4);
                     Imgui.TreePop();
                 }
 
                 if (Imgui.TreeNode("Drag and drop to copy/swap items"))
                 {
-                    if (Imgui.RadioButton("Copy", mode == Mode.Copy))
+                    if (Imgui.RadioButton("Copy", s_mode == Mode.Copy))
                     {
-                        mode = Mode.Copy;
+                        s_mode = Mode.Copy;
                     }
                     Imgui.SameLine();
-                    if (Imgui.RadioButton("Move", mode == Mode.Move))
+                    if (Imgui.RadioButton("Move", s_mode == Mode.Move))
                     {
-                        mode = Mode.Move;
+                        s_mode = Mode.Move;
                     }
                     Imgui.SameLine();
-                    if (Imgui.RadioButton("Swap", mode == Mode.Swap))
+                    if (Imgui.RadioButton("Swap", s_mode == Mode.Swap))
                     {
-                        mode = Mode.Swap;
+                        s_mode = Mode.Swap;
                     }
-                    for (var n = 0; n < names.Length; n++)
+                    for (var n = 0; n < s_names.Length; n++)
                     {
                         Imgui.PushId(n);
                         if ((n % 3) != 0)
@@ -2044,23 +2044,23 @@ namespace SampleApp
                             Imgui.SameLine();
                         }
 
-                        _ = Imgui.Button(names[n], new(60, 60));
+                        _ = Imgui.Button(s_names[n], new(60, 60));
 
                         if (Imgui.BeginDragDropSource(DragDropOptions.None))
                         {
                             _ = Imgui.SetDragDropPayload("DND_DEMO_CELL", new Span<int>(ref n));
 
-                            if (mode == Mode.Copy)
+                            if (s_mode == Mode.Copy)
                             {
-                                Imgui.Text($"Copy {names[n]}");
+                                Imgui.Text($"Copy {s_names[n]}");
                             }
-                            if (mode == Mode.Move)
+                            if (s_mode == Mode.Move)
                             {
-                                Imgui.Text($"Move {names[n]}");
+                                Imgui.Text($"Move {s_names[n]}");
                             }
-                            if (mode == Mode.Swap)
+                            if (s_mode == Mode.Swap)
                             {
-                                Imgui.Text($"Swap {names[n]}");
+                                Imgui.Text($"Swap {s_names[n]}");
                             }
                             Imgui.EndDragDropSource();
                         }
@@ -2070,18 +2070,18 @@ namespace SampleApp
                             if (payload != null)
                             {
                                 var payload_n = payload.Value.GetData<int>()[0];
-                                if (mode == Mode.Copy)
+                                if (s_mode == Mode.Copy)
                                 {
-                                    names[n] = names[payload_n];
+                                    s_names[n] = s_names[payload_n];
                                 }
-                                if (mode == Mode.Move)
+                                if (s_mode == Mode.Move)
                                 {
-                                    names[n] = names[payload_n];
-                                    names[payload_n] = "";
+                                    s_names[n] = s_names[payload_n];
+                                    s_names[payload_n] = "";
                                 }
-                                if (mode == Mode.Swap)
+                                if (s_mode == Mode.Swap)
                                 {
-                                    (names[payload_n], names[n]) = (names[n], names[payload_n]);
+                                    (s_names[payload_n], s_names[n]) = (s_names[n], s_names[payload_n]);
                                 }
                             }
                             Imgui.EndDragDropTarget();
@@ -2096,18 +2096,18 @@ namespace SampleApp
                     HelpMarker(
                         "We don't use the drag and drop api at all here! " +
                         "Instead we query when the item is held but not hovered, and order items accordingly.");
-                    for (var n = 0; n < item_names.Length; n++)
+                    for (var n = 0; n < s_itemNames.Length; n++)
                     {
-                        var item = item_names[n];
+                        var item = s_itemNames[n];
                         _ = Imgui.Selectable(item);
 
                         if (Imgui.IsItemActive() && !Imgui.IsItemHovered())
                         {
                             var n_next = n + (Imgui.GetMouseDragDelta(0).Height < 0.0f ? -1 : 1);
-                            if (n_next >= 0 && n_next < item_names.Length)
+                            if (n_next >= 0 && n_next < s_itemNames.Length)
                             {
-                                item_names[n] = item_names[n_next];
-                                item_names[n_next] = item;
+                                s_itemNames[n] = s_itemNames[n_next];
+                                s_itemNames[n_next] = item;
                                 Imgui.ResetMouseDragDelta();
                             }
                         }
@@ -2125,19 +2125,19 @@ namespace SampleApp
                     "Text", "Button", "Button (w/ repeat)", "Checkbox", "SliderFloat", "InputText", "InputTextMultiline", "InputFloat",
                     "InputFloat3", "ColorEdit4", "Selectable", "MenuItem", "TreeNode", "TreeNode (w/ double-click)", "Combo", "ListBox"
                 };
-                _ = Imgui.Combo("Item Type", item_type, item_names, item_names.Length);
+                _ = Imgui.Combo("Item Type", s_itemType, item_names, item_names.Length);
                 Imgui.SameLine();
                 HelpMarker("Testing how various types of items are interacting with the IsItemXXX functions. Note that the bool return value of most ImGui function is generally equivalent to calling Imgui.IsItemHovered().");
-                _ = Imgui.Checkbox("Item Disabled", item_disabled);
+                _ = Imgui.Checkbox("Item Disabled", s_itemDisabled);
 
                 // Submit selected items so we can query their status in the code following it.
                 var ret = false;
-                if (item_disabled)
+                if (s_itemDisabled)
                 {
                     Imgui.BeginDisabled(true);
                 }
 
-                switch (item_type)
+                switch (s_itemType)
                 {
                     case 0:
                         Imgui.Text("ITEM: Text");
@@ -2151,25 +2151,25 @@ namespace SampleApp
                         Imgui.PopButtonRepeat();
                         break;
                     case 3:
-                        ret = Imgui.Checkbox("ITEM: Checkbox", b);
+                        ret = Imgui.Checkbox("ITEM: Checkbox", s_b);
                         break;
                     case 4:
-                        ret = Imgui.Slider("ITEM: Slider", col4f.GetStateOfElement(0), 0.0f, 1.0f);
+                        ret = Imgui.Slider("ITEM: Slider", s_col4f.GetStateOfElement(0), 0.0f, 1.0f);
                         break;
                     case 5:
-                        ret = Imgui.InputText("ITEM: InputText", str);
+                        ret = Imgui.InputText("ITEM: InputText", s_str);
                         break;
                     case 6:
-                        ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", str);
+                        ret = Imgui.InputTextMultiline("ITEM: InputTextMultiline", s_str);
                         break;
                     case 7:
-                        ret = Imgui.Input("ITEM: InputFloat", col4f.GetStateOfElement(0), 1.0f);
+                        ret = Imgui.Input("ITEM: InputFloat", s_col4f.GetStateOfElement(0), 1.0f);
                         break;
                     case 8:
-                        ret = Imgui.Input("ITEM: InputFloat4", col4f);
+                        ret = Imgui.Input("ITEM: InputFloat4", s_col4f);
                         break;
                     case 9:
-                        ret = Imgui.ColorEditAlpha("ITEM: ColorEdit4", col4f2);
+                        ret = Imgui.ColorEditAlpha("ITEM: ColorEdit4", s_col4f2);
                         break;
                     case 10:
                         ret = Imgui.Selectable("ITEM: Selectable");
@@ -2190,13 +2190,13 @@ namespace SampleApp
                     case 14:
                         {
                             var items = new[] { "Apple", "Banana", "Cherry", "Kiwi" };
-                            ret = Imgui.Combo("ITEM: Combo", current, items);
+                            ret = Imgui.Combo("ITEM: Combo", s_current, items);
                         }
                         break;
                     case 15:
                         {
                             var items = new[] { "Apple", "Banana", "Cherry", "Kiwi" };
-                            ret = Imgui.ListBox("ITEM: ListBox", current2, items, items.Length);
+                            ret = Imgui.ListBox("ITEM: ListBox", s_current2, items, items.Length);
                         }
                         break;
                 }
@@ -2228,12 +2228,12 @@ namespace SampleApp
                 );
                 Imgui.BulletText($"w/ Hovering Delay: None = {hovered_delay_none}, Fast {hovered_delay_short}, Normal = {hovered_delay_normal}");
 
-                if (item_disabled)
+                if (s_itemDisabled)
                 {
                     Imgui.EndDisabled();
                 }
 
-                _ = Imgui.InputText("unused", empty, InputTextOptions.ReadOnly);
+                _ = Imgui.InputText("unused", s_empty, InputTextOptions.ReadOnly);
                 Imgui.SameLine();
                 HelpMarker("This widget is only here to be able to tab-out of the widgets above and see e.g. Deactivated() status.");
 
@@ -2242,8 +2242,8 @@ namespace SampleApp
 
             if (Imgui.TreeNode("Querying Window Status (Focused/Hovered etc.)"))
             {
-                _ = Imgui.Checkbox("Embed everything inside a child window for testing RootWindow flag.", embed_all_inside_a_child_window);
-                if (embed_all_inside_a_child_window)
+                _ = Imgui.Checkbox("Embed everything inside a child window for testing RootWindow flag.", s_embedAllInsideAChildWindow);
+                if (s_embedAllInsideAChildWindow)
                 {
                     _ = Imgui.BeginChild("outer_child", new(0, Imgui.GetFontSize() * 20.0f), true);
                 }
@@ -2276,20 +2276,20 @@ namespace SampleApp
                 _ = Imgui.BeginChild("child", new(0, 50), true);
                 Imgui.Text("This is another child window for testing the ChildWindows flag.");
                 Imgui.EndChild();
-                if (embed_all_inside_a_child_window)
+                if (s_embedAllInsideAChildWindow)
                 {
                     Imgui.EndChild();
                 }
 
-                _ = Imgui.Checkbox("Hovered/Active tests after Begin() for title bar testing", test_window);
-                if (test_window)
+                _ = Imgui.Checkbox("Hovered/Active tests after Begin() for title bar testing", s_testWindow);
+                if (s_testWindow)
                 {
-                    _ = Imgui.Begin("Title bar Hovered/Active tests", test_window);
+                    _ = Imgui.Begin("Title bar Hovered/Active tests", s_testWindow);
                     if (Imgui.BeginPopupContextItem())
                     {
                         if (Imgui.MenuItem("Close"))
                         {
-                            test_window.Value = false;
+                            s_testWindow.Value = false;
                         }
                         Imgui.EndPopup();
                     }
@@ -2324,11 +2324,11 @@ namespace SampleApp
                     "  \"xxx\"      display lines containing \"xxx\"\n" +
                     "  \"xxx,yyy\"  display lines containing \"xxx\" or \"yyy\"\n" +
                     "  \"-xxx\"     hide lines containing \"xxx\"");
-                _ = filter.Draw();
+                _ = s_filter.Draw();
                 var lines = new[] { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
                 for (var i = 0; i < lines.Length; i++)
                 {
-                    if (filter.PassFilter(lines[i]))
+                    if (s_filter.PassFilter(lines[i]))
                     {
                         Imgui.BulletText(lines[i]);
                     }
@@ -2340,10 +2340,9 @@ namespace SampleApp
 
         private static void ShowDemoWindowLayout()
         {
-            //    IMGUI_DEMO_MARKER("Layout");
-            //    if (!Imgui.CollapsingHeader("Layout & Scrolling"))
-            //        return;
-            //
+            if (!Imgui.CollapsingHeader("Layout & Scrolling"))
+                return;
+
             //    IMGUI_DEMO_MARKER("Layout/Child windows");
             //    if (Imgui.TreeNode("Child windows"))
             //    {
@@ -6207,7 +6206,7 @@ namespace SampleApp
         private static readonly State<bool> s_enabled = new(true);
         private static readonly State<float> s_f = new(0.5f);
         private static readonly State<int> s_n = new(0);
-        private static readonly State<bool> s_b = new(true);
+        private static readonly State<bool> s_b2 = new(true);
 
         private static void ShowExampleMenuFile()
         {
@@ -6269,7 +6268,7 @@ namespace SampleApp
 
             if (Imgui.BeginMenu("Options"))
             {
-                _ = Imgui.Checkbox("SomeOption", s_b);
+                _ = Imgui.Checkbox("SomeOption", s_b2);
                 Imgui.EndMenu();
             }
 
