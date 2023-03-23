@@ -21,9 +21,9 @@
 
         public void PushClipRectangle(RectangleF rect, bool intersectWithCurrentClipRectangle = false) => Native.ImDrawList_PushClipRect(_list, rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRectangle);
 
-        public void PushClipRectFullScreen() => Native.ImDrawList_PushClipRectFullScreen(_list);
+        public void PushClipRectangleFullScreen() => Native.ImDrawList_PushClipRectFullScreen(_list);
 
-        public void PopClipRect() => Native.ImDrawList_PopClipRect(_list);
+        public void PopClipRectangle() => Native.ImDrawList_PopClipRect(_list);
 
         public void PushTextureID(TextureId textureId) => Native.ImDrawList_PushTextureID(_list, textureId.ToNative());
 
@@ -31,11 +31,11 @@
 
         public void AddLine(PositionF p1, PositionF p2, Color color, float thickness = 1.0f) => Native.ImDrawList_AddLineEx(_list, p1.ToNative(), p2.ToNative(), color.ToNative(), thickness);
 
-        public void AddRect(RectangleF rect, Color color, float rounding = default, DrawOptions options = default, float thickness = 1.0f) => Native.ImDrawList_AddRectEx(_list, rect.Min.ToNative(), rect.Max.ToNative(), color.ToNative(), rounding, (Native.ImDrawFlags)options, thickness);
+        public void AddRectangle(RectangleF rect, Color color, float rounding = default, DrawOptions options = default, float thickness = 1.0f) => Native.ImDrawList_AddRectEx(_list, rect.Min.ToNative(), rect.Max.ToNative(), color.ToNative(), rounding, (Native.ImDrawFlags)options, thickness);
 
-        public void AddRectFilled(RectangleF rect, Color color, float rounding = default, DrawOptions options = default) => Native.ImDrawList_AddRectFilledEx(_list, rect.Min.ToNative(), rect.Max.ToNative(), color.ToNative(), rounding, (Native.ImDrawFlags)options);
+        public void AddRectangleFilled(RectangleF rect, Color color, float rounding = default, DrawOptions options = default) => Native.ImDrawList_AddRectFilledEx(_list, rect.Min.ToNative(), rect.Max.ToNative(), color.ToNative(), rounding, (Native.ImDrawFlags)options);
 
-        public void AddRectFilledMultiColor(RectangleF rect, Color colorUpperLeft, Color colorUpperRight, Color colorBottomRight, Color colorBottomLeft) => Native.ImDrawList_AddRectFilledMultiColor(_list, rect.Min.ToNative(), rect.Max.ToNative(), colorUpperLeft.ToNative(), colorUpperRight.ToNative(), colorBottomRight.ToNative(), colorBottomLeft.ToNative());
+        public void AddRectangleFilledMultiColor(RectangleF rect, Color colorUpperLeft, Color colorUpperRight, Color colorBottomRight, Color colorBottomLeft) => Native.ImDrawList_AddRectFilledMultiColor(_list, rect.Min.ToNative(), rect.Max.ToNative(), colorUpperLeft.ToNative(), colorUpperRight.ToNative(), colorBottomRight.ToNative(), colorBottomLeft.ToNative());
 
         public void AddQuad(PositionF p1, PositionF p2, PositionF p3, PositionF p4, Color color, float thickness = 1.0f) => Native.ImDrawList_AddQuadEx(_list, p1.ToNative(), p2.ToNative(), p3.ToNative(), p4.ToNative(), color.ToNative(), thickness);
 
@@ -61,7 +61,7 @@
             }
         }
 
-        public void AddTextImFontPtr(Font font, float fontSize, PositionF position, Color color, string text, float wrapWidth = default, RectangleF cpuFineClipRectange = default)
+        public void AddText(Font font, float fontSize, PositionF position, Color color, string text, float wrapWidth = default, RectangleF cpuFineClipRectange = default)
         {
             fixed (byte* textPtr = Native.StringToUtf8(text))
             {
@@ -92,7 +92,7 @@
 
         public void AddImage(TextureId userTextureId, RectangleF rectangle) => AddImage(userTextureId, rectangle, new(new(), new(1, 1)));
 
-        public void AddImage(TextureId userTextureId, RectangleF rectangle, TextureRectangle textureRectangle) => Native.ImDrawList_AddImageEx(_list, userTextureId.ToNative(), rectangle.Min.ToNative(), rectangle.Max.ToNative(), textureRectangle.Min.ToNative(), textureRectangle.Max.ToNative(), 0xFFFFFFFF);
+        public void AddImage(TextureId userTextureId, RectangleF rectangle, TextureRectangle textureRectangle) => Native.ImDrawList_AddImageEx(_list, userTextureId.ToNative(), rectangle.Min.ToNative(), rectangle.Max.ToNative(), textureRectangle.Min.ToNative(), textureRectangle.Max.ToNative(), Color.White.ToNative());
 
         public void AddImage(TextureId userTextureId, RectangleF rectangle, TextureRectangle textureRectangle, Color color) => Native.ImDrawList_AddImageEx(_list, userTextureId.ToNative(), rectangle.Min.ToNative(), rectangle.Max.ToNative(), textureRectangle.Min.ToNative(), textureRectangle.Max.ToNative(), color.ToNative());
 
@@ -100,7 +100,7 @@
 
         public void AddImageQuad(TextureId userTextureId, RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1) => AddImageQuad(userTextureId, rectangle1, rectangle2, textureRectangle1, new(new(1, 1), new(0, 1)));
 
-        public void AddImageQuad(TextureId userTextureId, RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1, TextureRectangle textureRectangle2) => Native.ImDrawList_AddImageQuadEx(_list, userTextureId.ToNative(), rectangle1.Min.ToNative(), rectangle1.Max.ToNative(), rectangle2.Min.ToNative(), rectangle2.Max.ToNative(), textureRectangle1.Min.ToNative(), textureRectangle1.Max.ToNative(), textureRectangle2.Min.ToNative(), textureRectangle2.Max.ToNative(), 0xFFFFFFFF);
+        public void AddImageQuad(TextureId userTextureId, RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1, TextureRectangle textureRectangle2) => Native.ImDrawList_AddImageQuadEx(_list, userTextureId.ToNative(), rectangle1.Min.ToNative(), rectangle1.Max.ToNative(), rectangle2.Min.ToNative(), rectangle2.Max.ToNative(), textureRectangle1.Min.ToNative(), textureRectangle1.Max.ToNative(), textureRectangle2.Min.ToNative(), textureRectangle2.Max.ToNative(), Color.White.ToNative());
 
         public void AddImageQuad(TextureId userTextureId, RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1, TextureRectangle textureRectangle2, Color color) => Native.ImDrawList_AddImageQuadEx(_list, userTextureId.ToNative(), rectangle1.Min.ToNative(), rectangle1.Max.ToNative(), rectangle2.Min.ToNative(), rectangle2.Max.ToNative(), textureRectangle1.Min.ToNative(), textureRectangle1.Max.ToNative(), textureRectangle2.Min.ToNative(), textureRectangle2.Max.ToNative(), color.ToNative());
 
@@ -146,11 +146,11 @@
 
         public void PrimUnreserve(int indexCount, int vertexCount) => Native.ImDrawList_PrimUnreserve(_list, indexCount, vertexCount);
 
-        public void PrimRect(RectangleF rectangle, Color color) => Native.ImDrawList_PrimRect(_list, rectangle.Min.ToNative(), rectangle.Max.ToNative(), color.ToNative());
+        public void PrimRectangle(RectangleF rectangle, Color color) => Native.ImDrawList_PrimRect(_list, rectangle.Min.ToNative(), rectangle.Max.ToNative(), color.ToNative());
 
-        public void PrimRectUV(RectangleF rectangle, TextureRectangle uvRectangle, Color color) => Native.ImDrawList_PrimRectUV(_list, rectangle.Min.ToNative(), rectangle.Max.ToNative(), uvRectangle.Min.ToNative(), uvRectangle.Max.ToNative(), color.ToNative());
+        public void PrimRectangleUv(RectangleF rectangle, TextureRectangle uvRectangle, Color color) => Native.ImDrawList_PrimRectUV(_list, rectangle.Min.ToNative(), rectangle.Max.ToNative(), uvRectangle.Min.ToNative(), uvRectangle.Max.ToNative(), color.ToNative());
 
-        public void PrimQuadUV(RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1, TextureRectangle textureRectangle2, Color color) => Native.ImDrawList_PrimQuadUV(_list, rectangle1.Min.ToNative(), rectangle1.Max.ToNative(), rectangle2.Min.ToNative(), rectangle2.Max.ToNative(), textureRectangle1.Min.ToNative(), textureRectangle1.Max.ToNative(), textureRectangle2.Min.ToNative(), textureRectangle2.Max.ToNative(), color.ToNative());
+        public void PrimQuadUv(RectangleF rectangle1, RectangleF rectangle2, TextureRectangle textureRectangle1, TextureRectangle textureRectangle2, Color color) => Native.ImDrawList_PrimQuadUV(_list, rectangle1.Min.ToNative(), rectangle1.Max.ToNative(), rectangle2.Min.ToNative(), rectangle2.Max.ToNative(), textureRectangle1.Min.ToNative(), textureRectangle1.Max.ToNative(), textureRectangle2.Min.ToNative(), textureRectangle2.Max.ToNative(), color.ToNative());
 
         public void PrimWriteVertex(PositionF position, TexturePosition uv, Color color) => Native.ImDrawList_PrimWriteVtx(_list, position.ToNative(), uv.ToNative(), color.ToNative());
 

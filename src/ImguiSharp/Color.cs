@@ -2,6 +2,10 @@
 {
     public readonly unsafe record struct Color(byte Red, byte Green, byte Blue, byte Alpha) : INativeValueWrapper<Color, uint>
     {
+        public static Color White => new(Native.IM_COL32_WHITE);
+
+        public static Color Black => new(Native.IM_COL32_BLACK);
+
         private Color(uint color) : this(
             (byte)((color >> Native.IM_COL32_R_SHIFT) & 0xFF),
             (byte)((color >> Native.IM_COL32_G_SHIFT) & 0xFF),

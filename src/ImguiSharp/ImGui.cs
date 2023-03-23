@@ -98,7 +98,7 @@ namespace ImguiSharp
 
         public static bool BeginChild(string name, SizeF size = default, bool border = false, WindowOptions options = default) => Native.StringToUtf8Func(name, namePtr => Native.ImGui_BeginChild(namePtr, size.ToNative(), border, (Native.ImGuiWindowFlags)options));
 
-        public static void BeginChildId(Id id, SizeF size = default, bool border = false, WindowOptions options = default) => Native.ImGui_BeginChildID(id.ToNative(), size.ToNative(), border, (Native.ImGuiWindowFlags)options);
+        public static bool BeginChild(Id id, SizeF size = default, bool border = false, WindowOptions options = default) => Native.ImGui_BeginChildID(id.ToNative(), size.ToNative(), border, (Native.ImGuiWindowFlags)options);
 
         public static void EndChild() => Native.ImGui_EndChild();
 
@@ -1442,9 +1442,9 @@ namespace ImguiSharp
 
         #region Clipping
 
-        public static void PushClipRect(RectangleF rect, bool intersectWithCurrentClipRect) => Native.ImGui_PushClipRect(rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRect);
+        public static void PushClipRectangle(RectangleF rect, bool intersectWithCurrentClipRect) => Native.ImGui_PushClipRect(rect.Min.ToNative(), rect.Max.ToNative(), intersectWithCurrentClipRect);
 
-        public static void PopClipRect() => Native.ImGui_PopClipRect();
+        public static void PopClipRectangle() => Native.ImGui_PopClipRect();
 
         #endregion
 

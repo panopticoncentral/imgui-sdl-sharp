@@ -886,8 +886,8 @@ namespace SampleApp
                             Imgui.Text("aaaaaaaa bbbbbbbb, c cccccccc,dddddddd. d eeeeeeee   ffffffff. gggggggg!hhhhhhhh");
                         }
 
-                        drawList.AddRect(Imgui.GetItemRectangle(), new Color(255, 255, 0, 255));
-                        drawList.AddRectFilled(marker, new Color(255, 0, 255, 255));
+                        drawList.AddRectangle(Imgui.GetItemRectangle(), new Color(255, 255, 0, 255));
+                        drawList.AddRectangleFilled(marker, new Color(255, 0, 255, 255));
                         Imgui.PopTextWrapPosition();
                     }
 
@@ -1807,16 +1807,16 @@ namespace SampleApp
 
                 // Drags
                 Imgui.Text($"Underlying float value: {s_dragF.Value}");
-                _ = Imgui.Drag("DragFloat (0 -> 1)", s_dragF, 0.005f, 0.0f, 1.0f, "%.3f", s_flags3);
-                _ = Imgui.Drag("DragFloat (0 -> +inf)", s_dragF, 0.005f, 0.0f, float.MaxValue, "%.3f", s_flags3);
-                _ = Imgui.Drag("DragFloat (-inf -> 1)", s_dragF, 0.005f, -float.MaxValue, 1.0f, "%.3f", s_flags3);
-                _ = Imgui.Drag("DragFloat (-inf -> +inf)", s_dragF, 0.005f, -float.MaxValue, +float.MaxValue, "%.3f", s_flags3);
-                _ = Imgui.Drag("DragInt (0 -> 100)", s_dragI, 0.5f, 0, 100, "%d", s_flags3);
+                _ = Imgui.Drag("Drag (0 -> 1)", s_dragF, 0.005f, 0.0f, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Drag("Drag (0 -> +inf)", s_dragF, 0.005f, 0.0f, float.MaxValue, "%.3f", s_flags3);
+                _ = Imgui.Drag("Drag (-inf -> 1)", s_dragF, 0.005f, -float.MaxValue, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Drag("Drag (-inf -> +inf)", s_dragF, 0.005f, -float.MaxValue, +float.MaxValue, "%.3f", s_flags3);
+                _ = Imgui.Drag("Drag (0 -> 100)", s_dragI, 0.5f, 0, 100, "%d", s_flags3);
 
                 // Sliders
                 Imgui.Text($"Underlying float value: {s_sliderF.Value}");
-                _ = Imgui.Slider("SliderFloat (0 -> 1)", s_sliderF, 0.0f, 1.0f, "%.3f", s_flags3);
-                _ = Imgui.Slider("SliderInt (0 -> 100)", s_sliderI, 0, 100, "%d", s_flags3);
+                _ = Imgui.Slider("Slider (0 -> 1)", s_sliderF, 0.0f, 1.0f, "%.3f", s_flags3);
+                _ = Imgui.Slider("Slider (0 -> 100)", s_sliderI, 0, 100, "%d", s_flags3);
 
                 Imgui.TreePop();
             }
@@ -2222,8 +2222,8 @@ namespace SampleApp
                     $"IsItemVisible() = {Imgui.IsItemVisible()}\n" +
                     $"IsItemClicked() = {Imgui.IsItemClicked()}\n" +
                     $"IsItemToggledOpen() = {Imgui.IsItemToggledOpen()}\n" +
-                    $"GetItemRectMin() = ({Imgui.GetItemRectangle().Min.X:F1}, {Imgui.GetItemRectangle().Min.Y:F1})\n" +
-                    $"GetItemRectMax() = ({Imgui.GetItemRectangle().Max.X:F1}, {Imgui.GetItemRectangle().Max.Y:F1})\n" +
+                    $"GetItemRectangle().Min = ({Imgui.GetItemRectangle().Min.X:F1}, {Imgui.GetItemRectangle().Min.Y:F1})\n" +
+                    $"GetItemRectangle().Max = ({Imgui.GetItemRectangle().Max.X:F1}, {Imgui.GetItemRectangle().Max.Y:F1})\n" +
                     $"GetItemRectSize() = ({Imgui.GetItemRectangleSize().Width:F1}, {Imgui.GetItemRectangleSize().Height:F1})"
                 );
                 Imgui.BulletText($"w/ Hovering Delay: None = {hovered_delay_none}, Fast {hovered_delay_short}, Normal = {hovered_delay_normal}");
@@ -2338,785 +2338,843 @@ namespace SampleApp
             }
         }
 
+        private static readonly State<bool> disable_mouse_wheel = new(false);
+        private static readonly State<bool> disable_menu = new(false);
+        private static readonly State<int> offset_x = new(0);
+        private static readonly State<float> f = new(0.0f);
+        private static readonly State<bool> show_indented_items = new(true);
+        private static readonly State<bool> c1 = new(false), c2 = new(false), c3 = new(false), c4 = new(false);
+        private static readonly State<float> f0 = new(1.0f), f1 = new(2.0f), f2 = new(3.0f);
+        private static readonly State<int> item = new(-1);
+        private static readonly StateVector<int> selection = new(4, new[] { 0, 1, 2, 3 });
+        private static readonly State<int> track_item = new(50);
+        private static readonly State<bool> enable_track = new(true);
+        private static readonly State<bool> enable_extra_decorations = new(false);
+        private static readonly State<float> scroll_to_off_px = new(0.0f);
+        private static readonly State<float> scroll_to_pos_px = new(200.0f);
+        private static readonly State<int> lines = new(7);
+        private static readonly State<bool> show_horizontal_contents_size_demo_window = new(false);
+        private static readonly State<bool> show_h_scrollbar = new(true);
+        private static readonly State<bool> show_button = new(true);
+        private static readonly State<bool> show_tree_nodes = new(true);
+        private static readonly State<bool> show_text_wrapped = new(false);
+        private static readonly State<bool> show_columns = new(true);
+        private static readonly State<bool> show_tab_bar = new(true);
+        private static readonly State<bool> show_child = new(false);
+        private static readonly State<bool> explicit_content_size = new(false);
+        private static readonly State<float> contents_size_x = new(300.0f);
+        private static readonly State<bool> open = new(true);
+        private static readonly StateVector<float> size = new(2, new[] { 100.0f, 100.0f });
+        private static readonly State<float> offsetX = new(30.0f);
+        private static readonly State<float> offsetY = new(30.0f);
+
         private static void ShowDemoWindowLayout()
         {
             if (!Imgui.CollapsingHeader("Layout & Scrolling"))
+            {
                 return;
+            }
 
-            //    IMGUI_DEMO_MARKER("Layout/Child windows");
-            //    if (Imgui.TreeNode("Child windows"))
-            //    {
-            //        HelpMarker("Use child windows to begin into a self-contained independent scrolling/clipping regions within a host window.");
-            //        static bool disable_mouse_wheel = false;
-            //        static bool disable_menu = false;
-            //        Imgui.Checkbox("Disable Mouse Wheel", &disable_mouse_wheel);
-            //        Imgui.Checkbox("Disable Menu", &disable_menu);
-            //
-            //        // Child 1: no border, enable horizontal scrollbar
-            //        {
-            //            ImGuiWindowFlags window_flags = ImGuiWindowFlags_HorizontalScrollbar;
-            //            if (disable_mouse_wheel)
-            //                window_flags |= ImGuiWindowFlags_NoScrollWithMouse;
-            //            Imgui.BeginChild("ChildL", ImVec2(Imgui.GetContentRegionAvail().x * 0.5f, 260), false, window_flags);
-            //            for (int i = 0; i < 100; i++)
-            //                Imgui.Text("%04d: scrollable region", i);
-            //            Imgui.EndChild();
-            //        }
-            //
-            //        Imgui.SameLine();
-            //
-            //        // Child 2: rounded border
-            //        {
-            //            ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
-            //            if (disable_mouse_wheel)
-            //                window_flags |= ImGuiWindowFlags_NoScrollWithMouse;
-            //            if (!disable_menu)
-            //                window_flags |= ImGuiWindowFlags_MenuBar;
-            //            Imgui.PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-            //            Imgui.BeginChild("ChildR", ImVec2(0, 260), true, window_flags);
-            //            if (!disable_menu && Imgui.BeginMenuBar())
-            //            {
-            //                if (Imgui.BeginMenu("Menu"))
-            //                {
-            //                    ShowExampleMenuFile();
-            //                    Imgui.EndMenu();
-            //                }
-            //                Imgui.EndMenuBar();
-            //            }
-            //            if (Imgui.BeginTable("split", 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_NoSavedSettings))
-            //            {
-            //                for (int i = 0; i < 100; i++)
-            //                {
-            //                    char buf[32];
-            //                    sprintf(buf, "%03d", i);
-            //                    Imgui.TableNextColumn();
-            //                    Imgui.Button(buf, ImVec2(-FLT_MIN, 0.0f));
-            //                }
-            //                Imgui.EndTable();
-            //            }
-            //            Imgui.EndChild();
-            //            Imgui.PopStyleVar();
-            //        }
-            //
-            //        Imgui.Separator();
-            //
-            //        // Demonstrate a few extra things
-            //        // - Changing ImGuiCol_ChildBg (which is transparent black in default styles)
-            //        // - Using SetCursorPos() to position child window (the child window is an item from the POV of parent window)
-            //        //   You can also call SetNextWindowPos() to position the child window. The parent window will effectively
-            //        //   layout from this position.
-            //        // - Using Imgui.GetItemRectMin/Max() to query the "item" state (because the child window is an item from
-            //        //   the POV of the parent window). See 'Demo->Querying Status (Edited/Active/Hovered etc.)' for details.
-            //        {
-            //            static int offset_x = 0;
-            //            Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
-            //            Imgui.DragInt("Offset X", &offset_x, 1.0f, -1000, 1000);
-            //
-            //            Imgui.SetCursorPosX(Imgui.GetCursorPosX() + (float)offset_x);
-            //            Imgui.PushStyleColor(ImGuiCol_ChildBg, IM_COL32(255, 0, 0, 100));
-            //            Imgui.BeginChild("Red", ImVec2(200, 100), true, ImGuiWindowFlags_None);
-            //            for (int n = 0; n < 50; n++)
-            //                Imgui.Text("Some test %d", n);
-            //            Imgui.EndChild();
-            //            bool child_is_hovered = Imgui.IsItemHovered();
-            //            ImVec2 child_rect_min = Imgui.GetItemRectMin();
-            //            ImVec2 child_rect_max = Imgui.GetItemRectMax();
-            //            Imgui.PopStyleColor();
-            //            Imgui.Text("Hovered: %d", child_is_hovered);
-            //            Imgui.Text("Rect of child window is: (%.0f,%.0f) (%.0f,%.0f)", child_rect_min.x, child_rect_min.y, child_rect_max.x, child_rect_max.y);
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Widgets Width");
-            //    if (Imgui.TreeNode("Widgets Width"))
-            //    {
-            //        static float f = 0.0f;
-            //        static bool show_indented_items = true;
-            //        Imgui.Checkbox("Show indented items", &show_indented_items);
-            //
-            //        // Use SetNextItemWidth() to set the width of a single upcoming item.
-            //        // Use PushItemWidth()/PopItemWidth() to set the width of a group of items.
-            //        // In real code use you'll probably want to choose width values that are proportional to your font size
-            //        // e.g. Using '20.0f * GetFontSize()' as width instead of '200.0f', etc.
-            //
-            //        Imgui.Text("SetNextItemWidth/PushItemWidth(100)");
-            //        Imgui.SameLine(); HelpMarker("Fixed width.");
-            //        Imgui.PushItemWidth(100);
-            //        Imgui.DragFloat("float##1b", &f);
-            //        if (show_indented_items)
-            //        {
-            //            Imgui.Indent();
-            //            Imgui.DragFloat("float (indented)##1b", &f);
-            //            Imgui.Unindent();
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        Imgui.Text("SetNextItemWidth/PushItemWidth(-100)");
-            //        Imgui.SameLine(); HelpMarker("Align to right edge minus 100");
-            //        Imgui.PushItemWidth(-100);
-            //        Imgui.DragFloat("float##2a", &f);
-            //        if (show_indented_items)
-            //        {
-            //            Imgui.Indent();
-            //            Imgui.DragFloat("float (indented)##2b", &f);
-            //            Imgui.Unindent();
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        Imgui.Text("SetNextItemWidth/PushItemWidth(GetContentRegionAvail().x * 0.5f)");
-            //        Imgui.SameLine(); HelpMarker("Half of available width.\n(~ right-cursor_pos)\n(works within a column set)");
-            //        Imgui.PushItemWidth(Imgui.GetContentRegionAvail().x * 0.5f);
-            //        Imgui.DragFloat("float##3a", &f);
-            //        if (show_indented_items)
-            //        {
-            //            Imgui.Indent();
-            //            Imgui.DragFloat("float (indented)##3b", &f);
-            //            Imgui.Unindent();
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        Imgui.Text("SetNextItemWidth/PushItemWidth(-GetContentRegionAvail().x * 0.5f)");
-            //        Imgui.SameLine(); HelpMarker("Align to right edge minus half");
-            //        Imgui.PushItemWidth(-Imgui.GetContentRegionAvail().x * 0.5f);
-            //        Imgui.DragFloat("float##4a", &f);
-            //        if (show_indented_items)
-            //        {
-            //            Imgui.Indent();
-            //            Imgui.DragFloat("float (indented)##4b", &f);
-            //            Imgui.Unindent();
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        // Demonstrate using PushItemWidth to surround three items.
-            //        // Calling SetNextItemWidth() before each of them would have the same effect.
-            //        Imgui.Text("SetNextItemWidth/PushItemWidth(-FLT_MIN)");
-            //        Imgui.SameLine(); HelpMarker("Align to right edge");
-            //        Imgui.PushItemWidth(-FLT_MIN);
-            //        Imgui.DragFloat("##float5a", &f);
-            //        if (show_indented_items)
-            //        {
-            //            Imgui.Indent();
-            //            Imgui.DragFloat("float (indented)##5b", &f);
-            //            Imgui.Unindent();
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout");
-            //    if (Imgui.TreeNode("Basic Horizontal Layout"))
-            //    {
-            //        Imgui.TextWrapped("(Use Imgui.SameLine() to keep adding items to the right of the preceding item)");
-            //
-            //        // Text
-            //        IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout/SameLine");
-            //        Imgui.Text("Two items: Hello"); Imgui.SameLine();
-            //        Imgui.TextColored(ImVec4(1,1,0,1), "Sailor");
-            //
-            //        // Adjust spacing
-            //        Imgui.Text("More spacing: Hello"); Imgui.SameLine(0, 20);
-            //        Imgui.TextColored(ImVec4(1,1,0,1), "Sailor");
-            //
-            //        // Button
-            //        Imgui.AlignTextToFramePadding();
-            //        Imgui.Text("Normal buttons"); Imgui.SameLine();
-            //        Imgui.Button("Banana"); Imgui.SameLine();
-            //        Imgui.Button("Apple"); Imgui.SameLine();
-            //        Imgui.Button("Corniflower");
-            //
-            //        // Button
-            //        Imgui.Text("Small buttons"); Imgui.SameLine();
-            //        Imgui.SmallButton("Like this one"); Imgui.SameLine();
-            //        Imgui.Text("can fit within a text block.");
-            //
-            //        // Aligned to arbitrary position. Easy/cheap column.
-            //        IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout/SameLine (with offset)");
-            //        Imgui.Text("Aligned");
-            //        Imgui.SameLine(150); Imgui.Text("x=150");
-            //        Imgui.SameLine(300); Imgui.Text("x=300");
-            //        Imgui.Text("Aligned");
-            //        Imgui.SameLine(150); Imgui.SmallButton("x=150");
-            //        Imgui.SameLine(300); Imgui.SmallButton("x=300");
-            //
-            //        // Checkbox
-            //        IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout/SameLine (more)");
-            //        static bool c1 = false, c2 = false, c3 = false, c4 = false;
-            //        Imgui.Checkbox("My", &c1); Imgui.SameLine();
-            //        Imgui.Checkbox("Tailor", &c2); Imgui.SameLine();
-            //        Imgui.Checkbox("Is", &c3); Imgui.SameLine();
-            //        Imgui.Checkbox("Rich", &c4);
-            //
-            //        // Various
-            //        static float f0 = 1.0f, f1 = 2.0f, f2 = 3.0f;
-            //        Imgui.PushItemWidth(80);
-            //        const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD" };
-            //        static int item = -1;
-            //        Imgui.Combo("Combo", &item, items, items.Length); Imgui.SameLine();
-            //        Imgui.SliderFloat("X", &f0, 0.0f, 5.0f); Imgui.SameLine();
-            //        Imgui.SliderFloat("Y", &f1, 0.0f, 5.0f); Imgui.SameLine();
-            //        Imgui.SliderFloat("Z", &f2, 0.0f, 5.0f);
-            //        Imgui.PopItemWidth();
-            //
-            //        Imgui.PushItemWidth(80);
-            //        Imgui.Text("Lists:");
-            //        static int selection[4] = { 0, 1, 2, 3 };
-            //        for (int i = 0; i < 4; i++)
-            //        {
-            //            if (i > 0) Imgui.SameLine();
-            //            Imgui.PushID(i);
-            //            Imgui.ListBox("", &selection[i], items, items.Length);
-            //            Imgui.PopID();
-            //            //if (Imgui.IsItemHovered()) Imgui.SetTooltip("ListBox %d hovered", i);
-            //        }
-            //        Imgui.PopItemWidth();
-            //
-            //        // Dummy
-            //        IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout/Dummy");
-            //        ImVec2 button_sz(40, 40);
-            //        Imgui.Button("A", button_sz); Imgui.SameLine();
-            //        Imgui.Dummy(button_sz); Imgui.SameLine();
-            //        Imgui.Button("B", button_sz);
-            //
-            //        // Manually wrapping
-            //        // (we should eventually provide this as an automatic layout feature, but for now you can do it manually)
-            //        IMGUI_DEMO_MARKER("Layout/Basic Horizontal Layout/Manual wrapping");
-            //        Imgui.Text("Manual wrapping:");
-            //        ImGuiStyle& style = Imgui.GetStyle();
-            //        int buttons_count = 20;
-            //        float window_visible_x2 = Imgui.GetWindowPos().x + Imgui.GetWindowContentRegionMax().x;
-            //        for (int n = 0; n < buttons_count; n++)
-            //        {
-            //            Imgui.PushID(n);
-            //            Imgui.Button("Box", button_sz);
-            //            float last_button_x2 = Imgui.GetItemRectMax().x;
-            //            float next_button_x2 = last_button_x2 + style.ItemSpacing.x + button_sz.x; // Expected position if next button was on same line
-            //            if (n + 1 < buttons_count && next_button_x2 < window_visible_x2)
-            //                Imgui.SameLine();
-            //            Imgui.PopID();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Groups");
-            //    if (Imgui.TreeNode("Groups"))
-            //    {
-            //        HelpMarker(
-            //            "BeginGroup() basically locks the horizontal position for new line. "
-            //            "EndGroup() bundles the whole group so that you can use \"item\" functions such as "
-            //            "IsItemHovered()/IsItemActive() or SameLine() etc. on the whole group.");
-            //        Imgui.BeginGroup();
-            //        {
-            //            Imgui.BeginGroup();
-            //            Imgui.Button("AAA");
-            //            Imgui.SameLine();
-            //            Imgui.Button("BBB");
-            //            Imgui.SameLine();
-            //            Imgui.BeginGroup();
-            //            Imgui.Button("CCC");
-            //            Imgui.Button("DDD");
-            //            Imgui.EndGroup();
-            //            Imgui.SameLine();
-            //            Imgui.Button("EEE");
-            //            Imgui.EndGroup();
-            //            if (Imgui.IsItemHovered())
-            //                Imgui.SetTooltip("First group hovered");
-            //        }
-            //        // Capture the group size and create widgets using the same size
-            //        ImVec2 size = Imgui.GetItemRectSize();
-            //        const float values[5] = { 0.5f, 0.20f, 0.80f, 0.60f, 0.25f };
-            //        Imgui.PlotHistogram("##values", values, values.Length, 0, NULL, 0.0f, 1.0f, size);
-            //
-            //        Imgui.Button("ACTION", ImVec2((size.x - Imgui.GetStyle().ItemSpacing.x) * 0.5f, size.y));
-            //        Imgui.SameLine();
-            //        Imgui.Button("REACTION", ImVec2((size.x - Imgui.GetStyle().ItemSpacing.x) * 0.5f, size.y));
-            //        Imgui.EndGroup();
-            //        Imgui.SameLine();
-            //
-            //        Imgui.Button("LEVERAGE\nBUZZWORD", size);
-            //        Imgui.SameLine();
-            //
-            //        if (Imgui.BeginListBox("List", size))
-            //        {
-            //            Imgui.Selectable("Selected", true);
-            //            Imgui.Selectable("Not Selected", false);
-            //            Imgui.EndListBox();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Text Baseline Alignment");
-            //    if (Imgui.TreeNode("Text Baseline Alignment"))
-            //    {
-            //        {
-            //            Imgui.BulletText("Text baseline:");
-            //            Imgui.SameLine(); HelpMarker(
-            //                "This is testing the vertical alignment that gets applied on text to keep it aligned with widgets. "
-            //                "Lines only composed of text or \"small\" widgets use less vertical space than lines with framed widgets.");
-            //            Imgui.Indent();
-            //
-            //            Imgui.Text("KO Blahblah"); Imgui.SameLine();
-            //            Imgui.Button("Some framed item"); Imgui.SameLine();
-            //            HelpMarker("Baseline of button will look misaligned with text..");
-            //
-            //            // If your line starts with text, call AlignTextToFramePadding() to align text to upcoming widgets.
-            //            // (because we don't know what's coming after the Text() statement, we need to move the text baseline
-            //            // down by FramePadding.y ahead of time)
-            //            Imgui.AlignTextToFramePadding();
-            //            Imgui.Text("OK Blahblah"); Imgui.SameLine();
-            //            Imgui.Button("Some framed item"); Imgui.SameLine();
-            //            HelpMarker("We call AlignTextToFramePadding() to vertically align the text baseline by +FramePadding.y");
-            //
-            //            // SmallButton() uses the same vertical padding as Text
-            //            Imgui.Button("TEST##1"); Imgui.SameLine();
-            //            Imgui.Text("TEST"); Imgui.SameLine();
-            //            Imgui.SmallButton("TEST##2");
-            //
-            //            // If your line starts with text, call AlignTextToFramePadding() to align text to upcoming widgets.
-            //            Imgui.AlignTextToFramePadding();
-            //            Imgui.Text("Text aligned to framed item"); Imgui.SameLine();
-            //            Imgui.Button("Item##1"); Imgui.SameLine();
-            //            Imgui.Text("Item"); Imgui.SameLine();
-            //            Imgui.SmallButton("Item##2"); Imgui.SameLine();
-            //            Imgui.Button("Item##3");
-            //
-            //            Imgui.Unindent();
-            //        }
-            //
-            //        Imgui.Spacing();
-            //
-            //        {
-            //            Imgui.BulletText("Multi-line text:");
-            //            Imgui.Indent();
-            //            Imgui.Text("One\nTwo\nThree"); Imgui.SameLine();
-            //            Imgui.Text("Hello\nWorld"); Imgui.SameLine();
-            //            Imgui.Text("Banana");
-            //
-            //            Imgui.Text("Banana"); Imgui.SameLine();
-            //            Imgui.Text("Hello\nWorld"); Imgui.SameLine();
-            //            Imgui.Text("One\nTwo\nThree");
-            //
-            //            Imgui.Button("HOP##1"); Imgui.SameLine();
-            //            Imgui.Text("Banana"); Imgui.SameLine();
-            //            Imgui.Text("Hello\nWorld"); Imgui.SameLine();
-            //            Imgui.Text("Banana");
-            //
-            //            Imgui.Button("HOP##2"); Imgui.SameLine();
-            //            Imgui.Text("Hello\nWorld"); Imgui.SameLine();
-            //            Imgui.Text("Banana");
-            //            Imgui.Unindent();
-            //        }
-            //
-            //        Imgui.Spacing();
-            //
-            //        {
-            //            Imgui.BulletText("Misc items:");
-            //            Imgui.Indent();
-            //
-            //            // SmallButton() sets FramePadding to zero. Text baseline is aligned to match baseline of previous Button.
-            //            Imgui.Button("80x80", ImVec2(80, 80));
-            //            Imgui.SameLine();
-            //            Imgui.Button("50x50", ImVec2(50, 50));
-            //            Imgui.SameLine();
-            //            Imgui.Button("Button()");
-            //            Imgui.SameLine();
-            //            Imgui.SmallButton("SmallButton()");
-            //
-            //            // Tree
-            //            const float spacing = Imgui.GetStyle().ItemInnerSpacing.x;
-            //            Imgui.Button("Button##1");
-            //            Imgui.SameLine(0.0f, spacing);
-            //            if (Imgui.TreeNode("Node##1"))
-            //            {
-            //                // Placeholder tree data
-            //                for (int i = 0; i < 6; i++)
-            //                    Imgui.BulletText("Item %d..", i);
-            //                Imgui.TreePop();
-            //            }
-            //
-            //            // Vertically align text node a bit lower so it'll be vertically centered with upcoming widget.
-            //            // Otherwise you can use SmallButton() (smaller fit).
-            //            Imgui.AlignTextToFramePadding();
-            //
-            //            // Common mistake to avoid: if we want to SameLine after TreeNode we need to do it before we add
-            //            // other contents below the node.
-            //            bool node_open = Imgui.TreeNode("Node##2");
-            //            Imgui.SameLine(0.0f, spacing); Imgui.Button("Button##2");
-            //            if (node_open)
-            //            {
-            //                // Placeholder tree data
-            //                for (int i = 0; i < 6; i++)
-            //                    Imgui.BulletText("Item %d..", i);
-            //                Imgui.TreePop();
-            //            }
-            //
-            //            // Bullet
-            //            Imgui.Button("Button##3");
-            //            Imgui.SameLine(0.0f, spacing);
-            //            Imgui.BulletText("Bullet text");
-            //
-            //            Imgui.AlignTextToFramePadding();
-            //            Imgui.BulletText("Node");
-            //            Imgui.SameLine(0.0f, spacing); Imgui.Button("Button##4");
-            //            Imgui.Unindent();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Scrolling");
-            //    if (Imgui.TreeNode("Scrolling"))
-            //    {
-            //        // Vertical scroll functions
-            //        IMGUI_DEMO_MARKER("Layout/Scrolling/Vertical");
-            //        HelpMarker("Use SetScrollHereY() or SetScrollFromPosY() to scroll to a given vertical position.");
-            //
-            //        static int track_item = 50;
-            //        static bool enable_track = true;
-            //        static bool enable_extra_decorations = false;
-            //        static float scroll_to_off_px = 0.0f;
-            //        static float scroll_to_pos_px = 200.0f;
-            //
-            //        Imgui.Checkbox("Decoration", &enable_extra_decorations);
-            //
-            //        Imgui.Checkbox("Track", &enable_track);
-            //        Imgui.PushItemWidth(100);
-            //        Imgui.SameLine(140); enable_track |= Imgui.DragInt("##item", &track_item, 0.25f, 0, 99, "Item = %d");
-            //
-            //        bool scroll_to_off = Imgui.Button("Scroll Offset");
-            //        Imgui.SameLine(140); scroll_to_off |= Imgui.DragFloat("##off", &scroll_to_off_px, 1.00f, 0, FLT_MAX, "+%.0f px");
-            //
-            //        bool scroll_to_pos = Imgui.Button("Scroll To Pos");
-            //        Imgui.SameLine(140); scroll_to_pos |= Imgui.DragFloat("##pos", &scroll_to_pos_px, 1.00f, -10, FLT_MAX, "X/Y = %.0f px");
-            //        Imgui.PopItemWidth();
-            //
-            //        if (scroll_to_off || scroll_to_pos)
-            //            enable_track = false;
-            //
-            //        ImGuiStyle& style = Imgui.GetStyle();
-            //        float child_w = (Imgui.GetContentRegionAvail().x - 4 * style.ItemSpacing.x) / 5;
-            //        if (child_w < 1.0f)
-            //            child_w = 1.0f;
-            //        Imgui.PushID("##VerticalScrolling");
-            //        for (int i = 0; i < 5; i++)
-            //        {
-            //            if (i > 0) Imgui.SameLine();
-            //            Imgui.BeginGroup();
-            //            const char* names[] = { "Top", "25%", "Center", "75%", "Bottom" };
-            //            Imgui.TextUnformatted(names[i]);
-            //
-            //            const ImGuiWindowFlags child_flags = enable_extra_decorations ? ImGuiWindowFlags_MenuBar : 0;
-            //            const ImGuiID child_id = Imgui.GetID((void*)(intptr_t)i);
-            //            const bool child_is_visible = Imgui.BeginChild(child_id, ImVec2(child_w, 200.0f), true, child_flags);
-            //            if (Imgui.BeginMenuBar())
-            //            {
-            //                Imgui.TextUnformatted("abc");
-            //                Imgui.EndMenuBar();
-            //            }
-            //            if (scroll_to_off)
-            //                Imgui.SetScrollY(scroll_to_off_px);
-            //            if (scroll_to_pos)
-            //                Imgui.SetScrollFromPosY(Imgui.GetCursorStartPos().y + scroll_to_pos_px, i * 0.25f);
-            //            if (child_is_visible) // Avoid calling SetScrollHereY when running with culled items
-            //            {
-            //                for (int item = 0; item < 100; item++)
-            //                {
-            //                    if (enable_track && item == track_item)
-            //                    {
-            //                        Imgui.TextColored(ImVec4(1, 1, 0, 1), "Item %d", item);
-            //                        Imgui.SetScrollHereY(i * 0.25f); // 0.0f:top, 0.5f:center, 1.0f:bottom
-            //                    }
-            //                    else
-            //                    {
-            //                        Imgui.Text("Item %d", item);
-            //                    }
-            //                }
-            //            }
-            //            float scroll_y = Imgui.GetScrollY();
-            //            float scroll_max_y = Imgui.GetScrollMaxY();
-            //            Imgui.EndChild();
-            //            Imgui.Text("%.0f/%.0f", scroll_y, scroll_max_y);
-            //            Imgui.EndGroup();
-            //        }
-            //        Imgui.PopID();
-            //
-            //        // Horizontal scroll functions
-            //        IMGUI_DEMO_MARKER("Layout/Scrolling/Horizontal");
-            //        Imgui.Spacing();
-            //        HelpMarker(
-            //            "Use SetScrollHereX() or SetScrollFromPosX() to scroll to a given horizontal position.\n\n"
-            //            "Because the clipping rectangle of most window hides half worth of WindowPadding on the "
-            //            "left/right, using SetScrollFromPosX(+1) will usually result in clipped text whereas the "
-            //            "equivalent SetScrollFromPosY(+1) wouldn't.");
-            //        Imgui.PushID("##HorizontalScrolling");
-            //        for (int i = 0; i < 5; i++)
-            //        {
-            //            float child_height = Imgui.GetTextLineHeight() + style.ScrollbarSize + style.WindowPadding.y * 2.0f;
-            //            ImGuiWindowFlags child_flags = ImGuiWindowFlags_HorizontalScrollbar | (enable_extra_decorations ? ImGuiWindowFlags_AlwaysVerticalScrollbar : 0);
-            //            ImGuiID child_id = Imgui.GetID((void*)(intptr_t)i);
-            //            bool child_is_visible = Imgui.BeginChild(child_id, ImVec2(-100, child_height), true, child_flags);
-            //            if (scroll_to_off)
-            //                Imgui.SetScrollX(scroll_to_off_px);
-            //            if (scroll_to_pos)
-            //                Imgui.SetScrollFromPosX(Imgui.GetCursorStartPos().x + scroll_to_pos_px, i * 0.25f);
-            //            if (child_is_visible) // Avoid calling SetScrollHereY when running with culled items
-            //            {
-            //                for (int item = 0; item < 100; item++)
-            //                {
-            //                    if (item > 0)
-            //                        Imgui.SameLine();
-            //                    if (enable_track && item == track_item)
-            //                    {
-            //                        Imgui.TextColored(ImVec4(1, 1, 0, 1), "Item %d", item);
-            //                        Imgui.SetScrollHereX(i * 0.25f); // 0.0f:left, 0.5f:center, 1.0f:right
-            //                    }
-            //                    else
-            //                    {
-            //                        Imgui.Text("Item %d", item);
-            //                    }
-            //                }
-            //            }
-            //            float scroll_x = Imgui.GetScrollX();
-            //            float scroll_max_x = Imgui.GetScrollMaxX();
-            //            Imgui.EndChild();
-            //            Imgui.SameLine();
-            //            const char* names[] = { "Left", "25%", "Center", "75%", "Right" };
-            //            Imgui.Text("%s\n%.0f/%.0f", names[i], scroll_x, scroll_max_x);
-            //            Imgui.Spacing();
-            //        }
-            //        Imgui.PopID();
-            //
-            //        // Miscellaneous Horizontal Scrolling Demo
-            //        IMGUI_DEMO_MARKER("Layout/Scrolling/Horizontal (more)");
-            //        HelpMarker(
-            //            "Horizontal scrolling for a window is enabled via the ImGuiWindowFlags_HorizontalScrollbar flag.\n\n"
-            //            "You may want to also explicitly specify content width by using SetNextWindowContentWidth() before Begin().");
-            //        static int lines = 7;
-            //        Imgui.SliderInt("Lines", &lines, 1, 15);
-            //        Imgui.PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
-            //        Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2.0f, 1.0f));
-            //        ImVec2 scrolling_child_size = ImVec2(0, Imgui.GetFrameHeightWithSpacing() * 7 + 30);
-            //        Imgui.BeginChild("scrolling", scrolling_child_size, true, ImGuiWindowFlags_HorizontalScrollbar);
-            //        for (int line = 0; line < lines; line++)
-            //        {
-            //            // Display random stuff. For the sake of this trivial demo we are using basic Button() + SameLine()
-            //            // If you want to create your own time line for a real application you may be better off manipulating
-            //            // the cursor position yourself, aka using SetCursorPos/SetCursorScreenPos to position the widgets
-            //            // yourself. You may also want to use the lower-level ImDrawList API.
-            //            int num_buttons = 10 + ((line & 1) ? line * 9 : line * 3);
-            //            for (int n = 0; n < num_buttons; n++)
-            //            {
-            //                if (n > 0) Imgui.SameLine();
-            //                Imgui.PushID(n + line * 1000);
-            //                char num_buf[16];
-            //                sprintf(num_buf, "%d", n);
-            //                const char* label = (!(n % 15)) ? "FizzBuzz" : (!(n % 3)) ? "Fizz" : (!(n % 5)) ? "Buzz" : num_buf;
-            //                float hue = n * 0.05f;
-            //                Imgui.PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(hue, 0.6f, 0.6f));
-            //                Imgui.PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(hue, 0.7f, 0.7f));
-            //                Imgui.PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(hue, 0.8f, 0.8f));
-            //                Imgui.Button(label, ImVec2(40.0f + sinf((float)(line + n)) * 20.0f, 0.0f));
-            //                Imgui.PopStyleColor(3);
-            //                Imgui.PopID();
-            //            }
-            //        }
-            //        float scroll_x = Imgui.GetScrollX();
-            //        float scroll_max_x = Imgui.GetScrollMaxX();
-            //        Imgui.EndChild();
-            //        Imgui.PopStyleVar(2);
-            //        float scroll_x_delta = 0.0f;
-            //        Imgui.SmallButton("<<");
-            //        if (Imgui.IsItemActive())
-            //            scroll_x_delta = -Imgui.GetIO().DeltaTime * 1000.0f;
-            //        Imgui.SameLine();
-            //        Imgui.Text("Scroll from code"); Imgui.SameLine();
-            //        Imgui.SmallButton(">>");
-            //        if (Imgui.IsItemActive())
-            //            scroll_x_delta = +Imgui.GetIO().DeltaTime * 1000.0f;
-            //        Imgui.SameLine();
-            //        Imgui.Text("%.0f/%.0f", scroll_x, scroll_max_x);
-            //        if (scroll_x_delta != 0.0f)
-            //        {
-            //            // Demonstrate a trick: you can use Begin to set yourself in the context of another window
-            //            // (here we are already out of your child window)
-            //            Imgui.BeginChild("scrolling");
-            //            Imgui.SetScrollX(Imgui.GetScrollX() + scroll_x_delta);
-            //            Imgui.EndChild();
-            //        }
-            //        Imgui.Spacing();
-            //
-            //        static bool show_horizontal_contents_size_demo_window = false;
-            //        Imgui.Checkbox("Show Horizontal contents size demo window", &show_horizontal_contents_size_demo_window);
-            //
-            //        if (show_horizontal_contents_size_demo_window)
-            //        {
-            //            static bool show_h_scrollbar = true;
-            //            static bool show_button = true;
-            //            static bool show_tree_nodes = true;
-            //            static bool show_text_wrapped = false;
-            //            static bool show_columns = true;
-            //            static bool show_tab_bar = true;
-            //            static bool show_child = false;
-            //            static bool explicit_content_size = false;
-            //            static float contents_size_x = 300.0f;
-            //            if (explicit_content_size)
-            //                Imgui.SetNextWindowContentSize(ImVec2(contents_size_x, 0.0f));
-            //            Imgui.Begin("Horizontal contents size demo window", &show_horizontal_contents_size_demo_window, show_h_scrollbar ? ImGuiWindowFlags_HorizontalScrollbar : 0);
-            //            IMGUI_DEMO_MARKER("Layout/Scrolling/Horizontal contents size demo window");
-            //            Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(2, 0));
-            //            Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 0));
-            //            HelpMarker("Test of different widgets react and impact the work rectangle growing when horizontal scrolling is enabled.\n\nUse 'Metrics->Tools->Show windows rectangles' to visualize rectangles.");
-            //            Imgui.Checkbox("H-scrollbar", &show_h_scrollbar);
-            //            Imgui.Checkbox("Button", &show_button);            // Will grow contents size (unless explicitly overwritten)
-            //            Imgui.Checkbox("Tree nodes", &show_tree_nodes);    // Will grow contents size and display highlight over full width
-            //            Imgui.Checkbox("Text wrapped", &show_text_wrapped);// Will grow and use contents size
-            //            Imgui.Checkbox("Columns", &show_columns);          // Will use contents size
-            //            Imgui.Checkbox("Tab bar", &show_tab_bar);          // Will use contents size
-            //            Imgui.Checkbox("Child", &show_child);              // Will grow and use contents size
-            //            Imgui.Checkbox("Explicit content size", &explicit_content_size);
-            //            Imgui.Text("Scroll %.1f/%.1f %.1f/%.1f", Imgui.GetScrollX(), Imgui.GetScrollMaxX(), Imgui.GetScrollY(), Imgui.GetScrollMaxY());
-            //            if (explicit_content_size)
-            //            {
-            //                Imgui.SameLine();
-            //                Imgui.SetNextItemWidth(100);
-            //                Imgui.DragFloat("##csx", &contents_size_x);
-            //                ImVec2 p = Imgui.GetCursorScreenPos();
-            //                Imgui.GetWindowDrawList()->AddRectFilled(p, ImVec2(p.x + 10, p.y + 10), IM_COL32_WHITE);
-            //                Imgui.GetWindowDrawList()->AddRectFilled(ImVec2(p.x + contents_size_x - 10, p.y), ImVec2(p.x + contents_size_x, p.y + 10), IM_COL32_WHITE);
-            //                Imgui.Dummy(ImVec2(0, 10));
-            //            }
-            //            Imgui.PopStyleVar(2);
-            //            Imgui.Separator();
-            //            if (show_button)
-            //            {
-            //                Imgui.Button("this is a 300-wide button", ImVec2(300, 0));
-            //            }
-            //            if (show_tree_nodes)
-            //            {
-            //                bool open = true;
-            //                if (Imgui.TreeNode("this is a tree node"))
-            //                {
-            //                    if (Imgui.TreeNode("another one of those tree node..."))
-            //                    {
-            //                        Imgui.Text("Some tree contents");
-            //                        Imgui.TreePop();
-            //                    }
-            //                    Imgui.TreePop();
-            //                }
-            //                Imgui.CollapsingHeader("CollapsingHeader", &open);
-            //            }
-            //            if (show_text_wrapped)
-            //            {
-            //                Imgui.TextWrapped("This text should automatically wrap on the edge of the work rectangle.");
-            //            }
-            //            if (show_columns)
-            //            {
-            //                Imgui.Text("Tables:");
-            //                if (Imgui.BeginTable("table", 4, ImGuiTableFlags_Borders))
-            //                {
-            //                    for (int n = 0; n < 4; n++)
-            //                    {
-            //                        Imgui.TableNextColumn();
-            //                        Imgui.Text("Width %.2f", Imgui.GetContentRegionAvail().x);
-            //                    }
-            //                    Imgui.EndTable();
-            //                }
-            //                Imgui.Text("Columns:");
-            //                Imgui.Columns(4);
-            //                for (int n = 0; n < 4; n++)
-            //                {
-            //                    Imgui.Text("Width %.2f", Imgui.GetColumnWidth());
-            //                    Imgui.NextColumn();
-            //                }
-            //                Imgui.Columns(1);
-            //            }
-            //            if (show_tab_bar && Imgui.BeginTabBar("Hello"))
-            //            {
-            //                if (Imgui.BeginTabItem("OneOneOne")) { Imgui.EndTabItem(); }
-            //                if (Imgui.BeginTabItem("TwoTwoTwo")) { Imgui.EndTabItem(); }
-            //                if (Imgui.BeginTabItem("ThreeThreeThree")) { Imgui.EndTabItem(); }
-            //                if (Imgui.BeginTabItem("FourFourFour")) { Imgui.EndTabItem(); }
-            //                Imgui.EndTabBar();
-            //            }
-            //            if (show_child)
-            //            {
-            //                Imgui.BeginChild("child", ImVec2(0, 0), true);
-            //                Imgui.EndChild();
-            //            }
-            //            Imgui.End();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Layout/Clipping");
-            //    if (Imgui.TreeNode("Clipping"))
-            //    {
-            //        static ImVec2 size(100.0f, 100.0f);
-            //        static ImVec2 offset(30.0f, 30.0f);
-            //        Imgui.DragFloat2("size", (float*)&size, 0.5f, 1.0f, 200.0f, "%.0f");
-            //        Imgui.TextWrapped("(Click and drag to scroll)");
-            //
-            //        HelpMarker(
-            //            "(Left) Using Imgui.PushClipRect():\n"
-            //            "Will alter ImGui hit-testing logic + ImDrawList rendering.\n"
-            //            "(use this if you want your clipping rectangle to affect interactions)\n\n"
-            //            "(Center) Using ImDrawList::PushClipRect():\n"
-            //            "Will alter ImDrawList rendering only.\n"
-            //            "(use this as a shortcut if you are only using ImDrawList calls)\n\n"
-            //            "(Right) Using ImDrawList::AddText() with a fine ClipRect:\n"
-            //            "Will alter only this specific ImDrawList::AddText() rendering.\n"
-            //            "This is often used internally to avoid altering the clipping rectangle and minimize draw calls.");
-            //
-            //        for (int n = 0; n < 3; n++)
-            //        {
-            //            if (n > 0)
-            //                Imgui.SameLine();
-            //
-            //            Imgui.PushID(n);
-            //            Imgui.InvisibleButton("##canvas", size);
-            //            if (Imgui.IsItemActive() && Imgui.IsMouseDragging(ImGuiMouseButton_Left))
-            //            {
-            //                offset.x += Imgui.GetIO().MouseDelta.x;
-            //                offset.y += Imgui.GetIO().MouseDelta.y;
-            //            }
-            //            Imgui.PopID();
-            //            if (!Imgui.IsItemVisible()) // Skip rendering as ImDrawList elements are not clipped.
-            //                continue;
-            //
-            //            const ImVec2 p0 = Imgui.GetItemRectMin();
-            //            const ImVec2 p1 = Imgui.GetItemRectMax();
-            //            const char* text_str = "Line 1 hello\nLine 2 clip me!";
-            //            const ImVec2 text_pos = ImVec2(p0.x + offset.x, p0.y + offset.y);
-            //            ImDrawList* draw_list = Imgui.GetWindowDrawList();
-            //            switch (n)
-            //            {
-            //            case 0:
-            //                Imgui.PushClipRect(p0, p1, true);
-            //                draw_list->AddRectFilled(p0, p1, IM_COL32(90, 90, 120, 255));
-            //                draw_list->AddText(text_pos, IM_COL32_WHITE, text_str);
-            //                Imgui.PopClipRect();
-            //                break;
-            //            case 1:
-            //                draw_list->PushClipRect(p0, p1, true);
-            //                draw_list->AddRectFilled(p0, p1, IM_COL32(90, 90, 120, 255));
-            //                draw_list->AddText(text_pos, IM_COL32_WHITE, text_str);
-            //                draw_list->PopClipRect();
-            //                break;
-            //            case 2:
-            //                ImVec4 clip_rect(p0.x, p0.y, p1.x, p1.y); // AddText() takes a ImVec4* here so let's convert.
-            //                draw_list->AddRectFilled(p0, p1, IM_COL32(90, 90, 120, 255));
-            //                draw_list->AddText(Imgui.GetFont(), Imgui.GetFontSize(), text_pos, IM_COL32_WHITE, text_str, NULL, 0.0f, &clip_rect);
-            //                break;
-            //            }
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
+            if (Imgui.TreeNode("Child windows"))
+            {
+                HelpMarker("Use child windows to begin into a self-contained independent scrolling/clipping regions within a host window.");
+                _ = Imgui.Checkbox("Disable Mouse Wheel", disable_mouse_wheel);
+                _ = Imgui.Checkbox("Disable Menu", disable_menu);
+
+                {
+                    var window_flags = WindowOptions.HorizontalScrollbar;
+                    if (disable_mouse_wheel)
+                    {
+                        window_flags |= WindowOptions.NoScrollWithMouse;
+                    }
+
+                    _ = Imgui.BeginChild("ChildL", new(Imgui.GetContentRegionAvailable().Width * 0.5f, 260), false, window_flags);
+                    for (var i = 0; i < 100; i++)
+                    {
+                        Imgui.Text($"{i:D4}: scrollable region");
+                    }
+
+                    Imgui.EndChild();
+                }
+
+                Imgui.SameLine();
+
+                {
+                    var window_flags = WindowOptions.None;
+                    if (disable_mouse_wheel)
+                    {
+                        window_flags |= WindowOptions.NoScrollWithMouse;
+                    }
+
+                    if (!disable_menu)
+                    {
+                        window_flags |= WindowOptions.MenuBar;
+                    }
+
+                    Imgui.PushStyleVariable(StyleVariable.ChildRounding, 5.0f);
+                    _ = Imgui.BeginChild("ChildR", new(0, 260), true, window_flags);
+                    if (!disable_menu && Imgui.BeginMenuBar())
+                    {
+                        if (Imgui.BeginMenu("Menu"))
+                        {
+                            ShowExampleMenuFile();
+                            Imgui.EndMenu();
+                        }
+                        Imgui.EndMenuBar();
+                    }
+                    if (Imgui.BeginTable("split", 2, TableOptions.Resizable | TableOptions.NoSavedSettings))
+                    {
+                        for (var i = 0; i < 100; i++)
+                        {
+                            _ = Imgui.TableNextColumn();
+                            _ = Imgui.Button($"{i:D3}", new(-SizeF.MinNormalizedValue, 0.0f));
+                        }
+                        Imgui.EndTable();
+                    }
+                    Imgui.EndChild();
+                    Imgui.PopStyleVariable();
+                }
+
+                Imgui.Separator();
+
+                {
+                    Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
+                    _ = Imgui.Drag("Offset X", offset_x, 1.0f, -1000, 1000);
+
+                    Imgui.SetCursorPosX(Imgui.GetCursorPosX() + (float)offset_x);
+                    Imgui.PushStyleColor(StyleColor.ChildBackground, new Color(255, 0, 0, 100));
+                    _ = Imgui.BeginChild("Red", new(200, 100), true, WindowOptions.None);
+                    for (var n = 0; n < 50; n++)
+                    {
+                        Imgui.Text($"Some test {n}");
+                    }
+
+                    Imgui.EndChild();
+                    var child_is_hovered = Imgui.IsItemHovered();
+                    var child_rect_min = Imgui.GetItemRectangle().Min;
+                    var child_rect_max = Imgui.GetItemRectangle().Max;
+                    Imgui.PopStyleColor();
+                    Imgui.Text($"Hovered: {child_is_hovered}");
+                    Imgui.Text($"Rect of child window is: ({child_rect_min.X:F0},{child_rect_min.Y:F0}) ({child_rect_max.X:F0},{child_rect_max.Y:F0})");
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Widgets Width"))
+            {
+                _ = Imgui.Checkbox("Show indented items", show_indented_items);
+
+                Imgui.Text("SetNextItemWidth/PushItemWidth(100)");
+                Imgui.SameLine();
+                HelpMarker("Fixed width.");
+                Imgui.PushItemWidth(100);
+                _ = Imgui.Drag("float##1b", f);
+                if (show_indented_items)
+                {
+                    Imgui.Indent();
+                    _ = Imgui.Drag("float (indented)##1b", f);
+                    Imgui.Unindent();
+                }
+                Imgui.PopItemWidth();
+
+                Imgui.Text("SetNextItemWidth/PushItemWidth(-100)");
+                Imgui.SameLine();
+                HelpMarker("Align to right edge minus 100");
+                Imgui.PushItemWidth(-100);
+                _ = Imgui.Drag("float##2a", f);
+                if (show_indented_items)
+                {
+                    Imgui.Indent();
+                    _ = Imgui.Drag("float (indented)##2b", f);
+                    Imgui.Unindent();
+                }
+                Imgui.PopItemWidth();
+
+                Imgui.Text("SetNextItemWidth/PushItemWidth(GetContentRegionAvailable().Width * 0.5f)");
+                Imgui.SameLine()
+                    ; HelpMarker("Half of available width.\n(~ right-cursor_pos)\n(works within a column set)");
+                Imgui.PushItemWidth(Imgui.GetContentRegionAvailable().Width * 0.5f);
+                _ = Imgui.Drag("float##3a", f);
+                if (show_indented_items)
+                {
+                    Imgui.Indent();
+                    _ = Imgui.Drag("float (indented)##3b", f);
+                    Imgui.Unindent();
+                }
+                Imgui.PopItemWidth();
+
+                Imgui.Text("SetNextItemWidth/PushItemWidth(-GetContentRegionAvailable().Width * 0.5f)");
+                Imgui.SameLine();
+                HelpMarker("Align to right edge minus half");
+                Imgui.PushItemWidth(-Imgui.GetContentRegionAvailable().Width * 0.5f);
+                _ = Imgui.Drag("float##4a", f);
+                if (show_indented_items)
+                {
+                    Imgui.Indent();
+                    _ = Imgui.Drag("float (indented)##4b", f);
+                    Imgui.Unindent();
+                }
+                Imgui.PopItemWidth();
+
+                Imgui.Text("SetNextItemWidth/PushItemWidth(-FLT_MIN)");
+                Imgui.SameLine();
+                HelpMarker("Align to right edge");
+                Imgui.PushItemWidth(-SizeF.MinNormalizedValue);
+                _ = Imgui.Drag("##float5a", f);
+                if (show_indented_items)
+                {
+                    Imgui.Indent();
+                    _ = Imgui.Drag("float (indented)##5b", f);
+                    Imgui.Unindent();
+                }
+                Imgui.PopItemWidth();
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Basic Horizontal Layout"))
+            {
+                Imgui.TextWrapped("(Use Imgui.SameLine() to keep adding items to the right of the preceding item)");
+
+                Imgui.Text("Two items: Hello");
+                Imgui.SameLine();
+                Imgui.TextColored(new(1, 1, 0, 1), "Sailor");
+
+                Imgui.Text("More spacing: Hello");
+                Imgui.SameLine(0, 20);
+                Imgui.TextColored(new(1, 1, 0, 1), "Sailor");
+
+                Imgui.AlignTextToFramePadding();
+                Imgui.Text("Normal buttons");
+                Imgui.SameLine();
+                _ = Imgui.Button("Banana");
+                Imgui.SameLine();
+                _ = Imgui.Button("Apple");
+                Imgui.SameLine();
+                _ = Imgui.Button("Corniflower");
+
+                Imgui.Text("Small buttons");
+                Imgui.SameLine();
+                _ = Imgui.SmallButton("Like this one");
+                Imgui.SameLine();
+                Imgui.Text("can fit within a text block.");
+
+                Imgui.Text("Aligned");
+                Imgui.SameLine(150);
+                Imgui.Text("x=150");
+                Imgui.SameLine(300);
+                Imgui.Text("x=300");
+                Imgui.Text("Aligned");
+                Imgui.SameLine(150);
+                _ = Imgui.SmallButton("x=150");
+                Imgui.SameLine(300);
+                _ = Imgui.SmallButton("x=300");
+
+                _ = Imgui.Checkbox("My", c1);
+                Imgui.SameLine();
+                _ = Imgui.Checkbox("Tailor", c2);
+                Imgui.SameLine();
+                _ = Imgui.Checkbox("Is", c3);
+                Imgui.SameLine();
+                _ = Imgui.Checkbox("Rich", c4);
+
+                Imgui.PushItemWidth(80);
+                var items = new[] { "AAAA", "BBBB", "CCCC", "DDDD" };
+                _ = Imgui.Combo("Combo", item, items);
+                Imgui.SameLine();
+                _ = Imgui.Slider("X", f0, 0.0f, 5.0f);
+                Imgui.SameLine();
+                _ = Imgui.Slider("Y", f1, 0.0f, 5.0f);
+                Imgui.SameLine();
+                _ = Imgui.Slider("Z", f2, 0.0f, 5.0f);
+                Imgui.PopItemWidth();
+
+                Imgui.PushItemWidth(80);
+                Imgui.Text("Lists:");
+                for (var i = 0; i < 4; i++)
+                {
+                    if (i > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.PushId(i);
+                    _ = Imgui.ListBox("", selection.GetStateOfElement(i), items, items.Length);
+                    Imgui.PopId();
+                }
+                Imgui.PopItemWidth();
+
+                SizeF buttonSz = new(40, 40);
+                _ = Imgui.Button("A", buttonSz);
+                Imgui.SameLine();
+                Imgui.Dummy(buttonSz);
+                Imgui.SameLine();
+                _ = Imgui.Button("B", buttonSz);
+
+                Imgui.Text("Manual wrapping:");
+                var style = Imgui.GetStyle();
+                var buttons_count = 20;
+                var window_visible_x2 = Imgui.GetWindowPosition().X + Imgui.GetWindowContentRegionMax().X;
+                for (var n = 0; n < buttons_count; n++)
+                {
+                    Imgui.PushId(n);
+                    _ = Imgui.Button("Box", buttonSz);
+                    var last_button_x2 = Imgui.GetItemRectangle().Max.X;
+                    var next_button_x2 = last_button_x2 + style.ItemSpacing.Width + buttonSz.Width;
+                    if (n + 1 < buttons_count && next_button_x2 < window_visible_x2)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.PopId();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Groups"))
+            {
+                HelpMarker(
+                    "BeginGroup() basically locks the horizontal position for new line. " +
+                    "EndGroup() bundles the whole group so that you can use \"item\" functions such as " +
+                    "IsItemHovered()/IsItemActive() or SameLine() etc. on the whole group.");
+                Imgui.BeginGroup();
+                {
+                    Imgui.BeginGroup();
+                    _ = Imgui.Button("AAA");
+                    Imgui.SameLine();
+                    _ = Imgui.Button("BBB");
+                    Imgui.SameLine();
+                    Imgui.BeginGroup();
+                    _ = Imgui.Button("CCC");
+                    _ = Imgui.Button("DDD");
+                    Imgui.EndGroup();
+                    Imgui.SameLine();
+                    _ = Imgui.Button("EEE");
+                    Imgui.EndGroup();
+                    if (Imgui.IsItemHovered())
+                    {
+                        Imgui.SetTooltip("First group hovered");
+                    }
+                }
+                // Capture the group size and create widgets using the same size
+                var size = Imgui.GetItemRectangleSize();
+                var values = new float[] { 0.5f, 0.20f, 0.80f, 0.60f, 0.25f };
+                Imgui.PlotHistogram("##values", values, 0, null, 0.0f, 1.0f, size);
+
+                _ = Imgui.Button("ACTION", new((size.Width - Imgui.GetStyle().ItemSpacing.Width) * 0.5f, size.Height));
+                Imgui.SameLine();
+                _ = Imgui.Button("REACTION", new((size.Width - Imgui.GetStyle().ItemSpacing.Width) * 0.5f, size.Height));
+                Imgui.EndGroup();
+                Imgui.SameLine();
+
+                _ = Imgui.Button("LEVERAGE\nBUZZWORD", size);
+                Imgui.SameLine();
+
+                if (Imgui.BeginListBox("List", size))
+                {
+                    _ = Imgui.Selectable("Selected", true);
+                    _ = Imgui.Selectable("Not Selected", false);
+                    Imgui.EndListBox();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Text Baseline Alignment"))
+            {
+                {
+                    Imgui.BulletText("Text baseline:");
+                    Imgui.SameLine(); HelpMarker(
+                        "This is testing the vertical alignment that gets applied on text to keep it aligned with widgets. " +
+                        "Lines only composed of text or \"small\" widgets use less vertical space than lines with framed widgets.");
+                    Imgui.Indent();
+
+                    Imgui.Text("KO Blahblah");
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Some framed item");
+                    Imgui.SameLine();
+                    HelpMarker("Baseline of button will look misaligned with text..");
+
+                    Imgui.AlignTextToFramePadding();
+                    Imgui.Text("OK Blahblah");
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Some framed item");
+                    Imgui.SameLine();
+                    HelpMarker("We call AlignTextToFramePadding() to vertically align the text baseline by +FramePadding.Y");
+
+                    _ = Imgui.Button("TEST##1");
+                    Imgui.SameLine();
+                    Imgui.Text("TEST");
+                    Imgui.SameLine();
+                    _ = Imgui.SmallButton("TEST##2");
+
+                    Imgui.AlignTextToFramePadding();
+                    Imgui.Text("Text aligned to framed item");
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Item##1");
+                    Imgui.SameLine();
+                    Imgui.Text("Item");
+                    Imgui.SameLine();
+                    _ = Imgui.SmallButton("Item##2");
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Item##3");
+
+                    Imgui.Unindent();
+                }
+
+                Imgui.Spacing();
+
+                {
+                    Imgui.BulletText("Multi-line text:");
+                    Imgui.Indent();
+                    Imgui.Text("One\nTwo\nThree");
+                    Imgui.SameLine();
+                    Imgui.Text("Hello\nWorld");
+                    Imgui.SameLine();
+                    Imgui.Text("Banana");
+
+                    Imgui.Text("Banana");
+                    Imgui.SameLine();
+                    Imgui.Text("Hello\nWorld");
+                    Imgui.SameLine();
+                    Imgui.Text("One\nTwo\nThree");
+
+                    _ = Imgui.Button("HOP##1");
+                    Imgui.SameLine();
+                    Imgui.Text("Banana");
+                    Imgui.SameLine();
+                    Imgui.Text("Hello\nWorld");
+                    Imgui.SameLine();
+                    Imgui.Text("Banana");
+
+                    _ = Imgui.Button("HOP##2");
+                    Imgui.SameLine();
+                    Imgui.Text("Hello\nWorld");
+                    Imgui.SameLine();
+                    Imgui.Text("Banana");
+                    Imgui.Unindent();
+                }
+
+                Imgui.Spacing();
+
+                {
+                    Imgui.BulletText("Misc items:");
+                    Imgui.Indent();
+
+                    _ = Imgui.Button("80x80", new(80, 80));
+                    Imgui.SameLine();
+                    _ = Imgui.Button("50x50", new(50, 50));
+                    Imgui.SameLine();
+                    _ = Imgui.Button("Button()");
+                    Imgui.SameLine();
+                    _ = Imgui.SmallButton("SmallButton()");
+
+                    var spacing = Imgui.GetStyle().ItemInnerSpacing.Width;
+                    _ = Imgui.Button("Button##1");
+                    Imgui.SameLine(0.0f, spacing);
+                    if (Imgui.TreeNode("Node##1"))
+                    {
+                        for (var i = 0; i < 6; i++)
+                        {
+                            Imgui.BulletText($"Item {i}..");
+                        }
+
+                        Imgui.TreePop();
+                    }
+
+                    Imgui.AlignTextToFramePadding();
+
+                    var node_open = Imgui.TreeNode("Node##2");
+                    Imgui.SameLine(0.0f, spacing); _ = Imgui.Button("Button##2");
+                    if (node_open)
+                    {
+                        for (var i = 0; i < 6; i++)
+                        {
+                            Imgui.BulletText($"Item {i}..");
+                        }
+
+                        Imgui.TreePop();
+                    }
+
+                    _ = Imgui.Button("Button##3");
+                    Imgui.SameLine(0.0f, spacing);
+                    Imgui.BulletText("Bullet text");
+
+                    Imgui.AlignTextToFramePadding();
+                    Imgui.BulletText("Node");
+                    Imgui.SameLine(0.0f, spacing); _ = Imgui.Button("Button##4");
+                    Imgui.Unindent();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Scrolling"))
+            {
+                HelpMarker("Use SetScrollHereY() or SetScrollFromPosY() to scroll to a given vertical position.");
+
+                _ = Imgui.Checkbox("Decoration", enable_extra_decorations);
+
+                _ = Imgui.Checkbox("Track", enable_track);
+                Imgui.PushItemWidth(100);
+                Imgui.SameLine(140); enable_track.Value |= Imgui.Drag("##item", track_item, 0.25f, 0, 99, "Item = %d");
+
+                var scroll_to_off = Imgui.Button("Scroll Offset");
+                Imgui.SameLine(140); scroll_to_off |= Imgui.Drag("##off", scroll_to_off_px, 1.00f, 0, float.MaxValue, "+%.0f px");
+
+                var scroll_to_pos = Imgui.Button("Scroll To Pos");
+                Imgui.SameLine(140); scroll_to_pos |= Imgui.Drag("##pos", scroll_to_pos_px, 1.00f, -10, float.MaxValue, "X/Y = %.0f px");
+                Imgui.PopItemWidth();
+
+                if (scroll_to_off || scroll_to_pos)
+                {
+                    enable_track.Value = false;
+                }
+
+                var style = Imgui.GetStyle();
+                var child_w = (Imgui.GetContentRegionAvailable().Width - (4 * style.ItemSpacing.Width)) / 5;
+                if (child_w < 1.0f)
+                {
+                    child_w = 1.0f;
+                }
+
+                Imgui.PushId("##VerticalScrolling");
+                for (var i = 0; i < 5; i++)
+                {
+                    if (i > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.BeginGroup();
+                    var names = new[] { "Top", "25%", "Center", "75%", "Bottom" };
+                    Imgui.TextUnformatted(names[i]);
+
+                    var child_flags = enable_extra_decorations ? WindowOptions.MenuBar : 0;
+                    var child_id = Imgui.GetId((nuint)i);
+                    var child_is_visible = Imgui.BeginChild(child_id, new(child_w, 200.0f), true, child_flags);
+                    if (Imgui.BeginMenuBar())
+                    {
+                        Imgui.TextUnformatted("abc");
+                        Imgui.EndMenuBar();
+                    }
+                    if (scroll_to_off)
+                    {
+                        Imgui.SetScrollY(scroll_to_off_px);
+                    }
+
+                    if (scroll_to_pos)
+                    {
+                        Imgui.SetScrollFromPositionY(Imgui.GetCursorStartPosition().Y + scroll_to_pos_px, i * 0.25f);
+                    }
+
+                    if (child_is_visible) // Avoid calling SetScrollHereY when running with culled items
+                    {
+                        for (var item = 0; item < 100; item++)
+                        {
+                            if (enable_track && item == track_item)
+                            {
+                                Imgui.TextColored(new(1, 1, 0, 1), $"Item {item}");
+                                Imgui.SetScrollHereY(i * 0.25f);
+                            }
+                            else
+                            {
+                                Imgui.Text($"Item {item}");
+                            }
+                        }
+                    }
+                    var scroll_y = Imgui.GetScrollY();
+                    var scroll_max_y = Imgui.GetScrollMaxY();
+                    Imgui.EndChild();
+                    Imgui.Text($"{scroll_y:F0}/{scroll_max_y:F0}");
+                    Imgui.EndGroup();
+                }
+                Imgui.PopId();
+
+                Imgui.Spacing();
+                HelpMarker(
+                    "Use SetScrollHereX() or SetScrollFromPosX() to scroll to a given horizontal position.\n\n" +
+                    "Because the clipping rectangle of most window hides half worth of WindowPadding on the " +
+                    "left/right, using SetScrollFromPosX(+1) will usually result in clipped text whereas the " +
+                    "equivalent SetScrollFromPosY(+1) wouldn't.");
+                Imgui.PushId("##HorizontalScrolling");
+                for (var i = 0; i < 5; i++)
+                {
+                    var child_height = Imgui.GetTextLineHeight() + style.ScrollbarSize + (style.WindowPadding.Width * 2.0f);
+                    var child_flags = WindowOptions.HorizontalScrollbar | (enable_extra_decorations ? WindowOptions.AlwaysVerticalScrollbar : 0);
+                    var child_id = Imgui.GetId((nuint)i);
+                    var child_is_visible = Imgui.BeginChild(child_id, new(-100, child_height), true, child_flags);
+                    if (scroll_to_off)
+                    {
+                        Imgui.SetScrollX(scroll_to_off_px);
+                    }
+
+                    if (scroll_to_pos)
+                    {
+                        Imgui.SetScrollFromPositionX(Imgui.GetCursorStartPosition().X + scroll_to_pos_px, i * 0.25f);
+                    }
+
+                    if (child_is_visible)
+                    {
+                        for (var item = 0; item < 100; item++)
+                        {
+                            if (item > 0)
+                            {
+                                Imgui.SameLine();
+                            }
+
+                            if (enable_track && item == track_item)
+                            {
+                                Imgui.TextColored(new(1, 1, 0, 1), $"Item {item}");
+                                Imgui.SetScrollHereX(i * 0.25f);
+                            }
+                            else
+                            {
+                                Imgui.Text($"Item {item}");
+                            }
+                        }
+                    }
+                    Imgui.EndChild();
+                    Imgui.SameLine();
+                    var names = new[] { "Left", "25%", "Center", "75%", "Right" };
+                    Imgui.Text($"{names[i]}\n{Imgui.GetScrollX():F0}/{Imgui.GetScrollMaxX():F0}");
+                    Imgui.Spacing();
+                }
+                Imgui.PopId();
+
+                HelpMarker(
+                    "Horizontal scrolling for a window is enabled via the WindowOptions.HorizontalScrollbar flag.\n\n" +
+                    "You may want to also explicitly specify content width by using SetNextWindowContentWidth() before Begin().");
+                _ = Imgui.Slider("Lines", lines, 1, 15);
+                Imgui.PushStyleVariable(StyleVariable.FrameRounding, 3.0f);
+                Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(2.0f, 1.0f));
+                SizeF scrolling_child_size = new(0, (Imgui.GetFrameHeightWithSpacing() * 7) + 30);
+                _ = Imgui.BeginChild("scrolling", scrolling_child_size, true, WindowOptions.HorizontalScrollbar);
+                for (var line = 0; line < lines; line++)
+                {
+                    var num_buttons = 10 + ((line & 1) == 1 ? line * 9 : line * 3);
+                    for (var n = 0; n < num_buttons; n++)
+                    {
+                        if (n > 0)
+                        {
+                            Imgui.SameLine();
+                        }
+
+                        Imgui.PushId(n + (line * 1000));
+                        var label = ((n % 15) == 0) ? "FizzBuzz" : ((n % 3) == 0) ? "Fizz" : ((n % 5) == 0) ? "Buzz" : $"{n}";
+                        var hue = n * 0.05f;
+                        Imgui.PushStyleColor(StyleColor.Button, ColorF.FromHsv(hue, 0.6f, 0.6f));
+                        Imgui.PushStyleColor(StyleColor.ButtonHovered, ColorF.FromHsv(hue, 0.7f, 0.7f));
+                        Imgui.PushStyleColor(StyleColor.ButtonActive, ColorF.FromHsv(hue, 0.8f, 0.8f));
+                        _ = Imgui.Button(label, new(40.0f + ((float)Math.Sin(line + n) * 20.0f), 0.0f));
+                        Imgui.PopStyleColor(3);
+                        Imgui.PopId();
+                    }
+                }
+                var scroll_x = Imgui.GetScrollX();
+                var scroll_max_x = Imgui.GetScrollMaxX();
+                Imgui.EndChild();
+                Imgui.PopStyleVariable(2);
+                var scroll_x_delta = 0.0f;
+                _ = Imgui.SmallButton("<<");
+                if (Imgui.IsItemActive())
+                {
+                    scroll_x_delta = -Imgui.GetIo().DeltaTime * 1000.0f;
+                }
+
+                Imgui.SameLine();
+                Imgui.Text("Scroll from code");
+                Imgui.SameLine();
+                _ = Imgui.SmallButton(">>");
+                if (Imgui.IsItemActive())
+                {
+                    scroll_x_delta = +Imgui.GetIo().DeltaTime * 1000.0f;
+                }
+
+                Imgui.SameLine();
+                Imgui.Text($"{scroll_x:F0}/{scroll_max_x:F0}");
+                if (scroll_x_delta != 0.0f)
+                {
+                    _ = Imgui.BeginChild("scrolling");
+                    Imgui.SetScrollX(Imgui.GetScrollX() + scroll_x_delta);
+                    Imgui.EndChild();
+                }
+                Imgui.Spacing();
+
+                _ = Imgui.Checkbox("Show Horizontal contents size demo window", show_horizontal_contents_size_demo_window);
+
+                if (show_horizontal_contents_size_demo_window)
+                {
+                    if (explicit_content_size)
+                    {
+                        Imgui.SetNextWindowContentSize(new(contents_size_x, 0.0f));
+                    }
+
+                    _ = Imgui.Begin("Horizontal contents size demo window", show_horizontal_contents_size_demo_window, show_h_scrollbar ? WindowOptions.HorizontalScrollbar : 0);
+                    Imgui.PushStyleVariable(StyleVariable.ItemSpacing, new SizeF(2, 0));
+                    Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(2, 0));
+                    HelpMarker("Test of different widgets react and impact the work rectangle growing when horizontal scrolling is enabled.\n\nUse 'Metrics->Tools->Show windows rectangles' to visualize rectangles.");
+                    _ = Imgui.Checkbox("H-scrollbar", show_h_scrollbar);
+                    _ = Imgui.Checkbox("Button", show_button);
+                    _ = Imgui.Checkbox("Tree nodes", show_tree_nodes);
+                    _ = Imgui.Checkbox("Text wrapped", show_text_wrapped);
+                    _ = Imgui.Checkbox("Columns", show_columns);
+                    _ = Imgui.Checkbox("Tab bar", show_tab_bar);
+                    _ = Imgui.Checkbox("Child", show_child);
+                    _ = Imgui.Checkbox("Explicit content size", explicit_content_size);
+                    Imgui.Text($"Scroll {Imgui.GetScrollX():F1}/{Imgui.GetScrollMaxX():F1} {Imgui.GetScrollY():F1}/{Imgui.GetScrollMaxY():F1}");
+                    if (explicit_content_size)
+                    {
+                        Imgui.SameLine();
+                        Imgui.SetNextItemWidth(100);
+                        _ = Imgui.Drag("##csx", contents_size_x);
+                        var p = Imgui.GetCursorScreenPosition();
+                        Imgui.GetWindowDrawList()!.Value.AddRectangleFilled(new RectangleF(p, new PositionF(p.X + 10, p.Y + 10)), Color.White);
+                        Imgui.GetWindowDrawList()!.Value.AddRectangleFilled(new RectangleF(new PositionF(p.X + contents_size_x - 10, p.Y), new PositionF(p.X + contents_size_x, p.Y + 10)), Color.White);
+                        Imgui.Dummy(new(0, 10));
+                    }
+                    Imgui.PopStyleVariable(2);
+                    Imgui.Separator();
+                    if (show_button)
+                    {
+                        _ = Imgui.Button("this is a 300-wide button", new(300, 0));
+                    }
+                    if (show_tree_nodes)
+                    {
+                        if (Imgui.TreeNode("this is a tree node"))
+                        {
+                            if (Imgui.TreeNode("another one of those tree node..."))
+                            {
+                                Imgui.Text("Some tree contents");
+                                Imgui.TreePop();
+                            }
+                            Imgui.TreePop();
+                        }
+                        _ = Imgui.CollapsingHeader("CollapsingHeader", open);
+                    }
+                    if (show_text_wrapped)
+                    {
+                        Imgui.TextWrapped("This text should automatically wrap on the edge of the work rectangle.");
+                    }
+                    if (show_columns)
+                    {
+                        Imgui.Text("Tables:");
+                        if (Imgui.BeginTable("table", 4, TableOptions.Borders))
+                        {
+                            for (var n = 0; n < 4; n++)
+                            {
+                                _ = Imgui.TableNextColumn();
+                                Imgui.Text($"Width {Imgui.GetContentRegionAvailable().Width:F2}");
+                            }
+                            Imgui.EndTable();
+                        }
+                        Imgui.Text("Columns:");
+                        Imgui.Columns(4);
+                        for (var n = 0; n < 4; n++)
+                        {
+                            Imgui.Text($"Width {Imgui.GetColumnWidth():F2}");
+                            Imgui.NextColumn();
+                        }
+                        Imgui.Columns(1);
+                    }
+                    if (show_tab_bar && Imgui.BeginTabBar("Hello"))
+                    {
+                        if (Imgui.BeginTabItem("OneOneOne"))
+                        {
+                            Imgui.EndTabItem();
+                        }
+                        if (Imgui.BeginTabItem("TwoTwoTwo"))
+                        {
+                            Imgui.EndTabItem();
+                        }
+                        if (Imgui.BeginTabItem("ThreeThreeThree"))
+                        {
+                            Imgui.EndTabItem();
+                        }
+                        if (Imgui.BeginTabItem("FourFourFour"))
+                        {
+                            Imgui.EndTabItem();
+                        }
+                        Imgui.EndTabBar();
+                    }
+                    if (show_child)
+                    {
+                        _ = Imgui.BeginChild("child", new(0, 0), true);
+                        Imgui.EndChild();
+                    }
+                    Imgui.End();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Clipping"))
+            {
+                _ = Imgui.Drag("size", size, 0.5f, 1.0f, 200.0f, "%.0f");
+                Imgui.TextWrapped("(Click and drag to scroll)");
+
+                HelpMarker(
+                    "(Left) Using Imgui.PushClipRect():\n" +
+                    "Will alter ImGui hit-testing logic + ImDrawList rendering.\n" +
+                    "(use this if you want your clipping rectangle to affect interactions)\n\n" +
+                    "(Center) Using ImDrawList::PushClipRect():\n" +
+                    "Will alter ImDrawList rendering only.\n" +
+                    "(use this as a shortcut if you are only using ImDrawList calls)\n\n" +
+                    "(Right) Using ImDrawList::AddText() with a fine ClipRect:\n" +
+                    "Will alter only this specific ImDrawList::AddText() rendering.\n" +
+                    "This is often used internally to avoid altering the clipping rectangle and minimize draw calls.");
+
+                for (var n = 0; n < 3; n++)
+                {
+                    if (n > 0)
+                    {
+                        Imgui.SameLine();
+                    }
+
+                    Imgui.PushId(n);
+                    _ = Imgui.InvisibleButton("##canvas", new(size[0], size[1]));
+                    if (Imgui.IsItemActive() && Imgui.IsMouseDragging(MouseButton.Left))
+                    {
+                        offsetX.Value += Imgui.GetIo().MouseDelta.Width;
+                        offsetY.Value += Imgui.GetIo().MouseDelta.Height;
+                    }
+                    Imgui.PopId();
+                    if (!Imgui.IsItemVisible()) // Skip rendering as ImDrawList elements are not clipped.
+                    {
+                        continue;
+                    }
+
+                    var p0 = Imgui.GetItemRectangle().Min;
+                    var p1 = Imgui.GetItemRectangle().Max;
+                    var text_str = "Line 1 hello\nLine 2 clip me!";
+                    var text_pos = new PositionF(p0.X + offsetX, p0.Y + offsetY);
+                    var draw_list = Imgui.GetWindowDrawList()!.Value;
+                    switch (n)
+                    {
+                        case 0:
+                            Imgui.PushClipRectangle(new(p0, p1), true);
+                            draw_list.AddRectangleFilled(new(p0, p1), new(90, 90, 120, 255));
+                            draw_list.AddText(text_pos, Color.White, text_str);
+                            Imgui.PopClipRectangle();
+                            break;
+                        case 1:
+                            draw_list.PushClipRectangle(new(p0, p1), true);
+                            draw_list.AddRectangleFilled(new(p0, p1), new(90, 90, 120, 255));
+                            draw_list.AddText(text_pos, Color.White, text_str);
+                            draw_list.PopClipRectangle();
+                            break;
+                        case 2:
+                            var clip_rect = new RectangleF(p0, p1);
+                            draw_list.AddRectangleFilled(new(p0, p1), new(90, 90, 120, 255));
+                            draw_list.AddText(Imgui.GetFont()!.Value, Imgui.GetFontSize(), text_pos, Color.White, text_str, 0.0f, clip_rect);
+                            break;
+                    }
+                }
+
+                Imgui.TreePop();
+            }
         }
 
         private static void ShowDemoWindowPopups()
@@ -3214,7 +3272,7 @@ namespace SampleApp
             //        // Call the more complete ShowExampleMenuFile which we use in various places of this demo
             //        if (Imgui.Button("With a menu.."))
             //            Imgui.OpenPopup("my_file_popup");
-            //        if (Imgui.BeginPopup("my_file_popup", ImGuiWindowFlags_MenuBar))
+            //        if (Imgui.BeginPopup("my_file_popup", WindowOptions.MenuBar))
             //        {
             //            if (Imgui.BeginMenuBar())
             //            {
@@ -3287,7 +3345,7 @@ namespace SampleApp
             //                if (Imgui.Selectable("Set to zero")) value = 0.0f;
             //                if (Imgui.Selectable("Set to PI")) value = 3.1415f;
             //                Imgui.SetNextItemWidth(-FLT_MIN);
-            //                Imgui.DragFloat("##Value", &value, 0.1f, 0.0f, 0.0f);
+            //                Imgui.Drag("##Value", &value, 0.1f, 0.0f, 0.0f);
             //                Imgui.EndPopup();
             //            }
             //
@@ -3338,7 +3396,7 @@ namespace SampleApp
             //        ImVec2 center = Imgui.GetMainViewport()->GetCenter();
             //        Imgui.SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
             //
-            //        if (Imgui.BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            //        if (Imgui.BeginPopupModal("Delete?", NULL, WindowOptions.AlwaysAutoResize))
             //        {
             //            Imgui.Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
             //            Imgui.Separator();
@@ -3347,9 +3405,9 @@ namespace SampleApp
             //            //Imgui.Combo("Combo", &unused_i, "Delete\0Delete harder\0");
             //
             //            static bool dont_ask_me_next_time = false;
-            //            Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+            //            Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(0, 0));
             //            Imgui.Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-            //            Imgui.PopStyleVar();
+            //            Imgui.PopStyleVariable();
             //
             //            if (Imgui.Button("OK", ImVec2(120, 0))) { Imgui.CloseCurrentPopup(); }
             //            Imgui.SetItemDefaultFocus();
@@ -3360,7 +3418,7 @@ namespace SampleApp
             //
             //        if (Imgui.Button("Stacked modals.."))
             //            Imgui.OpenPopup("Stacked 1");
-            //        if (Imgui.BeginPopupModal("Stacked 1", NULL, ImGuiWindowFlags_MenuBar))
+            //        if (Imgui.BeginPopupModal("Stacked 1", NULL, WindowOptions.MenuBar))
             //        {
             //            if (Imgui.BeginMenuBar())
             //            {
@@ -3371,7 +3429,7 @@ namespace SampleApp
             //                }
             //                Imgui.EndMenuBar();
             //            }
-            //            Imgui.Text("Hello from Stacked The First\nUsing style.Colors[ImGuiCol_ModalWindowDimBg] behind it.");
+            //            Imgui.Text("Hello from Stacked The First\nUsing style.Colors[StyleColor.ModalWindowDimBg] behind it.");
             //
             //            // Testing behavior of widgets stacking their own regular popups over the modal.
             //            static int item = 1;
@@ -3488,13 +3546,13 @@ namespace SampleApp
         //static void PushStyleCompact()
         //{
         //    ImGuiStyle& style = Imgui.GetStyle();
-        //    Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x, (float)(int)(style.FramePadding.y * 0.60f)));
-        //    Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x, (float)(int)(style.ItemSpacing.y * 0.60f)));
+        //    Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(style.FramePadding.X, (float)(int)(style.FramePadding.Y * 0.60f)));
+        //    Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(style.ItemSpacing.X, (float)(int)(style.ItemSpacing.Y * 0.60f)));
         //}
         //
         //static void PopStyleCompact()
         //{
-        //    Imgui.PopStyleVar(2);
+        //    Imgui.PopStyleVariable(2);
         //}
         //
         //// Show a combo box with a choice of sizing policies
@@ -3503,22 +3561,22 @@ namespace SampleApp
         //    struct EnumDesc { ImGuiTableFlags Value; const char* Name; const char* Tooltip; };
         //    static const EnumDesc policies[] =
         //    {
-        //        { ImGuiTableFlags_None,               "Default",                            "Use default sizing policy:\n- ImGuiTableFlags_SizingFixedFit if ScrollX is on or if host window has ImGuiWindowFlags_AlwaysAutoResize.\n- ImGuiTableFlags_SizingStretchSame otherwise." },
-        //        { ImGuiTableFlags_SizingFixedFit,     "ImGuiTableFlags_SizingFixedFit",     "Columns default to _WidthFixed (if resizable) or _WidthAuto (if not resizable), matching contents width." },
-        //        { ImGuiTableFlags_SizingFixedSame,    "ImGuiTableFlags_SizingFixedSame",    "Columns are all the same width, matching the maximum contents width.\nImplicitly disable ImGuiTableFlags_Resizable and enable ImGuiTableFlags_NoKeepColumnsVisible." },
-        //        { ImGuiTableFlags_SizingStretchProp,  "ImGuiTableFlags_SizingStretchProp",  "Columns default to _WidthStretch with weights proportional to their widths." },
-        //        { ImGuiTableFlags_SizingStretchSame,  "ImGuiTableFlags_SizingStretchSame",  "Columns default to _WidthStretch with same weights." }
+        //        { TableOptions.None,               "Default",                            "Use default sizing policy:\n- TableOptions.SizingFixedFit if ScrollX is on or if host window has WindowOptions.AlwaysAutoResize.\n- TableOptions.SizingStretchSame otherwise." },
+        //        { TableOptions.SizingFixedFit,     "TableOptions.SizingFixedFit",     "Columns default to _WidthFixed (if resizable) or _WidthAuto (if not resizable), matching contents width." },
+        //        { TableOptions.SizingFixedSame,    "TableOptions.SizingFixedSame",    "Columns are all the same width, matching the maximum contents width.\nImplicitly disable TableOptions.Resizable and enable TableOptions.NoKeepColumnsVisible." },
+        //        { TableOptions.SizingStretchProp,  "TableOptions.SizingStretchProp",  "Columns default to _WidthStretch with weights proportional to their widths." },
+        //        { TableOptions.SizingStretchSame,  "TableOptions.SizingStretchSame",  "Columns default to _WidthStretch with same weights." }
         //    };
         //    int idx;
         //    for (idx = 0; idx < policies.Length; idx++)
-        //        if (policies[idx].Value == (*p_flags & ImGuiTableFlags_SizingMask_))
+        //        if (policies[idx].Value == (*p_flags & TableOptions.SizingMask_))
         //            break;
         //    const char* preview_text = (idx < policies.Length) ? policies[idx].Name + (idx > 0 ? strlen("ImGuiTableFlags") : 0) : "";
         //    if (Imgui.BeginCombo("Sizing Policy", preview_text))
         //    {
         //        for (int n = 0; n < policies.Length; n++)
         //            if (Imgui.Selectable(policies[n].Name, idx == n))
-        //                *p_flags = (*p_flags & ~ImGuiTableFlags_SizingMask_) | policies[n].Value;
+        //                *p_flags = (*p_flags & ~TableOptions.SizingMask_) | policies[n].Value;
         //        Imgui.EndCombo();
         //    }
         //    Imgui.SameLine();
@@ -3580,10 +3638,10 @@ namespace SampleApp
             //        return;
             //
             //    // Using those as a base value to create width/height that are factor of the size of our font
-            //    const float TEXT_BASE_WIDTH = Imgui.CalcTextSize("A").x;
+            //    const float TEXT_BASE_WIDTH = Imgui.CalcTextSize("A").X;
             //    const float TEXT_BASE_HEIGHT = Imgui.GetTextLineHeightWithSpacing();
             //
-            //    Imgui.PushID("Tables");
+            //    Imgui.PushId("Tables");
             //
             //    int open_action = -1;
             //    if (Imgui.Button("Open all"))
@@ -3600,17 +3658,17 @@ namespace SampleApp
             //    HelpMarker("Disable the indenting of tree nodes so demo tables can use the full window width.");
             //    Imgui.Separator();
             //    if (disable_indent)
-            //        Imgui.PushStyleVar(ImGuiStyleVar_IndentSpacing, 0.0f);
+            //        Imgui.PushStyleVariable(StyleVariable.IndentSpacing, 0.0f);
             //
             //    // About Styling of tables
             //    // Most settings are configured on a per-table basis via the flags passed to BeginTable() and TableSetupColumns APIs.
             //    // There are however a few settings that a shared and part of the ImGuiStyle structure:
             //    //   style.CellPadding                          // Padding within each cell
-            //    //   style.Colors[ImGuiCol_TableHeaderBg]       // Table header background
-            //    //   style.Colors[ImGuiCol_TableBorderStrong]   // Table outer and header borders
-            //    //   style.Colors[ImGuiCol_TableBorderLight]    // Table inner borders
-            //    //   style.Colors[ImGuiCol_TableRowBg]          // Table row background when ImGuiTableFlags_RowBg is enabled (even rows)
-            //    //   style.Colors[ImGuiCol_TableRowBgAlt]       // Table row background when ImGuiTableFlags_RowBg is enabled (odds rows)
+            //    //   style.Colors[StyleColor.TableHeaderBg]       // Table header background
+            //    //   style.Colors[StyleColor.TableBorderStrong]   // Table outer and header borders
+            //    //   style.Colors[StyleColor.TableBorderLight]    // Table inner borders
+            //    //   style.Colors[StyleColor.TableRowBg]          // Table row background when TableOptions.RowBg is enabled (even rows)
+            //    //   style.Colors[StyleColor.TableRowBgAlt]       // Table row background when TableOptions.RowBg is enabled (odds rows)
             //
             //    // Demos
             //    if (open_action != -1)
@@ -3660,7 +3718,7 @@ namespace SampleApp
             //        // as TableNextColumn() will automatically wrap around and create new rows as needed.
             //        // This is generally more convenient when your cells all contains the same type of data.
             //        HelpMarker(
-            //            "Only using TableNextColumn(), which tends to be convenient for tables where every cell contains the same type of contents.\n"
+            //            "Only using TableNextColumn(), which tends to be convenient for tables where every cell contains the same type of contents.\n" +
             //            "This is also more similar to the old NextColumn() function of the Columns API, and provided to facilitate the Columns->Tables API transition.");
             //        if (Imgui.BeginTable("table3", 3))
             //        {
@@ -3682,37 +3740,37 @@ namespace SampleApp
             //    {
             //        // Expose a few Borders related flags interactively
             //        enum ContentsType { CT_Text, CT_FillButton };
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+            //        static ImGuiTableFlags flags = TableOptions.Borders | TableOptions.RowBg;
             //        static bool display_headers = false;
             //        static int contents_type = CT_Text;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_RowBg", &flags, ImGuiTableFlags_RowBg);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Borders", &flags, ImGuiTableFlags_Borders);
-            //        Imgui.SameLine(); HelpMarker("ImGuiTableFlags_Borders\n = ImGuiTableFlags_BordersInnerV\n | ImGuiTableFlags_BordersOuterV\n | ImGuiTableFlags_BordersInnerV\n | ImGuiTableFlags_BordersOuterH");
+            //        Imgui.CheckboxFlags("TableOptions.RowBg", &flags, TableOptions.RowBg);
+            //        Imgui.CheckboxFlags("TableOptions.Borders", &flags, TableOptions.Borders);
+            //        Imgui.SameLine(); HelpMarker("TableOptions.Borders\n = TableOptions.BordersInnerV\n | TableOptions.BordersOuterV\n | TableOptions.BordersInnerV\n | TableOptions.BordersOuterH");
             //        Imgui.Indent();
             //
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersH", &flags, ImGuiTableFlags_BordersH);
+            //        Imgui.CheckboxFlags("TableOptions.BordersH", &flags, TableOptions.BordersH);
             //        Imgui.Indent();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterH", &flags, ImGuiTableFlags_BordersOuterH);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerH", &flags, ImGuiTableFlags_BordersInnerH);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuterH", &flags, TableOptions.BordersOuterH);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInnerH", &flags, TableOptions.BordersInnerH);
             //        Imgui.Unindent();
             //
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersV", &flags, ImGuiTableFlags_BordersV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags, TableOptions.BordersV);
             //        Imgui.Indent();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterV", &flags, ImGuiTableFlags_BordersOuterV);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerV", &flags, ImGuiTableFlags_BordersInnerV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags, TableOptions.BordersOuterV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags, TableOptions.BordersInnerV);
             //        Imgui.Unindent();
             //
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuter", &flags, ImGuiTableFlags_BordersOuter);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInner", &flags, ImGuiTableFlags_BordersInner);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuter", &flags, TableOptions.BordersOuter);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInner", &flags, TableOptions.BordersInner);
             //        Imgui.Unindent();
             //
             //        Imgui.AlignTextToFramePadding(); Imgui.Text("Cell contents:");
             //        Imgui.SameLine(); Imgui.RadioButton("Text", &contents_type, CT_Text);
             //        Imgui.SameLine(); Imgui.RadioButton("FillButton", &contents_type, CT_FillButton);
             //        Imgui.Checkbox("Display headers", &display_headers);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBody", &flags, ImGuiTableFlags_NoBordersInBody); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
+            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBody", &flags, TableOptions.NoBordersInBody); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
             //        PopStyleCompact();
             //
             //        if (Imgui.BeginTable("table1", 3, flags))
@@ -3753,10 +3811,10 @@ namespace SampleApp
             //    {
             //        // By default, if we don't enable ScrollX the sizing policy for each column is "Stretch"
             //        // All columns maintain a sizing weight, and they will occupy all available width.
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
+            //        static ImGuiTableFlags flags = TableOptions.SizingStretchSame | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersV", &flags, ImGuiTableFlags_BordersV);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags, TableOptions.BordersV);
             //        Imgui.SameLine(); HelpMarker("Using the _Resizable flag automatically enables the _BordersInnerV flag as well, this is why the resize borders are still showing when unchecking this.");
             //        PopStyleCompact();
             //
@@ -3781,17 +3839,17 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Resizable, fixed");
             //    if (Imgui.TreeNode("Resizable, fixed"))
             //    {
-            //        // Here we use ImGuiTableFlags_SizingFixedFit (even though _ScrollX is not set)
+            //        // Here we use TableOptions.SizingFixedFit (even though _ScrollX is not set)
             //        // So columns will adopt the "Fixed" policy and will maintain a fixed width regardless of the whole available width (unless table is small)
             //        // If there is not enough available width to fit all columns, they will however be resized down.
             //        // FIXME-TABLE: Providing a stretch-on-init would make sense especially for tables which don't have saved settings
             //        HelpMarker(
-            //            "Using _Resizable + _SizingFixedFit flags.\n"
-            //            "Fixed-width columns generally makes more sense if you want to use horizontal scrolling.\n\n"
+            //            "Using _Resizable + _SizingFixedFit flags.\n" +
+            //            "Fixed-width columns generally makes more sense if you want to use horizontal scrolling.\n\n" +
             //            "Double-click a column border to auto-fit the column to its contents.");
             //        PushStyleCompact();
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendX", &flags, ImGuiTableFlags_NoHostExtendX);
+            //        static ImGuiTableFlags flags = TableOptions.SizingFixedFit | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody;
+            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags, TableOptions.NoHostExtendX);
             //        PopStyleCompact();
             //
             //        if (Imgui.BeginTable("table1", 3, flags))
@@ -3816,9 +3874,9 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Resizable, mixed"))
             //    {
             //        HelpMarker(
-            //            "Using TableSetupColumn() to alter resizing policy on a per-column basis.\n\n"
+            //            "Using TableSetupColumn() to alter resizing policy on a per-column basis.\n\n" +
             //            "When combining Fixed and Stretch columns, generally you only want one, maybe two trailing columns to use _WidthStretch.");
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+            //        static ImGuiTableFlags flags = TableOptions.SizingFixedFit | TableOptions.RowBg | TableOptions.Borders | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
             //
             //        if (Imgui.BeginTable("table1", 3, flags))
             //        {
@@ -3866,15 +3924,15 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Reorderable, hideable, with headers"))
             //    {
             //        HelpMarker(
-            //            "Click and drag column headers to reorder columns.\n\n"
+            //            "Click and drag column headers to reorder columns.\n\n" +
             //            "Right-click on a header to open a context menu.");
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV;
+            //        static ImGuiTableFlags flags = TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.BordersOuter | TableOptions.BordersV;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Reorderable", &flags, ImGuiTableFlags_Reorderable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Hideable", &flags, ImGuiTableFlags_Hideable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBody", &flags, ImGuiTableFlags_NoBordersInBody);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBodyUntilResize", &flags, ImGuiTableFlags_NoBordersInBodyUntilResize); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.Reorderable", &flags, TableOptions.Reorderable);
+            //        Imgui.CheckboxFlags("TableOptions.Hideable", &flags, TableOptions.Hideable);
+            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBody", &flags, TableOptions.NoBordersInBody);
+            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBodyUntilResize", &flags, TableOptions.NoBordersInBodyUntilResize); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
             //        PopStyleCompact();
             //
             //        if (Imgui.BeginTable("table1", 3, flags))
@@ -3897,8 +3955,8 @@ namespace SampleApp
             //            Imgui.EndTable();
             //        }
             //
-            //        // Use outer_size.x == 0.0f instead of default to make the table as tight as possible (only valid when no scrolling and no stretch column)
-            //        if (Imgui.BeginTable("table2", 3, flags | ImGuiTableFlags_SizingFixedFit, ImVec2(0.0f, 0.0f)))
+            //        // Use outer_size.X == 0.0f instead of default to make the table as tight as possible (only valid when no scrolling and no stretch column)
+            //        if (Imgui.BeginTable("table2", 3, flags | TableOptions.SizingFixedFit, ImVec2(0.0f, 0.0f)))
             //        {
             //            Imgui.TableSetupColumn("One");
             //            Imgui.TableSetupColumn("Two");
@@ -3926,24 +3984,24 @@ namespace SampleApp
             //        // First example: showcase use of padding flags and effect of BorderOuterV/BorderInnerV on X padding.
             //        // We don't expose BorderOuterH/BorderInnerH here because they have no effect on X padding.
             //        HelpMarker(
-            //            "We often want outer padding activated when any using features which makes the edges of a column visible:\n"
-            //            "e.g.:\n"
-            //            "- BorderOuterV\n"
-            //            "- any form of row selection\n"
-            //            "Because of this, activating BorderOuterV sets the default to PadOuterX. Using PadOuterX or NoPadOuterX you can override the default.\n\n"
-            //            "Actual padding values are using style.CellPadding.\n\n"
+            //            "We often want outer padding activated when any using features which makes the edges of a column visible:\n" +
+            //            "e.g.:\n" +
+            //            "- BorderOuterV\n" +
+            //            "- any form of row selection\n" +
+            //            "Because of this, activating BorderOuterV sets the default to PadOuterX. Using PadOuterX or NoPadOuterX you can override the default.\n\n" +
+            //            "Actual padding values are using style.CellPadding.\n\n" +
             //            "In this demo we don't show horizontal borders to emphasize how they don't affect default horizontal padding.");
             //
-            //        static ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV;
+            //        static ImGuiTableFlags flags1 = TableOptions.BordersV;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_PadOuterX", &flags1, ImGuiTableFlags_PadOuterX);
-            //        Imgui.SameLine(); HelpMarker("Enable outer-most padding (default if ImGuiTableFlags_BordersOuterV is set)");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoPadOuterX", &flags1, ImGuiTableFlags_NoPadOuterX);
-            //        Imgui.SameLine(); HelpMarker("Disable outer-most padding (default if ImGuiTableFlags_BordersOuterV is not set)");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoPadInnerX", &flags1, ImGuiTableFlags_NoPadInnerX);
+            //        Imgui.CheckboxFlags("TableOptions.PadOuterX", &flags1, TableOptions.PadOuterX);
+            //        Imgui.SameLine(); HelpMarker("Enable outer-most padding (default if TableOptions.BordersOuterV is set)");
+            //        Imgui.CheckboxFlags("TableOptions.NoPadOuterX", &flags1, TableOptions.NoPadOuterX);
+            //        Imgui.SameLine(); HelpMarker("Disable outer-most padding (default if TableOptions.BordersOuterV is not set)");
+            //        Imgui.CheckboxFlags("TableOptions.NoPadInnerX", &flags1, TableOptions.NoPadInnerX);
             //        Imgui.SameLine(); HelpMarker("Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off)");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterV", &flags1, ImGuiTableFlags_BordersOuterV);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerV", &flags1, ImGuiTableFlags_BordersInnerV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags1, TableOptions.BordersOuterV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags1, TableOptions.BordersInnerV);
             //        static bool show_headers = false;
             //        Imgui.Checkbox("show_headers", &show_headers);
             //        PopStyleCompact();
@@ -3966,7 +4024,7 @@ namespace SampleApp
             //                    Imgui.TableSetColumnIndex(column);
             //                    if (row == 0)
             //                    {
-            //                        Imgui.Text("Avail %.2f", Imgui.GetContentRegionAvail().x);
+            //                        Imgui.Text("Avail %.2f", Imgui.GetContentRegionAvailable().Width);
             //                    }
             //                    else
             //                    {
@@ -3984,45 +4042,45 @@ namespace SampleApp
             //        // Second example: set style.CellPadding to (0.0) or a custom value.
             //        // FIXME-TABLE: Vertical border effectively not displayed the same way as horizontal one...
             //        HelpMarker("Setting style.CellPadding to (0,0) or a custom value.");
-            //        static ImGuiTableFlags flags2 = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+            //        static ImGuiTableFlags flags2 = TableOptions.Borders | TableOptions.RowBg;
             //        static ImVec2 cell_padding(0.0f, 0.0f);
             //        static bool show_widget_frame_bg = true;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Borders", &flags2, ImGuiTableFlags_Borders);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersH", &flags2, ImGuiTableFlags_BordersH);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersV", &flags2, ImGuiTableFlags_BordersV);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInner", &flags2, ImGuiTableFlags_BordersInner);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuter", &flags2, ImGuiTableFlags_BordersOuter);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_RowBg", &flags2, ImGuiTableFlags_RowBg);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags2, ImGuiTableFlags_Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.Borders", &flags2, TableOptions.Borders);
+            //        Imgui.CheckboxFlags("TableOptions.BordersH", &flags2, TableOptions.BordersH);
+            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags2, TableOptions.BordersV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInner", &flags2, TableOptions.BordersInner);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuter", &flags2, TableOptions.BordersOuter);
+            //        Imgui.CheckboxFlags("TableOptions.RowBg", &flags2, TableOptions.RowBg);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags2, TableOptions.Resizable);
             //        Imgui.Checkbox("show_widget_frame_bg", &show_widget_frame_bg);
-            //        Imgui.SliderFloat2("CellPadding", &cell_padding.x, 0.0f, 10.0f, "%.0f");
+            //        Imgui.Slider("CellPadding", &cell_padding.X, 0.0f, 10.0f, "%.0f");
             //        PopStyleCompact();
             //
-            //        Imgui.PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+            //        Imgui.PushStyleVariable(StyleVariable.CellPadding, cell_padding);
             //        if (Imgui.BeginTable("table_padding_2", 3, flags2))
             //        {
             //            static char text_bufs[3 * 5][16]; // Mini text storage for 3x5 cells
             //            static bool init = true;
             //            if (!show_widget_frame_bg)
-            //                Imgui.PushStyleColor(ImGuiCol_FrameBg, 0);
+            //                Imgui.PushStyleColor(StyleColor.FrameBg, 0);
             //            for (int cell = 0; cell < 3 * 5; cell++)
             //            {
             //                Imgui.TableNextColumn();
             //                if (init)
             //                    strcpy(text_bufs[cell], "edit me");
             //                Imgui.SetNextItemWidth(-FLT_MIN);
-            //                Imgui.PushID(cell);
+            //                Imgui.PushId(cell);
             //                Imgui.InputText("##cell", text_bufs[cell], IM_ARRAYSIZE(text_bufs[cell]));
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //            if (!show_widget_frame_bg)
             //                Imgui.PopStyleColor();
             //            init = false;
             //            Imgui.EndTable();
             //        }
-            //        Imgui.PopStyleVar();
+            //        Imgui.PopStyleVariable();
             //
             //        Imgui.TreePop();
             //    }
@@ -4032,16 +4090,16 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Explicit widths");
             //    if (Imgui.TreeNode("Sizing policies"))
             //    {
-            //        static ImGuiTableFlags flags1 = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_RowBg | ImGuiTableFlags_ContextMenuInBody;
+            //        static ImGuiTableFlags flags1 = TableOptions.BordersV | TableOptions.BordersOuterH | TableOptions.RowBg | TableOptions.ContextMenuInBody;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags1, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendX", &flags1, ImGuiTableFlags_NoHostExtendX);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags1, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags1, TableOptions.NoHostExtendX);
             //        PopStyleCompact();
             //
-            //        static ImGuiTableFlags sizing_policy_flags[4] = { ImGuiTableFlags_SizingFixedFit, ImGuiTableFlags_SizingFixedSame, ImGuiTableFlags_SizingStretchProp, ImGuiTableFlags_SizingStretchSame };
+            //        static ImGuiTableFlags sizing_policy_flags[4] = { TableOptions.SizingFixedFit, TableOptions.SizingFixedSame, TableOptions.SizingStretchProp, TableOptions.SizingStretchSame };
             //        for (int table_n = 0; table_n < 4; table_n++)
             //        {
-            //            Imgui.PushID(table_n);
+            //            Imgui.PushId(table_n);
             //            Imgui.SetNextItemWidth(TEXT_BASE_WIDTH * 30);
             //            EditTableSizingFlags(&sizing_policy_flags[table_n]);
             //
@@ -4069,7 +4127,7 @@ namespace SampleApp
             //                }
             //                Imgui.EndTable();
             //            }
-            //            Imgui.PopID();
+            //            Imgui.PopId();
             //        }
             //
             //        Imgui.Spacing();
@@ -4078,29 +4136,29 @@ namespace SampleApp
             //        HelpMarker("This section allows you to interact and see the effect of various sizing policies depending on whether Scroll is enabled and the contents of your columns.");
             //
             //        enum ContentsType { CT_ShowWidth, CT_ShortText, CT_LongText, CT_Button, CT_FillButton, CT_InputText };
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable;
+            //        static ImGuiTableFlags flags = TableOptions.ScrollY | TableOptions.Borders | TableOptions.RowBg | TableOptions.Resizable;
             //        static int contents_type = CT_ShowWidth;
             //        static int column_count = 3;
             //
             //        PushStyleCompact();
-            //        Imgui.PushID("Advanced");
+            //        Imgui.PushId("Advanced");
             //        Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
             //        EditTableSizingFlags(&flags);
             //        Imgui.Combo("Contents", &contents_type, "Show width\0Short Text\0Long Text\0Button\0Fill Button\0InputText\0");
             //        if (contents_type == CT_FillButton)
             //        {
             //            Imgui.SameLine();
-            //            HelpMarker("Be mindful that using right-alignment (e.g. size.x = -FLT_MIN) creates a feedback loop where contents width can feed into auto-column width can feed into contents width.");
+            //            HelpMarker("Be mindful that using right-alignment (e.g. size.X = -FLT_MIN) creates a feedback loop where contents width can feed into auto-column width can feed into contents width.");
             //        }
-            //        Imgui.DragInt("Columns", &column_count, 0.1f, 1, 64, "%d", SliderOptions.AlwaysClamp);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_PreciseWidths", &flags, ImGuiTableFlags_PreciseWidths);
+            //        Imgui.Drag("Columns", &column_count, 0.1f, 1, 64, "%d", SliderOptions.AlwaysClamp);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.PreciseWidths", &flags, TableOptions.PreciseWidths);
             //        Imgui.SameLine(); HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollX", &flags, ImGuiTableFlags_ScrollX);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollY", &flags, ImGuiTableFlags_ScrollY);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoClip", &flags, ImGuiTableFlags_NoClip);
+            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags, TableOptions.ScrollX);
+            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
+            //        Imgui.CheckboxFlags("TableOptions.NoClip", &flags, TableOptions.NoClip);
             //        Imgui.PopItemWidth();
-            //        Imgui.PopID();
+            //        Imgui.PopId();
             //        PopStyleCompact();
             //
             //        if (Imgui.BeginTable("table2", column_count, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 7)))
@@ -4111,7 +4169,7 @@ namespace SampleApp
             //                int column = Imgui.TableGetColumnIndex();
             //                int row = Imgui.TableGetRowIndex();
             //
-            //                Imgui.PushID(cell);
+            //                Imgui.PushId(cell);
             //                char label[32];
             //                static char text_buf[32] = "";
             //                sprintf(label, "Hello %d,%d", column, row);
@@ -4119,12 +4177,12 @@ namespace SampleApp
             //                {
             //                case CT_ShortText:  Imgui.TextUnformatted(label); break;
             //                case CT_LongText:   Imgui.Text("Some %s text %d,%d\nOver two lines..", column == 0 ? "long" : "longeeer", column, row); break;
-            //                case CT_ShowWidth:  Imgui.Text("W: %.1f", Imgui.GetContentRegionAvail().x); break;
+            //                case CT_ShowWidth:  Imgui.Text("W: %.1f", Imgui.GetContentRegionAvailable().Width); break;
             //                case CT_Button:     Imgui.Button(label); break;
             //                case CT_FillButton: Imgui.Button(label, ImVec2(-FLT_MIN, 0.0f)); break;
             //                case CT_InputText:  Imgui.SetNextItemWidth(-FLT_MIN); Imgui.InputText("##", text_buf, text_buf.Length); break;
             //                }
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //            Imgui.EndTable();
             //        }
@@ -4137,10 +4195,10 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Vertical scrolling, with clipping"))
             //    {
             //        HelpMarker("Here we activate ScrollY, which will create a child window container to allow hosting scrollable contents.\n\nWe also demonstrate using ImGuiListClipper to virtualize the submission of many items.");
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+            //        static ImGuiTableFlags flags = TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollY", &flags, ImGuiTableFlags_ScrollY);
+            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
             //        PopStyleCompact();
             //
             //        // When using ScrollX or ScrollY we need to specify a size for our table container!
@@ -4180,22 +4238,22 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Horizontal scrolling"))
             //    {
             //        HelpMarker(
-            //            "When ScrollX is enabled, the default sizing policy becomes ImGuiTableFlags_SizingFixedFit, "
-            //            "as automatically stretching columns doesn't make much sense with horizontal scrolling.\n\n"
+            //            "When ScrollX is enabled, the default sizing policy becomes TableOptions.SizingFixedFit, "
+            //            "as automatically stretching columns doesn't make much sense with horizontal scrolling.\n\n" +
             //            "Also note that as of the current version, you will almost always want to enable ScrollY along with ScrollX,"
             //            "because the container window won't automatically extend vertically to fix contents (this may be improved in future versions).");
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+            //        static ImGuiTableFlags flags = TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
             //        static int freeze_cols = 1;
             //        static int freeze_rows = 1;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollX", &flags, ImGuiTableFlags_ScrollX);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollY", &flags, ImGuiTableFlags_ScrollY);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags, TableOptions.ScrollX);
+            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
             //        Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //        Imgui.DragInt("freeze_cols", &freeze_cols, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
+            //        Imgui.Drag("freeze_cols", &freeze_cols, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
             //        Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //        Imgui.DragInt("freeze_rows", &freeze_rows, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
+            //        Imgui.Drag("freeze_rows", &freeze_rows, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
             //        PopStyleCompact();
             //
             //        // When using ScrollX or ScrollY we need to specify a size for our table container!
@@ -4239,17 +4297,17 @@ namespace SampleApp
             //        Imgui.SameLine();
             //        HelpMarker(
             //            "Showcase using Stretch columns + ScrollX together: "
-            //            "this is rather unusual and only makes sense when specifying an 'inner_width' for the table!\n"
-            //            "Without an explicit value, inner_width is == outer_size.x and therefore using Stretch columns + ScrollX together doesn't make sense.");
-            //        static ImGuiTableFlags flags2 = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_RowBg | ImGuiTableFlags_ContextMenuInBody;
+            //            "this is rather unusual and only makes sense when specifying an 'inner_width' for the table!\n" +
+            //            "Without an explicit value, inner_width is == outer_size.X and therefore using Stretch columns + ScrollX together doesn't make sense.");
+            //        static ImGuiTableFlags flags2 = TableOptions.SizingStretchSame | TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.BordersOuter | TableOptions.RowBg | TableOptions.ContextMenuInBody;
             //        static float inner_width = 1000.0f;
             //        PushStyleCompact();
-            //        Imgui.PushID("flags3");
+            //        Imgui.PushId("flags3");
             //        Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollX", &flags2, ImGuiTableFlags_ScrollX);
-            //        Imgui.DragFloat("inner_width", &inner_width, 1.0f, 0.0f, FLT_MAX, "%.1f");
+            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags2, TableOptions.ScrollX);
+            //        Imgui.Drag("inner_width", &inner_width, 1.0f, 0.0f, FLT_MAX, "%.1f");
             //        Imgui.PopItemWidth();
-            //        Imgui.PopID();
+            //        Imgui.PopId();
             //        PopStyleCompact();
             //        if (Imgui.BeginTable("table2", 7, flags2, outer_size, inner_width))
             //        {
@@ -4274,13 +4332,13 @@ namespace SampleApp
             //        static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort, ImGuiTableColumnFlags_None, ImGuiTableColumnFlags_DefaultHide };
             //        static ImGuiTableColumnFlags column_flags_out[column_count] = { 0, 0, 0 }; // Output from TableGetColumnFlags()
             //
-            //        if (Imgui.BeginTable("table_columns_flags_checkboxes", column_count, ImGuiTableFlags_None))
+            //        if (Imgui.BeginTable("table_columns_flags_checkboxes", column_count, TableOptions.None))
             //        {
             //            PushStyleCompact();
             //            for (int column = 0; column < column_count; column++)
             //            {
             //                Imgui.TableNextColumn();
-            //                Imgui.PushID(column);
+            //                Imgui.PushId(column);
             //                Imgui.AlignTextToFramePadding(); // FIXME-TABLE: Workaround for wrong text baseline propagation across columns
             //                Imgui.Text("'%s'", column_names[column]);
             //                Imgui.Spacing();
@@ -4291,7 +4349,7 @@ namespace SampleApp
             //                Imgui.BeginDisabled();
             //                ShowTableColumnsStatusFlags(column_flags_out[column]);
             //                Imgui.EndDisabled();
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //            PopStyleCompact();
             //            Imgui.EndTable();
@@ -4299,11 +4357,11 @@ namespace SampleApp
             //
             //        // Create the real table we care about for the example!
             //        // We use a scrolling table to be able to showcase the difference between the _IsEnabled and _IsVisible flags above, otherwise in
-            //        // a non-scrolling table columns are always visible (unless using ImGuiTableFlags_NoKeepColumnsVisible + resizing the parent window down)
+            //        // a non-scrolling table columns are always visible (unless using TableOptions.NoKeepColumnsVisible + resizing the parent window down)
             //        const ImGuiTableFlags flags
-            //            = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY
-            //            | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV
-            //            | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
+            //            = TableOptions.SizingFixedFit | TableOptions.ScrollX | TableOptions.ScrollY
+            //            | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV
+            //            | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Sortable;
             //        ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 9);
             //        if (Imgui.BeginTable("table_columns_flags", column_count, flags, outer_size))
             //        {
@@ -4337,14 +4395,14 @@ namespace SampleApp
             //    {
             //        HelpMarker("Using TableSetupColumn() to setup default width.");
             //
-            //        static ImGuiTableFlags flags1 = ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBodyUntilResize;
+            //        static ImGuiTableFlags flags1 = TableOptions.Borders | TableOptions.NoBordersInBodyUntilResize;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags1, ImGuiTableFlags_Resizable);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBodyUntilResize", &flags1, ImGuiTableFlags_NoBordersInBodyUntilResize);
+            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags1, TableOptions.Resizable);
+            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBodyUntilResize", &flags1, TableOptions.NoBordersInBodyUntilResize);
             //        PopStyleCompact();
             //        if (Imgui.BeginTable("table1", 3, flags1))
             //        {
-            //            // We could also set ImGuiTableFlags_SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
+            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
             //            Imgui.TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
             //            Imgui.TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, 200.0f); // Default to 200.0f
             //            Imgui.TableSetupColumn("three", ImGuiTableColumnFlags_WidthFixed);       // Default to auto
@@ -4356,7 +4414,7 @@ namespace SampleApp
             //                {
             //                    Imgui.TableSetColumnIndex(column);
             //                    if (row == 0)
-            //                        Imgui.Text("(w: %5.1f)", Imgui.GetContentRegionAvail().x);
+            //                        Imgui.Text("(w: %5.1f)", Imgui.GetContentRegionAvailable().Width);
             //                    else
             //                        Imgui.Text("Hello %d,%d", column, row);
             //                }
@@ -4366,15 +4424,15 @@ namespace SampleApp
             //
             //        HelpMarker("Using TableSetupColumn() to setup explicit width.\n\nUnless _NoKeepColumnsVisible is set, fixed columns with set width may still be shrunk down if there's not enough space in the host.");
             //
-            //        static ImGuiTableFlags flags2 = ImGuiTableFlags_None;
+            //        static ImGuiTableFlags flags2 = TableOptions.None;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoKeepColumnsVisible", &flags2, ImGuiTableFlags_NoKeepColumnsVisible);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerV", &flags2, ImGuiTableFlags_BordersInnerV);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterV", &flags2, ImGuiTableFlags_BordersOuterV);
+            //        Imgui.CheckboxFlags("TableOptions.NoKeepColumnsVisible", &flags2, TableOptions.NoKeepColumnsVisible);
+            //        Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags2, TableOptions.BordersInnerV);
+            //        Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags2, TableOptions.BordersOuterV);
             //        PopStyleCompact();
             //        if (Imgui.BeginTable("table2", 4, flags2))
             //        {
-            //            // We could also set ImGuiTableFlags_SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
+            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
             //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 100.0f);
             //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 15.0f);
             //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 30.0f);
@@ -4386,7 +4444,7 @@ namespace SampleApp
             //                {
             //                    Imgui.TableSetColumnIndex(column);
             //                    if (row == 0)
-            //                        Imgui.Text("(w: %5.1f)", Imgui.GetContentRegionAvail().x);
+            //                        Imgui.Text("(w: %5.1f)", Imgui.GetContentRegionAvailable().Width);
             //                    else
             //                        Imgui.Text("Hello %d,%d", column, row);
             //                }
@@ -4403,7 +4461,7 @@ namespace SampleApp
             //    {
             //        HelpMarker("This demonstrates embedding a table into another table cell.");
             //
-            //        if (Imgui.BeginTable("table_nested1", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable))
+            //        if (Imgui.BeginTable("table_nested1", 2, TableOptions.Borders | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable))
             //        {
             //            Imgui.TableSetupColumn("A0");
             //            Imgui.TableSetupColumn("A1");
@@ -4413,7 +4471,7 @@ namespace SampleApp
             //            Imgui.Text("A0 Row 0");
             //            {
             //                float rows_height = TEXT_BASE_HEIGHT * 2;
-            //                if (Imgui.BeginTable("table_nested2", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable))
+            //                if (Imgui.BeginTable("table_nested2", 2, TableOptions.Borders | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable))
             //                {
             //                    Imgui.TableSetupColumn("B0");
             //                    Imgui.TableSetupColumn("B1");
@@ -4446,8 +4504,8 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Row height");
             //    if (Imgui.TreeNode("Row height"))
             //    {
-            //        HelpMarker("You can pass a 'min_row_height' to TableNextRow().\n\nRows are padded with 'style.CellPadding.y' on top and bottom, so effectively the minimum row height will always be >= 'style.CellPadding.y * 2.0f'.\n\nWe cannot honor a _maximum_ row height as that would require a unique clipping rectangle per row.");
-            //        if (Imgui.BeginTable("table_row_height", 1, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerV))
+            //        HelpMarker("You can pass a 'min_row_height' to TableNextRow().\n\nRows are padded with 'style.CellPadding.Y' on top and bottom, so effectively the minimum row height will always be >= 'style.CellPadding.Y * 2.0f'.\n\nWe cannot honor a _maximum_ row height as that would require a unique clipping rectangle per row.");
+            //        if (Imgui.BeginTable("table_row_height", 1, TableOptions.BordersOuter | TableOptions.BordersInnerV))
             //        {
             //            for (int row = 0; row < 10; row++)
             //            {
@@ -4466,15 +4524,15 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Outer size");
             //    if (Imgui.TreeNode("Outer size"))
             //    {
-            //        // Showcasing use of ImGuiTableFlags_NoHostExtendX and ImGuiTableFlags_NoHostExtendY
+            //        // Showcasing use of TableOptions.NoHostExtendX and TableOptions.NoHostExtendY
             //        // Important to that note how the two flags have slightly different behaviors!
             //        Imgui.Text("Using NoHostExtendX and NoHostExtendY:");
             //        PushStyleCompact();
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_ContextMenuInBody | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX;
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendX", &flags, ImGuiTableFlags_NoHostExtendX);
-            //        Imgui.SameLine(); HelpMarker("Make outer width auto-fit to columns, overriding outer_size.x value.\n\nOnly available when ScrollX/ScrollY are disabled and Stretch columns are not used.");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendY", &flags, ImGuiTableFlags_NoHostExtendY);
-            //        Imgui.SameLine(); HelpMarker("Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit).\n\nOnly available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.");
+            //        static ImGuiTableFlags flags = TableOptions.Borders | TableOptions.Resizable | TableOptions.ContextMenuInBody | TableOptions.RowBg | TableOptions.SizingFixedFit | TableOptions.NoHostExtendX;
+            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags, TableOptions.NoHostExtendX);
+            //        Imgui.SameLine(); HelpMarker("Make outer width auto-fit to columns, overriding outer_size.X value.\n\nOnly available when ScrollX/ScrollY are disabled and Stretch columns are not used.");
+            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendY", &flags, TableOptions.NoHostExtendY);
+            //        Imgui.SameLine(); HelpMarker("Make outer height stop exactly at outer_size.Y (prevent auto-extending table past the limit).\n\nOnly available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.");
             //        PopStyleCompact();
             //
             //        ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 5.5f);
@@ -4497,7 +4555,7 @@ namespace SampleApp
             //        Imgui.Spacing();
             //
             //        Imgui.Text("Using explicit size:");
-            //        if (Imgui.BeginTable("table2", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg, ImVec2(TEXT_BASE_WIDTH * 30, 0.0f)))
+            //        if (Imgui.BeginTable("table2", 3, TableOptions.Borders | TableOptions.RowBg, ImVec2(TEXT_BASE_WIDTH * 30, 0.0f)))
             //        {
             //            for (int row = 0; row < 5; row++)
             //            {
@@ -4511,7 +4569,7 @@ namespace SampleApp
             //            Imgui.EndTable();
             //        }
             //        Imgui.SameLine();
-            //        if (Imgui.BeginTable("table3", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg, ImVec2(TEXT_BASE_WIDTH * 30, 0.0f)))
+            //        if (Imgui.BeginTable("table3", 3, TableOptions.Borders | TableOptions.RowBg, ImVec2(TEXT_BASE_WIDTH * 30, 0.0f)))
             //        {
             //            for (int row = 0; row < 3; row++)
             //            {
@@ -4533,15 +4591,15 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Background color");
             //    if (Imgui.TreeNode("Background color"))
             //    {
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_RowBg;
+            //        static ImGuiTableFlags flags = TableOptions.RowBg;
             //        static int row_bg_type = 1;
             //        static int row_bg_target = 1;
             //        static int cell_bg_type = 1;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_Borders", &flags, ImGuiTableFlags_Borders);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_RowBg", &flags, ImGuiTableFlags_RowBg);
-            //        Imgui.SameLine(); HelpMarker("ImGuiTableFlags_RowBg automatically sets RowBg0 to alternative colors pulled from the Style.");
+            //        Imgui.CheckboxFlags("TableOptions.Borders", &flags, TableOptions.Borders);
+            //        Imgui.CheckboxFlags("TableOptions.RowBg", &flags, TableOptions.RowBg);
+            //        Imgui.SameLine(); HelpMarker("TableOptions.RowBg automatically sets RowBg0 to alternative colors pulled from the Style.");
             //        Imgui.Combo("row bg type", (int*)&row_bg_type, "None\0Red\0Gradient\0");
             //        Imgui.Combo("row bg target", (int*)&row_bg_target, "RowBg0\0RowBg1\0"); Imgui.SameLine(); HelpMarker("Target RowBg0 to override the alternating odd/even colors,\nTarget RowBg1 to blend with them.");
             //        Imgui.Combo("cell bg type", (int*)&cell_bg_type, "None\0Blue\0"); Imgui.SameLine(); HelpMarker("We are colorizing cells to B1->C2 here.");
@@ -4557,7 +4615,7 @@ namespace SampleApp
             //                Imgui.TableNextRow();
             //
             //                // Demonstrate setting a row background color with 'Imgui.TableSetBgColor(ImGuiTableBgTarget_RowBgX, ...)'
-            //                // We use a transparent color so we can see the one behind in case our target is RowBg1 and RowBg0 was already targeted by the ImGuiTableFlags_RowBg flag.
+            //                // We use a transparent color so we can see the one behind in case our target is RowBg1 and RowBg0 was already targeted by the TableOptions.RowBg flag.
             //                if (row_bg_type != 0)
             //                {
             //                    ImU32 row_bg_color = Imgui.GetColorU32(row_bg_type == 1 ? ImVec4(0.7f, 0.3f, 0.3f, 0.65f) : ImVec4(0.2f + row * 0.1f, 0.2f, 0.2f, 0.65f)); // Flat or Gradient?
@@ -4591,7 +4649,7 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Tree view");
             //    if (Imgui.TreeNode("Tree view"))
             //    {
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_Resizable | ImGuiTableFlags_RowBg | ImGuiTableFlags_NoBordersInBody;
+            //        static ImGuiTableFlags flags = TableOptions.BordersV | TableOptions.BordersOuterH | TableOptions.Resizable | TableOptions.RowBg | TableOptions.NoBordersInBody;
             //
             //        if (Imgui.BeginTable("3ways", 3, flags))
             //        {
@@ -4664,9 +4722,9 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Item width"))
             //    {
             //        HelpMarker(
-            //            "Showcase using PushItemWidth() and how it is preserved on a per-column basis.\n\n"
+            //            "Showcase using PushItemWidth() and how it is preserved on a per-column basis.\n\n" +
             //            "Note that on auto-resizing non-resizable fixed columns, querying the content width for e.g. right-alignment doesn't make sense.");
-            //        if (Imgui.BeginTable("table_item_width", 3, ImGuiTableFlags_Borders))
+            //        if (Imgui.BeginTable("table_item_width", 3, TableOptions.Borders))
             //        {
             //            Imgui.TableSetupColumn("small");
             //            Imgui.TableSetupColumn("half");
@@ -4682,21 +4740,21 @@ namespace SampleApp
             //                    Imgui.TableSetColumnIndex(0);
             //                    Imgui.PushItemWidth(TEXT_BASE_WIDTH * 3.0f); // Small
             //                    Imgui.TableSetColumnIndex(1);
-            //                    Imgui.PushItemWidth(-Imgui.GetContentRegionAvail().x * 0.5f);
+            //                    Imgui.PushItemWidth(-Imgui.GetContentRegionAvailable().Width * 0.5f);
             //                    Imgui.TableSetColumnIndex(2);
             //                    Imgui.PushItemWidth(-FLT_MIN); // Right-aligned
             //                }
             //
             //                // Draw our contents
             //                static float dummy_f = 0.0f;
-            //                Imgui.PushID(row);
+            //                Imgui.PushId(row);
             //                Imgui.TableSetColumnIndex(0);
-            //                Imgui.SliderFloat("float0", &dummy_f, 0.0f, 1.0f);
+            //                Imgui.Slider("float0", &dummy_f, 0.0f, 1.0f);
             //                Imgui.TableSetColumnIndex(1);
-            //                Imgui.SliderFloat("float1", &dummy_f, 0.0f, 1.0f);
+            //                Imgui.Slider("float1", &dummy_f, 0.0f, 1.0f);
             //                Imgui.TableSetColumnIndex(2);
-            //                Imgui.SliderFloat("##float2", &dummy_f, 0.0f, 1.0f); // No visible label since right-aligned
-            //                Imgui.PopID();
+            //                Imgui.Slider("##float2", &dummy_f, 0.0f, 1.0f); // No visible label since right-aligned
+            //                Imgui.PopId();
             //            }
             //            Imgui.EndTable();
             //        }
@@ -4710,7 +4768,7 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Custom headers"))
             //    {
             //        const int COLUMNS_COUNT = 3;
-            //        if (Imgui.BeginTable("table_custom_headers", COLUMNS_COUNT, ImGuiTableFlags_Borders | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable))
+            //        if (Imgui.BeginTable("table_custom_headers", COLUMNS_COUNT, TableOptions.Borders | TableOptions.Reorderable | TableOptions.Hideable))
             //        {
             //            Imgui.TableSetupColumn("Apricot");
             //            Imgui.TableSetupColumn("Banana");
@@ -4726,13 +4784,13 @@ namespace SampleApp
             //            {
             //                Imgui.TableSetColumnIndex(column);
             //                const char* column_name = Imgui.TableGetColumnName(column); // Retrieve name passed to TableSetupColumn()
-            //                Imgui.PushID(column);
-            //                Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+            //                Imgui.PushId(column);
+            //                Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(0, 0));
             //                Imgui.Checkbox("##checkall", &column_selected[column]);
-            //                Imgui.PopStyleVar();
-            //                Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.x);
+            //                Imgui.PopStyleVariable();
+            //                Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.X);
             //                Imgui.TableHeader(column_name);
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //
             //            for (int row = 0; row < 5; row++)
@@ -4757,16 +4815,16 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Tables/Context menus");
             //    if (Imgui.TreeNode("Context menus"))
             //    {
-            //        HelpMarker("By default, right-clicking over a TableHeadersRow()/TableHeader() line will open the default context-menu.\nUsing ImGuiTableFlags_ContextMenuInBody we also allow right-clicking over columns body.");
-            //        static ImGuiTableFlags flags1 = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_ContextMenuInBody;
+            //        HelpMarker("By default, right-clicking over a TableHeadersRow()/TableHeader() line will open the default context-menu.\nUsing TableOptions.ContextMenuInBody we also allow right-clicking over columns body.");
+            //        static ImGuiTableFlags flags1 = TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Borders | TableOptions.ContextMenuInBody;
             //
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ContextMenuInBody", &flags1, ImGuiTableFlags_ContextMenuInBody);
+            //        Imgui.CheckboxFlags("TableOptions.ContextMenuInBody", &flags1, TableOptions.ContextMenuInBody);
             //        PopStyleCompact();
             //
             //        // Context Menus: first example
             //        // [1.1] Right-click on the TableHeadersRow() line to open the default table context menu.
-            //        // [1.2] Right-click in columns also open the default table context menu (if ImGuiTableFlags_ContextMenuInBody is set)
+            //        // [1.2] Right-click in columns also open the default table context menu (if TableOptions.ContextMenuInBody is set)
             //        const int COLUMNS_COUNT = 3;
             //        if (Imgui.BeginTable("table_context_menu", COLUMNS_COUNT, flags1))
             //        {
@@ -4795,7 +4853,7 @@ namespace SampleApp
             //        // [2.2] Right-click on the ".." to open a custom popup
             //        // [2.3] Right-click in columns to open another custom popup
             //        HelpMarker("Demonstrate mixing table context menu (over header), item context button (over button) and custom per-colum context menu (over column body).");
-            //        ImGuiTableFlags flags2 = ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders;
+            //        ImGuiTableFlags flags2 = TableOptions.Resizable | TableOptions.SizingFixedFit | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Borders;
             //        if (Imgui.BeginTable("table_context_menu_2", COLUMNS_COUNT, flags2))
             //        {
             //            Imgui.TableSetupColumn("One");
@@ -4815,7 +4873,7 @@ namespace SampleApp
             //                    Imgui.SameLine();
             //
             //                    // [2.2] Right-click on the ".." to open a custom popup
-            //                    Imgui.PushID(row * COLUMNS_COUNT + column);
+            //                    Imgui.PushId(row * COLUMNS_COUNT + column);
             //                    Imgui.SmallButton("..");
             //                    if (Imgui.BeginPopupContextItem())
             //                    {
@@ -4824,7 +4882,7 @@ namespace SampleApp
             //                            Imgui.CloseCurrentPopup();
             //                        Imgui.EndPopup();
             //                    }
-            //                    Imgui.PopID();
+            //                    Imgui.PopId();
             //                }
             //            }
             //
@@ -4834,7 +4892,7 @@ namespace SampleApp
             //            int hovered_column = -1;
             //            for (int column = 0; column < COLUMNS_COUNT + 1; column++)
             //            {
-            //                Imgui.PushID(column);
+            //                Imgui.PushId(column);
             //                if (Imgui.TableGetColumnFlags(column) & ImGuiTableColumnFlags_IsHovered)
             //                    hovered_column = column;
             //                if (hovered_column == column && !Imgui.IsAnyItemHovered() && Imgui.IsMouseReleased(1))
@@ -4849,7 +4907,7 @@ namespace SampleApp
             //                        Imgui.CloseCurrentPopup();
             //                    Imgui.EndPopup();
             //                }
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //
             //            Imgui.EndTable();
@@ -4866,9 +4924,9 @@ namespace SampleApp
             //    {
             //        HelpMarker("Multiple tables with the same identifier will share their settings, width, visibility, order etc.");
             //
-            //        static ImGuiTableFlags flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoSavedSettings;
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_ScrollY", &flags, ImGuiTableFlags_ScrollY);
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_SizingFixedFit", &flags, ImGuiTableFlags_SizingFixedFit);
+            //        static ImGuiTableFlags flags = TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Borders | TableOptions.SizingFixedFit | TableOptions.NoSavedSettings;
+            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
+            //        Imgui.CheckboxFlags("TableOptions.SizingFixedFit", &flags, TableOptions.SizingFixedFit);
             //        for (int n = 0; n < 3; n++)
             //        {
             //            char buf[32];
@@ -4922,13 +4980,13 @@ namespace SampleApp
             //
             //        // Options
             //        static ImGuiTableFlags flags =
-            //            ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
-            //            | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_NoBordersInBody
-            //            | ImGuiTableFlags_ScrollY;
+            //            TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Sortable | TableOptions.SortMulti
+            //            | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.NoBordersInBody
+            //            | TableOptions.ScrollY;
             //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_SortMulti", &flags, ImGuiTableFlags_SortMulti);
+            //        Imgui.CheckboxFlags("TableOptions.SortMulti", &flags, TableOptions.SortMulti);
             //        Imgui.SameLine(); HelpMarker("When sorting is enabled: hold shift when clicking headers to sort on multiple column. TableGetSortSpecs() may return specs where (SpecsCount > 1).");
-            //        Imgui.CheckboxFlags("ImGuiTableFlags_SortTristate", &flags, ImGuiTableFlags_SortTristate);
+            //        Imgui.CheckboxFlags("TableOptions.SortTristate", &flags, TableOptions.SortTristate);
             //        Imgui.SameLine(); HelpMarker("When sorting is enabled: allow no sorting, disable default sorting. TableGetSortSpecs() may return specs where (SpecsCount == 0).");
             //        PopStyleCompact();
             //
@@ -4967,7 +5025,7 @@ namespace SampleApp
             //                {
             //                    // Display a data item
             //                    MyItem* item = &items[row_n];
-            //                    Imgui.PushID(item->ID);
+            //                    Imgui.PushId(item->ID);
             //                    Imgui.TableNextRow();
             //                    Imgui.TableNextColumn();
             //                    Imgui.Text("%04d", item->ID);
@@ -4977,7 +5035,7 @@ namespace SampleApp
             //                    Imgui.SmallButton("None");
             //                    Imgui.TableNextColumn();
             //                    Imgui.Text("%d", item->Quantity);
-            //                    Imgui.PopID();
+            //                    Imgui.PopId();
             //                }
             //            Imgui.EndTable();
             //        }
@@ -4994,11 +5052,11 @@ namespace SampleApp
             //    if (Imgui.TreeNode("Advanced"))
             //    {
             //        static ImGuiTableFlags flags =
-            //            ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable
-            //            | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti
-            //            | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBody
-            //            | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY
-            //            | ImGuiTableFlags_SizingFixedFit;
+            //            TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable
+            //            | TableOptions.Sortable | TableOptions.SortMulti
+            //            | TableOptions.RowBg | TableOptions.Borders | TableOptions.NoBordersInBody
+            //            | TableOptions.ScrollX | TableOptions.ScrollY
+            //            | TableOptions.SizingFixedFit;
             //
             //        enum ContentsType { CT_Text, CT_Button, CT_SmallButton, CT_FillButton, CT_Selectable, CT_SelectableSpanRow };
             //        static int contents_type = CT_SelectableSpanRow;
@@ -5022,26 +5080,26 @@ namespace SampleApp
             //
             //            if (Imgui.TreeNodeEx("Features:", ImGuiTreeNodeFlags_DefaultOpen))
             //            {
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_Reorderable", &flags, ImGuiTableFlags_Reorderable);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_Hideable", &flags, ImGuiTableFlags_Hideable);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_Sortable", &flags, ImGuiTableFlags_Sortable);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoSavedSettings", &flags, ImGuiTableFlags_NoSavedSettings);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_ContextMenuInBody", &flags, ImGuiTableFlags_ContextMenuInBody);
+            //                Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
+            //                Imgui.CheckboxFlags("TableOptions.Reorderable", &flags, TableOptions.Reorderable);
+            //                Imgui.CheckboxFlags("TableOptions.Hideable", &flags, TableOptions.Hideable);
+            //                Imgui.CheckboxFlags("TableOptions.Sortable", &flags, TableOptions.Sortable);
+            //                Imgui.CheckboxFlags("TableOptions.NoSavedSettings", &flags, TableOptions.NoSavedSettings);
+            //                Imgui.CheckboxFlags("TableOptions.ContextMenuInBody", &flags, TableOptions.ContextMenuInBody);
             //                Imgui.TreePop();
             //            }
             //
             //            if (Imgui.TreeNodeEx("Decorations:", ImGuiTreeNodeFlags_DefaultOpen))
             //            {
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_RowBg", &flags, ImGuiTableFlags_RowBg);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersV", &flags, ImGuiTableFlags_BordersV);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterV", &flags, ImGuiTableFlags_BordersOuterV);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerV", &flags, ImGuiTableFlags_BordersInnerV);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersH", &flags, ImGuiTableFlags_BordersH);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersOuterH", &flags, ImGuiTableFlags_BordersOuterH);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_BordersInnerH", &flags, ImGuiTableFlags_BordersInnerH);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBody", &flags, ImGuiTableFlags_NoBordersInBody); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoBordersInBodyUntilResize", &flags, ImGuiTableFlags_NoBordersInBodyUntilResize); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
+            //                Imgui.CheckboxFlags("TableOptions.RowBg", &flags, TableOptions.RowBg);
+            //                Imgui.CheckboxFlags("TableOptions.BordersV", &flags, TableOptions.BordersV);
+            //                Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags, TableOptions.BordersOuterV);
+            //                Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags, TableOptions.BordersInnerV);
+            //                Imgui.CheckboxFlags("TableOptions.BordersH", &flags, TableOptions.BordersH);
+            //                Imgui.CheckboxFlags("TableOptions.BordersOuterH", &flags, TableOptions.BordersOuterH);
+            //                Imgui.CheckboxFlags("TableOptions.BordersInnerH", &flags, TableOptions.BordersInnerH);
+            //                Imgui.CheckboxFlags("TableOptions.NoBordersInBody", &flags, TableOptions.NoBordersInBody); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
+            //                Imgui.CheckboxFlags("TableOptions.NoBordersInBodyUntilResize", &flags, TableOptions.NoBordersInBodyUntilResize); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
             //                Imgui.TreePop();
             //            }
             //
@@ -5049,45 +5107,45 @@ namespace SampleApp
             //            {
             //                EditTableSizingFlags(&flags);
             //                Imgui.SameLine(); HelpMarker("In the Advanced demo we override the policy of each column so those table-wide settings have less effect that typical.");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendX", &flags, ImGuiTableFlags_NoHostExtendX);
-            //                Imgui.SameLine(); HelpMarker("Make outer width auto-fit to columns, overriding outer_size.x value.\n\nOnly available when ScrollX/ScrollY are disabled and Stretch columns are not used.");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoHostExtendY", &flags, ImGuiTableFlags_NoHostExtendY);
-            //                Imgui.SameLine(); HelpMarker("Make outer height stop exactly at outer_size.y (prevent auto-extending table past the limit).\n\nOnly available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoKeepColumnsVisible", &flags, ImGuiTableFlags_NoKeepColumnsVisible);
+            //                Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags, TableOptions.NoHostExtendX);
+            //                Imgui.SameLine(); HelpMarker("Make outer width auto-fit to columns, overriding outer_size.X value.\n\nOnly available when ScrollX/ScrollY are disabled and Stretch columns are not used.");
+            //                Imgui.CheckboxFlags("TableOptions.NoHostExtendY", &flags, TableOptions.NoHostExtendY);
+            //                Imgui.SameLine(); HelpMarker("Make outer height stop exactly at outer_size.Y (prevent auto-extending table past the limit).\n\nOnly available when ScrollX/ScrollY are disabled. Data below the limit will be clipped and not visible.");
+            //                Imgui.CheckboxFlags("TableOptions.NoKeepColumnsVisible", &flags, TableOptions.NoKeepColumnsVisible);
             //                Imgui.SameLine(); HelpMarker("Only available if ScrollX is disabled.");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_PreciseWidths", &flags, ImGuiTableFlags_PreciseWidths);
+            //                Imgui.CheckboxFlags("TableOptions.PreciseWidths", &flags, TableOptions.PreciseWidths);
             //                Imgui.SameLine(); HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoClip", &flags, ImGuiTableFlags_NoClip);
+            //                Imgui.CheckboxFlags("TableOptions.NoClip", &flags, TableOptions.NoClip);
             //                Imgui.SameLine(); HelpMarker("Disable clipping rectangle for every individual columns (reduce draw command count, items will be able to overflow into other columns). Generally incompatible with ScrollFreeze options.");
             //                Imgui.TreePop();
             //            }
             //
             //            if (Imgui.TreeNodeEx("Padding:", ImGuiTreeNodeFlags_DefaultOpen))
             //            {
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_PadOuterX", &flags, ImGuiTableFlags_PadOuterX);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoPadOuterX", &flags, ImGuiTableFlags_NoPadOuterX);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_NoPadInnerX", &flags, ImGuiTableFlags_NoPadInnerX);
+            //                Imgui.CheckboxFlags("TableOptions.PadOuterX", &flags, TableOptions.PadOuterX);
+            //                Imgui.CheckboxFlags("TableOptions.NoPadOuterX", &flags, TableOptions.NoPadOuterX);
+            //                Imgui.CheckboxFlags("TableOptions.NoPadInnerX", &flags, TableOptions.NoPadInnerX);
             //                Imgui.TreePop();
             //            }
             //
             //            if (Imgui.TreeNodeEx("Scrolling:", ImGuiTreeNodeFlags_DefaultOpen))
             //            {
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_ScrollX", &flags, ImGuiTableFlags_ScrollX);
+            //                Imgui.CheckboxFlags("TableOptions.ScrollX", &flags, TableOptions.ScrollX);
             //                Imgui.SameLine();
             //                Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //                Imgui.DragInt("freeze_cols", &freeze_cols, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_ScrollY", &flags, ImGuiTableFlags_ScrollY);
+            //                Imgui.Drag("freeze_cols", &freeze_cols, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
+            //                Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
             //                Imgui.SameLine();
             //                Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //                Imgui.DragInt("freeze_rows", &freeze_rows, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
+            //                Imgui.Drag("freeze_rows", &freeze_rows, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
             //                Imgui.TreePop();
             //            }
             //
             //            if (Imgui.TreeNodeEx("Sorting:", ImGuiTreeNodeFlags_DefaultOpen))
             //            {
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_SortMulti", &flags, ImGuiTableFlags_SortMulti);
+            //                Imgui.CheckboxFlags("TableOptions.SortMulti", &flags, TableOptions.SortMulti);
             //                Imgui.SameLine(); HelpMarker("When sorting is enabled: hold shift when clicking headers to sort on multiple column. TableGetSortSpecs() may return specs where (SpecsCount > 1).");
-            //                Imgui.CheckboxFlags("ImGuiTableFlags_SortTristate", &flags, ImGuiTableFlags_SortTristate);
+            //                Imgui.CheckboxFlags("TableOptions.SortTristate", &flags, TableOptions.SortTristate);
             //                Imgui.SameLine(); HelpMarker("When sorting is enabled: allow no sorting, disable default sorting. TableGetSortSpecs() may return specs where (SpecsCount == 0).");
             //                Imgui.TreePop();
             //            }
@@ -5097,24 +5155,24 @@ namespace SampleApp
             //                Imgui.Checkbox("show_headers", &show_headers);
             //                Imgui.Checkbox("show_wrapped_text", &show_wrapped_text);
             //
-            //                Imgui.DragFloat2("##OuterSize", &outer_size_value.x);
-            //                Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.x);
+            //                Imgui.DragFloat2("##OuterSize", &outer_size_value.X);
+            //                Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.X);
             //                Imgui.Checkbox("outer_size", &outer_size_enabled);
             //                Imgui.SameLine();
-            //                HelpMarker("If scrolling is disabled (ScrollX and ScrollY not set):\n"
-            //                    "- The table is output directly in the parent window.\n"
-            //                    "- OuterSize.x < 0.0f will right-align the table.\n"
-            //                    "- OuterSize.x = 0.0f will narrow fit the table unless there are any Stretch columns.\n"
-            //                    "- OuterSize.y then becomes the minimum size for the table, which will extend vertically if there are more rows (unless NoHostExtendY is set).");
+            //                HelpMarker("If scrolling is disabled (ScrollX and ScrollY not set):\n" +
+            //                    "- The table is output directly in the parent window.\n" +
+            //                    "- OuterSize.X < 0.0f will right-align the table.\n" +
+            //                    "- OuterSize.X = 0.0f will narrow fit the table unless there are any Stretch columns.\n" +
+            //                    "- OuterSize.Y then becomes the minimum size for the table, which will extend vertically if there are more rows (unless NoHostExtendY is set).");
             //
             //                // From a user point of view we will tend to use 'inner_width' differently depending on whether our table is embedding scrolling.
             //                // To facilitate toying with this demo we will actually pass 0.0f to the BeginTable() when ScrollX is disabled.
-            //                Imgui.DragFloat("inner_width (when ScrollX active)", &inner_width_with_scroll, 1.0f, 0.0f, FLT_MAX);
+            //                Imgui.Drag("inner_width (when ScrollX active)", &inner_width_with_scroll, 1.0f, 0.0f, FLT_MAX);
             //
-            //                Imgui.DragFloat("row_min_height", &row_min_height, 1.0f, 0.0f, FLT_MAX);
+            //                Imgui.Drag("row_min_height", &row_min_height, 1.0f, 0.0f, FLT_MAX);
             //                Imgui.SameLine(); HelpMarker("Specify height of the Selectable item.");
             //
-            //                Imgui.DragInt("items_count", &items_count, 0.1f, 0, 9999);
+            //                Imgui.Drag("items_count", &items_count, 0.1f, 0, 9999);
             //                Imgui.Combo("items_type (first column)", &contents_type, contents_type_names, contents_type_names.Length);
             //                //filter.Draw("filter");
             //                Imgui.TreePop();
@@ -5149,7 +5207,7 @@ namespace SampleApp
             //        const ImDrawList* table_draw_list = NULL;  // "
             //
             //        // Submit table
-            //        const float inner_width_to_use = (flags & ImGuiTableFlags_ScrollX) ? inner_width_with_scroll : 0.0f;
+            //        const float inner_width_to_use = (flags & TableOptions.ScrollX) ? inner_width_with_scroll : 0.0f;
             //        if (Imgui.BeginTable("table_advanced", 6, flags, outer_size_enabled ? outer_size_value : ImVec2(0, 0), inner_width_to_use))
             //        {
             //            // Declare columns
@@ -5159,7 +5217,7 @@ namespace SampleApp
             //            Imgui.TableSetupColumn("Name",         ImGuiTableColumnFlags_WidthFixed, 0.0f, MyItemColumnID_Name);
             //            Imgui.TableSetupColumn("Action",       ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f, MyItemColumnID_Action);
             //            Imgui.TableSetupColumn("Quantity",     ImGuiTableColumnFlags_PreferSortDescending, 0.0f, MyItemColumnID_Quantity);
-            //            Imgui.TableSetupColumn("Description",  (flags & ImGuiTableFlags_NoHostExtendX) ? 0 : ImGuiTableColumnFlags_WidthStretch, 0.0f, MyItemColumnID_Description);
+            //            Imgui.TableSetupColumn("Description",  (flags & TableOptions.NoHostExtendX) ? 0 : ImGuiTableColumnFlags_WidthStretch, 0.0f, MyItemColumnID_Description);
             //            Imgui.TableSetupColumn("Hidden",       ImGuiTableColumnFlags_DefaultHide | ImGuiTableColumnFlags_NoSort);
             //            Imgui.TableSetupScrollFreeze(freeze_cols, freeze_rows);
             //
@@ -5205,7 +5263,7 @@ namespace SampleApp
             //                    //    continue;
             //
             //                    const bool item_is_selected = selection.contains(item->ID);
-            //                    Imgui.PushID(item->ID);
+            //                    Imgui.PushId(item->ID);
             //                    Imgui.TableNextRow(ImGuiTableRowFlags_None, row_min_height);
             //
             //                    // For the demo purpose we can select among different type of items submitted in the first column
@@ -5225,7 +5283,7 @@ namespace SampleApp
             //                        ImGuiSelectableFlags selectable_flags = (contents_type == CT_SelectableSpanRow) ? ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap : ImGuiSelectableFlags_None;
             //                        if (Imgui.Selectable(label, item_is_selected, selectable_flags, ImVec2(0, row_min_height)))
             //                        {
-            //                            if (Imgui.GetIO().KeyCtrl)
+            //                            if (Imgui.GetIo().KeyCtrl)
             //                            {
             //                                if (item_is_selected)
             //                                    selection.find_erase_unsorted(item->ID);
@@ -5268,7 +5326,7 @@ namespace SampleApp
             //                    if (Imgui.TableSetColumnIndex(5))
             //                        Imgui.Text("1234");
             //
-            //                    Imgui.PopID();
+            //                    Imgui.PopId();
             //                }
             //            }
             //            Imgui.PopButtonRepeat();
@@ -5290,17 +5348,17 @@ namespace SampleApp
             //                    table_draw_list_draw_cmd_count - parent_draw_list_draw_cmd_count);
             //            else
             //                Imgui.Text(": DrawCmd: +%d (in child window), Scroll: (%.f/%.f) (%.f/%.f)",
-            //                    table_draw_list_draw_cmd_count - 1, table_scroll_cur.x, table_scroll_max.x, table_scroll_cur.y, table_scroll_max.y);
+            //                    table_draw_list_draw_cmd_count - 1, table_scroll_cur.X, table_scroll_max.X, table_scroll_cur.Y, table_scroll_max.Y);
             //        }
             //        Imgui.TreePop();
             //    }
             //
-            //    Imgui.PopID();
+            //    Imgui.PopId();
             //
             //    ShowDemoWindowColumns();
             //
             //    if (disable_indent)
-            //        Imgui.PopStyleVar();
+            //        Imgui.PopStyleVariable();
         }
 
         // Demonstrate old/legacy Columns API!
@@ -5369,7 +5427,7 @@ namespace SampleApp
             //        static int columns_count = 4;
             //        const int lines_count = 3;
             //        Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
-            //        Imgui.DragInt("##columns_count", &columns_count, 0.1f, 2, 10, "%d columns");
+            //        Imgui.Drag("##columns_count", &columns_count, 0.1f, 2, 10, "%d columns");
             //        if (columns_count < 2)
             //            columns_count = 2;
             //        Imgui.SameLine();
@@ -5383,7 +5441,7 @@ namespace SampleApp
             //                Imgui.Separator();
             //            Imgui.Text("%c%c%c", 'a' + i, 'a' + i, 'a' + i);
             //            Imgui.Text("Width %.2f", Imgui.GetColumnWidth());
-            //            Imgui.Text("Avail %.2f", Imgui.GetContentRegionAvail().x);
+            //            Imgui.Text("Avail %.2f", Imgui.GetContentRegionAvailable().Width);
             //            Imgui.Text("Offset %.2f", Imgui.GetColumnOffset());
             //            Imgui.Text("Long text that is likely to clip");
             //            Imgui.Button("Button", ImVec2(-FLT_MIN, 0.0f));
@@ -5448,7 +5506,7 @@ namespace SampleApp
             //    {
             //        Imgui.SetNextWindowContentSize(ImVec2(1500.0f, 0.0f));
             //        ImVec2 child_size = ImVec2(0, Imgui.GetFontSize() * 20.0f);
-            //        Imgui.BeginChild("##ScrollingRegion", child_size, false, ImGuiWindowFlags_HorizontalScrollbar);
+            //        Imgui.BeginChild("##ScrollingRegion", child_size, false, WindowOptions.HorizontalScrollbar);
             //        Imgui.Columns(10);
             //
             //        // Also demonstrate using clipper for large vertical lists
@@ -5516,7 +5574,7 @@ namespace SampleApp
             //    IMGUI_DEMO_MARKER("Inputs & Focus");
             //    if (Imgui.CollapsingHeader("Inputs & Focus"))
             //    {
-            //        ImGuiIO& io = Imgui.GetIO();
+            //        ImGuiIO& io = Imgui.GetIo();
             //
             //        // Display inputs submitted to ImGuiIO
             //        IMGUI_DEMO_MARKER("Inputs & Focus/Inputs");
@@ -5524,14 +5582,14 @@ namespace SampleApp
             //        if (Imgui.TreeNode("Inputs"))
             //        {
             //            HelpMarker(
-            //                "This is a simplified view. See more detailed input state:\n"
-            //                "- in 'Tools->Metrics/Debugger->Inputs'.\n"
+            //                "This is a simplified view. See more detailed input state:\n" +
+            //                "- in 'Tools->Metrics/Debugger->Inputs'.\n" +
             //                "- in 'Tools->Debug Log->IO'.");
             //            if (Imgui.IsMousePosValid())
-            //                Imgui.Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
+            //                Imgui.Text("Mouse pos: (%g, %g)", io.MousePos.X, io.MousePos.Y);
             //            else
             //                Imgui.Text("Mouse pos: <INVALID>");
-            //            Imgui.Text("Mouse delta: (%g, %g)", io.MouseDelta.x, io.MouseDelta.y);
+            //            Imgui.Text("Mouse delta: (%g, %g)", io.MouseDelta.X, io.MouseDelta.Y);
             //            Imgui.Text("Mouse down:");
             //            for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++) if (Imgui.IsMouseDown(i)) { Imgui.SameLine(); Imgui.Text("b%d (%.02f secs)", i, io.MouseDownDuration[i]); }
             //            Imgui.Text("Mouse wheel: %.1f", io.MouseWheel);
@@ -5541,7 +5599,7 @@ namespace SampleApp
             //#ifdef IMGUI_DISABLE_OBSOLETE_KEYIO
             //            struct funcs { static bool IsLegacyNativeDupe(ImGuiKey) { return false; } };
             //#else
-            //            struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && Imgui.GetIO().KeyMap[key] != -1; } }; // Hide Native<>ImGuiKey duplicates when both exists in the array
+            //            struct funcs { static bool IsLegacyNativeDupe(ImGuiKey key) { return key < 512 && Imgui.GetIo().KeyMap[key] != -1; } }; // Hide Native<>ImGuiKey duplicates when both exists in the array
             //#endif
             //            Imgui.Text("Keys down:");         for (ImGuiKey key = ImGuiKey_KeysData_OFFSET; key < ImGuiKey_COUNT; key = (ImGuiKey)(key + 1)) { if (funcs::IsLegacyNativeDupe(key) || !Imgui.IsKeyDown(key)) continue; Imgui.SameLine(); Imgui.Text((key < ImGuiKey_NamedKey_BEGIN) ? "\"%s\"" : "\"%s\" %d", Imgui.GetKeyName(key), key); Imgui.SameLine(); Imgui.Text("(%.02f)", Imgui.GetKeyData(key)->DownDuration); }
             //            Imgui.Text("Keys mods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
@@ -5558,7 +5616,7 @@ namespace SampleApp
             //            HelpMarker(
             //                "The value of io.WantCaptureMouse and io.WantCaptureKeyboard are normally set by Dear ImGui "
             //                "to instruct your application of how to route inputs. Typically, when a value is true, it means "
-            //                "Dear ImGui wants the corresponding inputs and we expect the underlying application to ignore them.\n\n"
+            //                "Dear ImGui wants the corresponding inputs and we expect the underlying application to ignore them.\n\n" +
             //                "The most typical case is: when hovering a window, Dear ImGui set io.WantCaptureMouse to true, "
             //                "and underlying application should ignore mouse inputs (in practice there are many and more subtle "
             //                "rules leading to how those flags are set).");
@@ -5573,15 +5631,15 @@ namespace SampleApp
             //            if (Imgui.TreeNode("WantCapture override"))
             //            {
             //                HelpMarker(
-            //                    "Hovering the colored canvas will override io.WantCaptureXXX fields.\n"
+            //                    "Hovering the colored canvas will override io.WantCaptureXXX fields.\n" +
             //                    "Notice how normally (when set to none), the value of io.WantCaptureKeyboard would be false when hovering and true when clicking.");
             //                static int capture_override_mouse = -1;
             //                static int capture_override_keyboard = -1;
             //                const char* capture_override_desc[] = { "None", "Set to false", "Set to true" };
             //                Imgui.SetNextItemWidth(Imgui.GetFontSize() * 15);
-            //                Imgui.SliderInt("SetNextFrameWantCaptureMouse() on hover", &capture_override_mouse, -1, +1, capture_override_desc[capture_override_mouse + 1], SliderOptions.AlwaysClamp);
+            //                Imgui.Slider("SetNextFrameWantCaptureMouse() on hover", &capture_override_mouse, -1, +1, capture_override_desc[capture_override_mouse + 1], SliderOptions.AlwaysClamp);
             //                Imgui.SetNextItemWidth(Imgui.GetFontSize() * 15);
-            //                Imgui.SliderInt("SetNextFrameWantCaptureKeyboard() on hover", &capture_override_keyboard, -1, +1, capture_override_desc[capture_override_keyboard + 1], SliderOptions.AlwaysClamp);
+            //                Imgui.Slider("SetNextFrameWantCaptureKeyboard() on hover", &capture_override_keyboard, -1, +1, capture_override_desc[capture_override_keyboard + 1], SliderOptions.AlwaysClamp);
             //
             //                Imgui.ColorButton("##panel", ImVec4(0.7f, 0.1f, 0.7f, 1.0f), ColorEditOptions.NoTooltip | ColorEditOptions.NoDragDrop, ImVec2(128.0f, 96.0f)); // Dummy item
             //                if (Imgui.IsItemHovered() && capture_override_mouse != -1)
@@ -5675,7 +5733,7 @@ namespace SampleApp
             //            if (Imgui.Button("Focus on Y")) { focus_ahead = 1; } Imgui.SameLine();
             //            if (Imgui.Button("Focus on Z")) { focus_ahead = 2; }
             //            if (focus_ahead != -1) Imgui.SetKeyboardFocusHere(focus_ahead);
-            //            Imgui.SliderFloat3("Float3", &f3[0], 0.0f, 1.0f);
+            //            Imgui.Slider("Float3", &f3[0], 0.0f, 1.0f);
             //
             //            Imgui.TextWrapped("NB: Cursor & selection are preserved when refocusing last used item in code.");
             //            Imgui.TreePop();
@@ -5695,7 +5753,7 @@ namespace SampleApp
             //
             //            Imgui.Button("Drag Me");
             //            if (Imgui.IsItemActive())
-            //                Imgui.GetForegroundDrawList()->AddLine(io.MouseClickedPos[0], io.MousePos, Imgui.GetColorU32(ImGuiCol_Button), 4.0f); // Draw a line between the button and the mouse cursor
+            //                Imgui.GetForegroundDrawList()->AddLine(io.MouseClickedPos[0], io.MousePos, Imgui.GetColorU32(StyleColor.Button), 4.0f); // Draw a line between the button and the mouse cursor
             //
             //            // Drag operations gets "unlocked" when the mouse has moved past a certain threshold
             //            // (the default threshold is stored in io.MouseDragThreshold). You can request a lower or higher
@@ -5704,9 +5762,9 @@ namespace SampleApp
             //            ImVec2 value_with_lock_threshold = Imgui.GetMouseDragDelta(0);
             //            ImVec2 mouse_delta = io.MouseDelta;
             //            Imgui.Text("GetMouseDragDelta(0):");
-            //            Imgui.Text("  w/ default threshold: (%.1f, %.1f)", value_with_lock_threshold.x, value_with_lock_threshold.y);
-            //            Imgui.Text("  w/ zero threshold: (%.1f, %.1f)", value_raw.x, value_raw.y);
-            //            Imgui.Text("io.MouseDelta: (%.1f, %.1f)", mouse_delta.x, mouse_delta.y);
+            //            Imgui.Text("  w/ default threshold: (%.1f, %.1f)", value_with_lock_threshold.X, value_with_lock_threshold.Y);
+            //            Imgui.Text("  w/ zero threshold: (%.1f, %.1f)", value_raw.X, value_raw.Y);
+            //            Imgui.Text("io.MouseDelta: (%.1f, %.1f)", mouse_delta.X, mouse_delta.Y);
             //            Imgui.TreePop();
             //        }
             //    }
@@ -5714,7 +5772,7 @@ namespace SampleApp
 
         public static void ShowAboutWindow(State<bool> p_open)
         {
-            //    if (!Imgui.Begin("About Dear ImGui", p_open, ImGuiWindowFlags_AlwaysAutoResize))
+            //    if (!Imgui.Begin("About Dear ImGui", p_open, WindowOptions.AlwaysAutoResize))
             //    {
             //        Imgui.End();
             //        return;
@@ -5729,12 +5787,12 @@ namespace SampleApp
             //    Imgui.Checkbox("Config/Build Information", &show_config_info);
             //    if (show_config_info)
             //    {
-            //        ImGuiIO& io = Imgui.GetIO();
+            //        ImGuiIO& io = Imgui.GetIo();
             //        ImGuiStyle& style = Imgui.GetStyle();
             //
             //        bool copy_to_clipboard = Imgui.Button("Copy to clipboard");
             //        ImVec2 child_size = ImVec2(0, Imgui.GetTextLineHeightWithSpacing() * 18);
-            //        Imgui.BeginChildFrame(Imgui.GetID("cfg_infos"), child_size, ImGuiWindowFlags_NoMove);
+            //        Imgui.BeginChildFrame(Imgui.GetId("cfg_infos"), child_size, WindowOptions.NoMove);
             //        if (copy_to_clipboard)
             //        {
             //            Imgui.LogToClipboard();
@@ -5831,16 +5889,16 @@ namespace SampleApp
             //        if (io.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset)   Imgui.Text(" RendererHasVtxOffset");
             //        Imgui.Separator();
             //        Imgui.Text("io.Fonts: %d fonts, Flags: 0x%08X, TexSize: %d,%d", io.Fonts->Fonts.Size, io.Fonts->Flags, io.Fonts->TexWidth, io.Fonts->TexHeight);
-            //        Imgui.Text("io.DisplaySize: %.2f,%.2f", io.DisplaySize.x, io.DisplaySize.y);
-            //        Imgui.Text("io.DisplayFramebufferScale: %.2f,%.2f", io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+            //        Imgui.Text("io.DisplaySize: %.2f,%.2f", io.DisplaySize.X, io.DisplaySize.Y);
+            //        Imgui.Text("io.DisplayFramebufferScale: %.2f,%.2f", io.DisplayFramebufferScale.X, io.DisplayFramebufferScale.Y);
             //        Imgui.Separator();
-            //        Imgui.Text("style.WindowPadding: %.2f,%.2f", style.WindowPadding.x, style.WindowPadding.y);
+            //        Imgui.Text("style.WindowPadding: %.2f,%.2f", style.WindowPadding.X, style.WindowPadding.Y);
             //        Imgui.Text("style.WindowBorderSize: %.2f", style.WindowBorderSize);
-            //        Imgui.Text("style.FramePadding: %.2f,%.2f", style.FramePadding.x, style.FramePadding.y);
+            //        Imgui.Text("style.FramePadding: %.2f,%.2f", style.FramePadding.X, style.FramePadding.Y);
             //        Imgui.Text("style.FrameRounding: %.2f", style.FrameRounding);
             //        Imgui.Text("style.FrameBorderSize: %.2f", style.FrameBorderSize);
-            //        Imgui.Text("style.ItemSpacing: %.2f,%.2f", style.ItemSpacing.x, style.ItemSpacing.y);
-            //        Imgui.Text("style.ItemInnerSpacing: %.2f,%.2f", style.ItemInnerSpacing.x, style.ItemInnerSpacing.y);
+            //        Imgui.Text("style.ItemSpacing: %.2f,%.2f", style.ItemSpacing.X, style.ItemSpacing.Y);
+            //        Imgui.Text("style.ItemInnerSpacing: %.2f,%.2f", style.ItemInnerSpacing.X, style.ItemInnerSpacing.Y);
             //
             //        if (copy_to_clipboard)
             //        {
@@ -5859,25 +5917,25 @@ namespace SampleApp
         //// Here we use the regular BeginCombo()/EndCombo() api which is the more flexible one.
         //void Imgui.ShowFontSelector(const char* label)
         //{
-        //    ImGuiIO& io = Imgui.GetIO();
+        //    ImGuiIO& io = Imgui.GetIo();
         //    ImFont* font_current = Imgui.GetFont();
         //    if (Imgui.BeginCombo(label, font_current->GetDebugName()))
         //    {
         //        for (int n = 0; n < io.Fonts->Fonts.Size; n++)
         //        {
         //            ImFont* font = io.Fonts->Fonts[n];
-        //            Imgui.PushID((void*)font);
+        //            Imgui.PushId((void*)font);
         //            if (Imgui.Selectable(font->GetDebugName(), font == font_current))
         //                io.FontDefault = font;
-        //            Imgui.PopID();
+        //            Imgui.PopId();
         //        }
         //        Imgui.EndCombo();
         //    }
         //    Imgui.SameLine();
         //    HelpMarker(
-        //        "- Load additional fonts with io.Fonts->AddFontFromFileTTF().\n"
-        //        "- The font atlas is built when calling io.Fonts->GetTexDataAsXXXX() or io.Fonts->Build().\n"
-        //        "- Read FAQ and docs/FONTS.md for more details.\n"
+        //        "- Load additional fonts with io.Fonts->AddFontFromFileTTF().\n" +
+        //        "- The font atlas is built when calling io.Fonts->GetTexDataAsXXXX() or io.Fonts->Build().\n" +
+        //        "- Read FAQ and docs/FONTS.md for more details.\n" +
         //        "- If you need to add/remove fonts at runtime (e.g. for DPI change), do it before calling NewFrame().");
         //}
         //
@@ -5923,7 +5981,7 @@ namespace SampleApp
             //    Imgui.ShowFontSelector("Fonts##Selector");
             //
             //    // Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
-            //    if (Imgui.SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
+            //    if (Imgui.Slider("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
             //        style.GrabRounding = style.FrameRounding; // Make GrabRounding always the same value as FrameRounding
             //    { bool border = (style.WindowBorderSize > 0.0f); if (Imgui.Checkbox("WindowBorder", &border)) { style.WindowBorderSize = border ? 1.0f : 0.0f; } }
             //    Imgui.SameLine();
@@ -5949,43 +6007,43 @@ namespace SampleApp
             //        if (Imgui.BeginTabItem("Sizes"))
             //        {
             //            Imgui.Text("Main");
-            //            Imgui.SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-            //            Imgui.SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-            //            Imgui.SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-            //            Imgui.SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
+            //            Imgui.Slider("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
+            //            Imgui.Slider("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
+            //            Imgui.Slider("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
             //            Imgui.Text("Borders");
-            //            Imgui.SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-            //            Imgui.SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
-            //            Imgui.SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
-            //            Imgui.SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
-            //            Imgui.SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
+            //            Imgui.Slider("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
+            //            Imgui.Slider("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
+            //            Imgui.Slider("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
+            //            Imgui.Slider("FrameBorderSize", &style.FrameBorderSize, 0.0f, 1.0f, "%.0f");
+            //            Imgui.Slider("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
             //            Imgui.Text("Rounding");
-            //            Imgui.SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
-            //            Imgui.SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
+            //            Imgui.Slider("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
             //            Imgui.Text("Alignment");
-            //            Imgui.SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
+            //            Imgui.Slider("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
             //            int window_menu_button_position = style.WindowMenuButtonPosition + 1;
             //            if (Imgui.Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
             //                style.WindowMenuButtonPosition = window_menu_button_position - 1;
             //            Imgui.Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
-            //            Imgui.SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
+            //            Imgui.Slider("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
             //            Imgui.SameLine(); HelpMarker("Alignment applies when a button is larger than its text content.");
-            //            Imgui.SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
+            //            Imgui.Slider("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
             //            Imgui.SameLine(); HelpMarker("Alignment applies when a selectable is larger than its text content.");
             //            Imgui.Text("Safe Area Padding");
             //            Imgui.SameLine(); HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
-            //            Imgui.SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
+            //            Imgui.Slider("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
             //            Imgui.EndTabItem();
             //        }
             //
@@ -6006,7 +6064,7 @@ namespace SampleApp
             //                    const char* name = Imgui.GetStyleColorName(i);
             //                    if (!output_only_modified || memcmp(&col, &ref->Colors[i], sizeof(ImVec4)) != 0)
             //                        Imgui.LogText("colors[ImGuiCol_%s]%*s= ImVec4(%.2ff, %.2ff, %.2ff, %.2ff);" IM_NEWLINE,
-            //                            name, 23 - (int)strlen(name), "", col.x, col.y, col.z, col.w);
+            //                            name, 23 - (int)strlen(name), "", col.X, col.Y, col.z, col.w);
             //                }
             //                Imgui.LogFinish();
             //            }
@@ -6021,30 +6079,30 @@ namespace SampleApp
             //            if (Imgui.RadioButton("Alpha",  alpha_flags == ColorEditOptions.AlphaPreview))     { alpha_flags = ColorEditOptions.AlphaPreview; } Imgui.SameLine();
             //            if (Imgui.RadioButton("Both",   alpha_flags == ColorEditOptions.AlphaPreviewHalf)) { alpha_flags = ColorEditOptions.AlphaPreviewHalf; } Imgui.SameLine();
             //            HelpMarker(
-            //                "In the color list:\n"
-            //                "Left-click on color square to open color picker,\n"
+            //                "In the color list:\n" +
+            //                "Left-click on color square to open color picker,\n" +
             //                "Right-click to open edit options menu.");
             //
-            //            Imgui.BeginChild("##colors", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
+            //            Imgui.BeginChild("##colors", ImVec2(0, 0), true, WindowOptions.AlwaysVerticalScrollbar | WindowOptions.AlwaysHorizontalScrollbar | WindowOptions.NavFlattened);
             //            Imgui.PushItemWidth(-160);
             //            for (int i = 0; i < ImGuiCol_COUNT; i++)
             //            {
             //                const char* name = Imgui.GetStyleColorName(i);
             //                if (!filter.PassFilter(name))
             //                    continue;
-            //                Imgui.PushID(i);
+            //                Imgui.PushId(i);
             //                Imgui.ColorEdit4("##color", (float*)&style.Colors[i], ColorEditOptions.AlphaBar | alpha_flags);
             //                if (memcmp(&style.Colors[i], &ref->Colors[i], sizeof(ImVec4)) != 0)
             //                {
             //                    // Tips: in a real user application, you may want to merge and use an icon font into the main font,
             //                    // so instead of "Save"/"Revert" you'd use icons!
             //                    // Read the FAQ and docs/FONTS.md about using icon fonts. It's really easy and super convenient!
-            //                    Imgui.SameLine(0.0f, style.ItemInnerSpacing.x); if (Imgui.Button("Save")) { ref->Colors[i] = style.Colors[i]; }
-            //                    Imgui.SameLine(0.0f, style.ItemInnerSpacing.x); if (Imgui.Button("Revert")) { style.Colors[i] = ref->Colors[i]; }
+            //                    Imgui.SameLine(0.0f, style.ItemInnerSpacing.X); if (Imgui.Button("Save")) { ref->Colors[i] = style.Colors[i]; }
+            //                    Imgui.SameLine(0.0f, style.ItemInnerSpacing.X); if (Imgui.Button("Revert")) { style.Colors[i] = ref->Colors[i]; }
             //                }
-            //                Imgui.SameLine(0.0f, style.ItemInnerSpacing.x);
+            //                Imgui.SameLine(0.0f, style.ItemInnerSpacing.X);
             //                Imgui.TextUnformatted(name);
-            //                Imgui.PopID();
+            //                Imgui.PopId();
             //            }
             //            Imgui.PopItemWidth();
             //            Imgui.EndChild();
@@ -6054,25 +6112,25 @@ namespace SampleApp
             //
             //        if (Imgui.BeginTabItem("Fonts"))
             //        {
-            //            ImGuiIO& io = Imgui.GetIO();
+            //            ImGuiIO& io = Imgui.GetIo();
             //            ImFontAtlas* atlas = io.Fonts;
             //            HelpMarker("Read FAQ and docs/FONTS.md for details on font loading.");
             //            Imgui.ShowFontAtlas(atlas);
             //
             //            // Post-baking font scaling. Note that this is NOT the nice way of scaling fonts, read below.
-            //            // (we enforce hard clamping manually as by default DragFloat/SliderFloat allows CTRL+Click text to get out of bounds).
+            //            // (we enforce hard clamping manually as by default Drag/Slider allows CTRL+Click text to get out of bounds).
             //            const float MIN_SCALE = 0.3f;
             //            const float MAX_SCALE = 2.0f;
             //            HelpMarker(
-            //                "Those are old settings provided for convenience.\n"
+            //                "Those are old settings provided for convenience.\n" +
             //                "However, the _correct_ way of scaling your UI is currently to reload your font at the designed size, "
-            //                "rebuild the font atlas, and call style.ScaleAllSizes() on a reference ImGuiStyle structure.\n"
+            //                "rebuild the font atlas, and call style.ScaleAllSizes() on a reference ImGuiStyle structure.\n" +
             //                "Using those settings here will give you poor quality results.");
             //            static float window_scale = 1.0f;
             //            Imgui.PushItemWidth(Imgui.GetFontSize() * 8);
-            //            if (Imgui.DragFloat("window scale", &window_scale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", SliderOptions.AlwaysClamp)) // Scale only this window
+            //            if (Imgui.Drag("window scale", &window_scale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", SliderOptions.AlwaysClamp)) // Scale only this window
             //                Imgui.SetWindowFontScale(window_scale);
-            //            Imgui.DragFloat("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", SliderOptions.AlwaysClamp); // Scale everything
+            //            Imgui.Drag("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", SliderOptions.AlwaysClamp); // Scale everything
             //            Imgui.PopItemWidth();
             //
             //            Imgui.EndTabItem();
@@ -6090,11 +6148,11 @@ namespace SampleApp
             //
             //            Imgui.Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
             //            Imgui.PushItemWidth(Imgui.GetFontSize() * 8);
-            //            Imgui.DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
+            //            Imgui.Drag("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
             //            if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
             //
             //            // When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
-            //            Imgui.DragFloat("Circle Tessellation Max Error", &style.CircleTessellationMaxError , 0.005f, 0.10f, 5.0f, "%.2f", SliderOptions.AlwaysClamp);
+            //            Imgui.Drag("Circle Tessellation Max Error", &style.CircleTessellationMaxError , 0.005f, 0.10f, 5.0f, "%.2f", SliderOptions.AlwaysClamp);
             //            if (Imgui.IsItemActive())
             //            {
             //                Imgui.SetNextWindowPos(Imgui.GetCursorScreenPos());
@@ -6102,7 +6160,7 @@ namespace SampleApp
             //                Imgui.TextUnformatted("(R = radius, N = number of segments)");
             //                Imgui.Spacing();
             //                ImDrawList* draw_list = Imgui.GetWindowDrawList();
-            //                const float min_widget_width = Imgui.CalcTextSize("N: MMM\nR: MMM").x;
+            //                const float min_widget_width = Imgui.CalcTextSize("N: MMM\nR: MMM").X;
             //                for (int n = 0; n < 8; n++)
             //                {
             //                    const float RAD_MIN = 5.0f;
@@ -6118,12 +6176,12 @@ namespace SampleApp
             //                    const float offset_y     = floorf(RAD_MAX);
             //
             //                    const ImVec2 p1 = Imgui.GetCursorScreenPos();
-            //                    draw_list->AddCircle(ImVec2(p1.x + offset_x, p1.y + offset_y), rad, Imgui.GetColorU32(ImGuiCol_Text));
+            //                    draw_list->AddCircle(ImVec2(p1.X + offset_x, p1.Y + offset_y), rad, Imgui.GetColorU32(StyleColor.Text));
             //                    Imgui.Dummy(ImVec2(canvas_width, RAD_MAX * 2));
             //
             //                    /*
             //                    const ImVec2 p2 = Imgui.GetCursorScreenPos();
-            //                    draw_list->AddCircleFilled(ImVec2(p2.x + offset_x, p2.y + offset_y), rad, Imgui.GetColorU32(ImGuiCol_Text));
+            //                    draw_list->AddCircleFilled(ImVec2(p2.X + offset_x, p2.Y + offset_y), rad, Imgui.GetColorU32(StyleColor.Text));
             //                    Imgui.Dummy(ImVec2(canvas_width, RAD_MAX * 2));
             //                    */
             //
@@ -6135,8 +6193,8 @@ namespace SampleApp
             //            Imgui.SameLine();
             //            HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
             //
-            //            Imgui.DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-            //            Imgui.DragFloat("Disabled Alpha", &style.DisabledAlpha, 0.005f, 0.0f, 1.0f, "%.2f"); Imgui.SameLine(); HelpMarker("Additional alpha multiplier for disabled items (multiply over current value of Alpha).");
+            //            Imgui.Drag("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
+            //            Imgui.Drag("Disabled Alpha", &style.DisabledAlpha, 0.005f, 0.0f, 1.0f, "%.2f"); Imgui.SameLine(); HelpMarker("Additional alpha multiplier for disabled items (multiply over current value of Alpha).");
             //            Imgui.PopItemWidth();
             //
             //            Imgui.EndTabItem();
@@ -6257,7 +6315,7 @@ namespace SampleApp
                 {
                     var name = Imgui.GetStyleColorName(color);
                     var p = Imgui.GetCursorScreenPosition();
-                    Imgui.GetWindowDrawList()?.AddRectFilled(new(p, new(p.X + sz, p.Y + sz)), Imgui.GetColor(color));
+                    Imgui.GetWindowDrawList()?.AddRectangleFilled(new(p, new(p.X + sz, p.Y + sz)), Imgui.GetColor(color));
                     Imgui.Dummy(new(sz, sz));
                     Imgui.SameLine();
                     _ = Imgui.MenuItem(name);
@@ -6392,8 +6450,8 @@ namespace SampleApp
         //        Imgui.Separator();
         //
         //        // Reserve enough left-over height for 1 separator + 1 input text
-        //        const float footer_height_to_reserve = Imgui.GetStyle().ItemSpacing.y + Imgui.GetFrameHeightWithSpacing();
-        //        if (Imgui.BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar))
+        //        const float footer_height_to_reserve = Imgui.GetStyle().ItemSpacing.Y + Imgui.GetFrameHeightWithSpacing();
+        //        if (Imgui.BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, WindowOptions.HorizontalScrollbar))
         //        {
         //            if (Imgui.BeginPopupContextWindow())
         //            {
@@ -6425,7 +6483,7 @@ namespace SampleApp
         //            // If your items are of variable height:
         //            // - Split them into same height items would be simpler and facilitate random-seeking into your list.
         //            // - Consider using manual call to IsRectVisible() and skipping extraneous decoration from your items.
-        //            Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
+        //            Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(4, 1)); // Tighten spacing
         //            if (copy_to_clipboard)
         //                Imgui.LogToClipboard();
         //            for (int i = 0; i < Items.Size; i++)
@@ -6441,7 +6499,7 @@ namespace SampleApp
         //                if (strstr(item, "[error]")) { color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f); has_color = true; }
         //                else if (strncmp(item, "# ", 2) == 0) { color = ImVec4(1.0f, 0.8f, 0.6f, 1.0f); has_color = true; }
         //                if (has_color)
-        //                    Imgui.PushStyleColor(ImGuiCol_Text, color);
+        //                    Imgui.PushStyleColor(StyleColor.Text, color);
         //                Imgui.TextUnformatted(item);
         //                if (has_color)
         //                    Imgui.PopStyleColor();
@@ -6455,7 +6513,7 @@ namespace SampleApp
         //                Imgui.SetScrollHereY(1.0f);
         //            ScrollToBottom = false;
         //
-        //            Imgui.PopStyleVar();
+        //            Imgui.PopStyleVariable();
         //        }
         //        Imgui.EndChild();
         //        Imgui.Separator();
@@ -6701,14 +6759,14 @@ namespace SampleApp
         //
         //        Imgui.Separator();
         //
-        //        if (Imgui.BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar))
+        //        if (Imgui.BeginChild("scrolling", ImVec2(0, 0), false, WindowOptions.HorizontalScrollbar))
         //        {
         //            if (clear)
         //                Clear();
         //            if (copy)
         //                Imgui.LogToClipboard();
         //
-        //            Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        //            Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(0, 0));
         //            const char* buf = Buf.begin();
         //            const char* buf_end = Buf.end();
         //            if (Filter.IsActive())
@@ -6753,7 +6811,7 @@ namespace SampleApp
         //                }
         //                clipper.End();
         //            }
-        //            Imgui.PopStyleVar();
+        //            Imgui.PopStyleVariable();
         //
         //            // Keep up at the bottom of the scroll region if we were already at the bottom at the beginning of the frame.
         //            // Using a scrollbar or mouse-wheel will take away from the bottom edge.
@@ -6798,7 +6856,7 @@ namespace SampleApp
         private static void ShowExampleAppLayout(State<bool> p_open)
         {
             //    Imgui.SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-            //    if (Imgui.Begin("Example: Simple layout", p_open, ImGuiWindowFlags_MenuBar))
+            //    if (Imgui.Begin("Example: Simple layout", p_open, WindowOptions.MenuBar))
             //    {
             //        IMGUI_DEMO_MARKER("Examples/Simple layout");
             //        if (Imgui.BeginMenuBar())
@@ -6860,7 +6918,7 @@ namespace SampleApp
         //static void ShowPlaceholderObject(const char* prefix, int uid)
         //{
         //    // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
-        //    Imgui.PushID(uid);
+        //    Imgui.PushId(uid);
         //
         //    // Text and Tree nodes are less high than framed widgets, using AlignTextToFramePadding() we add vertical spacing to make the tree lines equal high.
         //    Imgui.TableNextRow();
@@ -6875,7 +6933,7 @@ namespace SampleApp
         //        static float placeholder_members[8] = { 0.0f, 0.0f, 1.0f, 3.1416f, 100.0f, 999.0f };
         //        for (int i = 0; i < 8; i++)
         //        {
-        //            Imgui.PushID(i); // Use field index as identifier.
+        //            Imgui.PushId(i); // Use field index as identifier.
         //            if (i < 2)
         //            {
         //                ShowPlaceholderObject("Child", 424242);
@@ -6894,14 +6952,14 @@ namespace SampleApp
         //                if (i >= 5)
         //                    Imgui.InputFloat("##value", &placeholder_members[i], 1.0f);
         //                else
-        //                    Imgui.DragFloat("##value", &placeholder_members[i], 0.01f);
+        //                    Imgui.Drag("##value", &placeholder_members[i], 0.01f);
         //                Imgui.NextColumn();
         //            }
-        //            Imgui.PopID();
+        //            Imgui.PopId();
         //        }
         //        Imgui.TreePop();
         //    }
-        //    Imgui.PopID();
+        //    Imgui.PopId();
         //}
 
         private static void ShowExampleAppPropertyEditor(State<bool> p_open)
@@ -6920,8 +6978,8 @@ namespace SampleApp
             //        "Remember that in many simple cases, you can use Imgui.SameLine(xxx) to position\n"
             //        "your cursor horizontally instead of using the Columns() API.");
             //
-            //    Imgui.PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
-            //    if (Imgui.BeginTable("split", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable))
+            //    Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(2, 2));
+            //    if (Imgui.BeginTable("split", 2, TableOptions.BordersOuter | TableOptions.Resizable))
             //    {
             //        // Iterate placeholder objects (all the same data)
             //        for (int obj_i = 0; obj_i < 4; obj_i++)
@@ -6931,7 +6989,7 @@ namespace SampleApp
             //        }
             //        Imgui.EndTable();
             //    }
-            //    Imgui.PopStyleVar();
+            //    Imgui.PopStyleVariable();
             //    Imgui.End();
         }
 
@@ -6973,21 +7031,21 @@ namespace SampleApp
             //    case 1:
             //        {
             //            // Multiple calls to Text(), manually coarsely clipped - demonstrate how to use the ImGuiListClipper helper.
-            //            Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+            //            Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(0, 0));
             //            ImGuiListClipper clipper;
             //            clipper.Begin(lines);
             //            while (clipper.Step())
             //                for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
             //                    Imgui.Text("%i The quick brown fox jumps over the lazy dog", i);
-            //            Imgui.PopStyleVar();
+            //            Imgui.PopStyleVariable();
             //            break;
             //        }
             //    case 2:
             //        // Multiple calls to Text(), not clipped (slow)
-            //        Imgui.PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+            //        Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(0, 0));
             //        for (int i = 0; i < lines; i++)
             //            Imgui.Text("%i The quick brown fox jumps over the lazy dog", i);
-            //        Imgui.PopStyleVar();
+            //        Imgui.PopStyleVariable();
             //        break;
             //    }
             //    Imgui.EndChild();
@@ -6996,7 +7054,7 @@ namespace SampleApp
 
         private static void ShowExampleAppAutoResize(State<bool> p_open)
         {
-            //    if (!Imgui.Begin("Example: Auto-resizing window", p_open, ImGuiWindowFlags_AlwaysAutoResize))
+            //    if (!Imgui.Begin("Example: Auto-resizing window", p_open, WindowOptions.AlwaysAutoResize))
             //    {
             //        Imgui.End();
             //        return;
@@ -7008,7 +7066,7 @@ namespace SampleApp
             //        "Window will resize every-frame to the size of its content.\n"
             //        "Note that you probably don't want to query the window size to\n"
             //        "output your content because that would create a feedback loop.");
-            //    Imgui.SliderInt("Number of lines", &lines, 1, 20);
+            //    Imgui.Slider("Number of lines", &lines, 1, 20);
             //    for (int i = 0; i < lines; i++)
             //        Imgui.Text("%*sThis is line %d", i * 4, "", i); // Pad with space to extend size horizontally
             //    Imgui.End();
@@ -7020,9 +7078,9 @@ namespace SampleApp
             //    {
             //        // Helper functions to demonstrate programmatic constraints
             //        // FIXME: This doesn't take account of decoration size (e.g. title bar), library should make this easier.
-            //        static void AspectRatio(ImGuiSizeCallbackData* data)    { float aspect_ratio = *(float*)data->UserData; data->DesiredSize.x = IM_MAX(data->CurrentSize.x, data->CurrentSize.y); data->DesiredSize.y = (float)(int)(data->DesiredSize.x / aspect_ratio); }
-            //        static void Square(ImGuiSizeCallbackData* data)         { data->DesiredSize.x = data->DesiredSize.y = IM_MAX(data->CurrentSize.x, data->CurrentSize.y); }
-            //        static void Step(ImGuiSizeCallbackData* data)           { float step = *(float*)data->UserData; data->DesiredSize = ImVec2((int)(data->CurrentSize.x / step + 0.5f) * step, (int)(data->CurrentSize.y / step + 0.5f) * step); }
+            //        static void AspectRatio(ImGuiSizeCallbackData* data)    { float aspect_ratio = *(float*)data->UserData; data->DesiredSize.X = IM_MAX(data->CurrentSize.X, data->CurrentSize.Y); data->DesiredSize.Y = (float)(int)(data->DesiredSize.X / aspect_ratio); }
+            //        static void Square(ImGuiSizeCallbackData* data)         { data->DesiredSize.X = data->DesiredSize.Y = IM_MAX(data->CurrentSize.X, data->CurrentSize.Y); }
+            //        static void Step(ImGuiSizeCallbackData* data)           { float step = *(float*)data->UserData; data->DesiredSize = ImVec2((int)(data->CurrentSize.X / step + 0.5f) * step, (int)(data->CurrentSize.Y / step + 0.5f) * step); }
             //    };
             //
             //    const char* test_desc[] =
@@ -7057,22 +7115,22 @@ namespace SampleApp
             //
             //    // Submit window
             //    if (!window_padding)
-            //        Imgui.PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-            //    const ImGuiWindowFlags window_flags = auto_resize ? ImGuiWindowFlags_AlwaysAutoResize : 0;
+            //        Imgui.PushStyleVariable(StyleVariable.WindowPadding, ImVec2(0.0f, 0.0f));
+            //    const ImGuiWindowFlags window_flags = auto_resize ? WindowOptions.AlwaysAutoResize : 0;
             //    const bool window_open = Imgui.Begin("Example: Constrained Resize", p_open, window_flags);
             //    if (!window_padding)
-            //        Imgui.PopStyleVar();
+            //        Imgui.PopStyleVariable();
             //    if (window_open)
             //    {
             //        IMGUI_DEMO_MARKER("Examples/Constrained Resizing window");
-            //        if (Imgui.GetIO().KeyShift)
+            //        if (Imgui.GetIo().KeyShift)
             //        {
             //            // Display a dummy viewport (in your real app you would likely use ImageButton() to display a texture.
-            //            ImVec2 avail_size = Imgui.GetContentRegionAvail();
+            //            ImVec2 avail_size = Imgui.GetContentRegionAvailable();
             //            ImVec2 pos = Imgui.GetCursorScreenPos();
             //            Imgui.ColorButton("viewport", ImVec4(0.5f, 0.2f, 0.5f, 1.0f), ColorEditOptions.NoTooltip | ColorEditOptions.NoDragDrop, avail_size);
-            //            Imgui.SetCursorScreenPos(ImVec2(pos.x + 10, pos.y + 10));
-            //            Imgui.Text("%.2f x %.2f", avail_size.x, avail_size.y);
+            //            Imgui.SetCursorScreenPos(ImVec2(pos.X + 10, pos.Y + 10));
+            //            Imgui.Text("%.2f x %.2f", avail_size.X, avail_size.Y);
             //        }
             //        else
             //        {
@@ -7083,7 +7141,7 @@ namespace SampleApp
             //            Imgui.SetNextItemWidth(Imgui.GetFontSize() * 20);
             //            Imgui.Combo("Constraint", &type, test_desc, test_desc.Length);
             //            Imgui.SetNextItemWidth(Imgui.GetFontSize() * 20);
-            //            Imgui.DragInt("Lines", &display_lines, 0.2f, 1, 100);
+            //            Imgui.Drag("Lines", &display_lines, 0.2f, 1, 100);
             //            Imgui.Checkbox("Auto-resize", &auto_resize);
             //            Imgui.Checkbox("Window padding", &window_padding);
             //            for (int i = 0; i < display_lines; i++)
@@ -7096,8 +7154,8 @@ namespace SampleApp
         private static void ShowExampleAppSimpleOverlay(State<bool> p_open)
         {
             //    static int location = 0;
-            //    ImGuiIO& io = Imgui.GetIO();
-            //    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+            //    ImGuiIO& io = Imgui.GetIo();
+            //    ImGuiWindowFlags window_flags = WindowOptions.NoDecoration | WindowOptions.AlwaysAutoResize | WindowOptions.NoSavedSettings | WindowOptions.NoFocusOnAppearing | WindowOptions.NoNav;
             //    if (location >= 0)
             //    {
             //        const float PAD = 10.0f;
@@ -7105,18 +7163,18 @@ namespace SampleApp
             //        ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
             //        ImVec2 work_size = viewport->WorkSize;
             //        ImVec2 window_pos, window_pos_pivot;
-            //        window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
-            //        window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
-            //        window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
-            //        window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
+            //        window_pos.X = (location & 1) ? (work_pos.X + work_size.X - PAD) : (work_pos.X + PAD);
+            //        window_pos.Y = (location & 2) ? (work_pos.Y + work_size.Y - PAD) : (work_pos.Y + PAD);
+            //        window_pos_pivot.X = (location & 1) ? 1.0f : 0.0f;
+            //        window_pos_pivot.Y = (location & 2) ? 1.0f : 0.0f;
             //        Imgui.SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-            //        window_flags |= ImGuiWindowFlags_NoMove;
+            //        window_flags |= WindowOptions.NoMove;
             //    }
             //    else if (location == -2)
             //    {
             //        // Center window
             //        Imgui.SetNextWindowPos(Imgui.GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-            //        window_flags |= ImGuiWindowFlags_NoMove;
+            //        window_flags |= WindowOptions.NoMove;
             //    }
             //    Imgui.SetNextWindowBgAlpha(0.35f); // Transparent background
             //    if (Imgui.Begin("Example: Simple overlay", p_open, window_flags))
@@ -7125,7 +7183,7 @@ namespace SampleApp
             //        Imgui.Text("Simple overlay\n" "(right-click to change position)");
             //        Imgui.Separator();
             //        if (Imgui.IsMousePosValid())
-            //            Imgui.Text("Mouse Position: (%.1f,%.1f)", io.MousePos.x, io.MousePos.y);
+            //            Imgui.Text("Mouse Position: (%.1f,%.1f)", io.MousePos.X, io.MousePos.Y);
             //        else
             //            Imgui.Text("Mouse Position: <invalid>");
             //        if (Imgui.BeginPopupContextWindow())
@@ -7146,7 +7204,7 @@ namespace SampleApp
         private static void ShowExampleAppFullscreen(State<bool> p_open)
         {
             //    static bool use_work_area = true;
-            //    static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+            //    static ImGuiWindowFlags flags = WindowOptions.NoDecoration | WindowOptions.NoMove | WindowOptions.NoSavedSettings;
             //
             //    // We demonstrate using the full viewport area or the work area (without menu-bars, task-bars etc.)
             //    // Based on your use case you may want one of the other.
@@ -7160,12 +7218,12 @@ namespace SampleApp
             //        Imgui.SameLine();
             //        HelpMarker("Main Area = entire viewport,\nWork Area = entire viewport minus sections used by the main menu bars, task bars etc.\n\nEnable the main-menu bar in Examples menu to see the difference.");
             //
-            //        Imgui.CheckboxFlags("ImGuiWindowFlags_NoBackground", &flags, ImGuiWindowFlags_NoBackground);
-            //        Imgui.CheckboxFlags("ImGuiWindowFlags_NoDecoration", &flags, ImGuiWindowFlags_NoDecoration);
+            //        Imgui.CheckboxFlags("WindowOptions.NoBackground", &flags, WindowOptions.NoBackground);
+            //        Imgui.CheckboxFlags("WindowOptions.NoDecoration", &flags, WindowOptions.NoDecoration);
             //        Imgui.Indent();
-            //        Imgui.CheckboxFlags("ImGuiWindowFlags_NoTitleBar", &flags, ImGuiWindowFlags_NoTitleBar);
-            //        Imgui.CheckboxFlags("ImGuiWindowFlags_NoCollapse", &flags, ImGuiWindowFlags_NoCollapse);
-            //        Imgui.CheckboxFlags("ImGuiWindowFlags_NoScrollbar", &flags, ImGuiWindowFlags_NoScrollbar);
+            //        Imgui.CheckboxFlags("WindowOptions.NoTitleBar", &flags, WindowOptions.NoTitleBar);
+            //        Imgui.CheckboxFlags("WindowOptions.NoCollapse", &flags, WindowOptions.NoCollapse);
+            //        Imgui.CheckboxFlags("WindowOptions.NoScrollbar", &flags, WindowOptions.NoScrollbar);
             //        Imgui.Unindent();
             //
             //        if (p_open && Imgui.Button("Close this window"))
@@ -7183,13 +7241,13 @@ namespace SampleApp
             //    // You can use the "##" and "###" markers to manipulate the display/ID.
             //
             //    // Using "##" to display same title but have unique identifier.
-            //    Imgui.SetNextWindowPos(ImVec2(base_pos.x + 100, base_pos.y + 100), ImGuiCond_FirstUseEver);
+            //    Imgui.SetNextWindowPos(ImVec2(base_pos.X + 100, base_pos.Y + 100), ImGuiCond_FirstUseEver);
             //    Imgui.Begin("Same title as another window##1");
             //    IMGUI_DEMO_MARKER("Examples/Manipulating window titles");
             //    Imgui.Text("This is window 1.\nMy title is the same as window 2, but my identifier is unique.");
             //    Imgui.End();
             //
-            //    Imgui.SetNextWindowPos(ImVec2(base_pos.x + 100, base_pos.y + 200), ImGuiCond_FirstUseEver);
+            //    Imgui.SetNextWindowPos(ImVec2(base_pos.X + 100, base_pos.Y + 200), ImGuiCond_FirstUseEver);
             //    Imgui.Begin("Same title as another window##2");
             //    Imgui.Text("This is window 2.\nMy title is the same as window 1, but my identifier is unique.");
             //    Imgui.End();
@@ -7197,7 +7255,7 @@ namespace SampleApp
             //    // Using "###" to display a changing title but keep a static identifier "AnimatedTitle"
             //    char buf[128];
             //    sprintf(buf, "Animated title %c %d###AnimatedTitle", "|/-\\"[(int)(Imgui.GetTime() / 0.25f) & 3], Imgui.GetFrameCount());
-            //    Imgui.SetNextWindowPos(ImVec2(base_pos.x + 100, base_pos.y + 300), ImGuiCond_FirstUseEver);
+            //    Imgui.SetNextWindowPos(ImVec2(base_pos.X + 100, base_pos.Y + 300), ImGuiCond_FirstUseEver);
             //    Imgui.Begin(buf);
             //    Imgui.Text("This window has a changing title.");
             //    Imgui.End();
@@ -7231,7 +7289,7 @@ namespace SampleApp
             //            ImVec2 gradient_size = ImVec2(Imgui.CalcItemWidth(), Imgui.GetFrameHeight());
             //            {
             //                ImVec2 p0 = Imgui.GetCursorScreenPos();
-            //                ImVec2 p1 = ImVec2(p0.x + gradient_size.x, p0.y + gradient_size.y);
+            //                ImVec2 p1 = ImVec2(p0.X + gradient_size.X, p0.Y + gradient_size.Y);
             //                ImU32 col_a = Imgui.GetColorU32(IM_COL32(0, 0, 0, 255));
             //                ImU32 col_b = Imgui.GetColorU32(IM_COL32(255, 255, 255, 255));
             //                draw_list->AddRectFilledMultiColor(p0, p1, col_a, col_b, col_b, col_a);
@@ -7239,7 +7297,7 @@ namespace SampleApp
             //            }
             //            {
             //                ImVec2 p0 = Imgui.GetCursorScreenPos();
-            //                ImVec2 p1 = ImVec2(p0.x + gradient_size.x, p0.y + gradient_size.y);
+            //                ImVec2 p1 = ImVec2(p0.X + gradient_size.X, p0.Y + gradient_size.Y);
             //                ImU32 col_a = Imgui.GetColorU32(IM_COL32(0, 255, 0, 255));
             //                ImU32 col_b = Imgui.GetColorU32(IM_COL32(255, 0, 0, 255));
             //                draw_list->AddRectFilledMultiColor(p0, p1, col_a, col_b, col_b, col_a);
@@ -7256,16 +7314,16 @@ namespace SampleApp
             //            static bool curve_segments_override = false;
             //            static int curve_segments_override_v = 8;
             //            static ImVec4 colf = ImVec4(1.0f, 1.0f, 0.4f, 1.0f);
-            //            Imgui.DragFloat("Size", &sz, 0.2f, 2.0f, 100.0f, "%.0f");
-            //            Imgui.DragFloat("Thickness", &thickness, 0.05f, 1.0f, 8.0f, "%.02f");
-            //            Imgui.SliderInt("N-gon sides", &ngon_sides, 3, 12);
+            //            Imgui.Drag("Size", &sz, 0.2f, 2.0f, 100.0f, "%.0f");
+            //            Imgui.Drag("Thickness", &thickness, 0.05f, 1.0f, 8.0f, "%.02f");
+            //            Imgui.Slider("N-gon sides", &ngon_sides, 3, 12);
             //            Imgui.Checkbox("##circlesegmentoverride", &circle_segments_override);
-            //            Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.x);
-            //            circle_segments_override |= Imgui.SliderInt("Circle segments override", &circle_segments_override_v, 3, 40);
+            //            Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.X);
+            //            circle_segments_override |= Imgui.Slider("Circle segments override", &circle_segments_override_v, 3, 40);
             //            Imgui.Checkbox("##curvessegmentoverride", &curve_segments_override);
-            //            Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.x);
-            //            curve_segments_override |= Imgui.SliderInt("Curves segments override", &curve_segments_override_v, 3, 40);
-            //            Imgui.ColorEdit4("Color", &colf.x);
+            //            Imgui.SameLine(0.0f, Imgui.GetStyle().ItemInnerSpacing.X);
+            //            curve_segments_override |= Imgui.Slider("Curves segments override", &curve_segments_override_v, 3, 40);
+            //            Imgui.ColorEdit4("Color", &colf.X);
             //
             //            const ImVec2 p = Imgui.GetCursorScreenPos();
             //            const ImU32 col = ImColor(colf);
@@ -7274,8 +7332,8 @@ namespace SampleApp
             //            const float rounding = sz / 5.0f;
             //            const int circle_segments = circle_segments_override ? circle_segments_override_v : 0;
             //            const int curve_segments = curve_segments_override ? curve_segments_override_v : 0;
-            //            float x = p.x + 4.0f;
-            //            float y = p.y + 4.0f;
+            //            float x = p.X + 4.0f;
+            //            float y = p.Y + 4.0f;
             //            for (int n = 0; n < 2; n++)
             //            {
             //                // First line uses a thickness of 1.0f, second line uses the configurable thickness
@@ -7299,7 +7357,7 @@ namespace SampleApp
             //                ImVec2 cp4[4] = { ImVec2(x, y), ImVec2(x + sz * 1.3f, y + sz * 0.3f), ImVec2(x + sz - sz * 1.3f, y + sz - sz * 0.3f), ImVec2(x + sz, y + sz) };
             //                draw_list->AddBezierCubic(cp4[0], cp4[1], cp4[2], cp4[3], col, th, curve_segments);
             //
-            //                x = p.x + 4;
+            //                x = p.X + 4;
             //                y += sz + spacing;
             //            }
             //            draw_list->AddNgonFilled(ImVec2(x + sz * 0.5f, y + sz * 0.5f), sz*0.5f, col, ngon_sides);               x += sz + spacing;  // N-gon
@@ -7334,23 +7392,23 @@ namespace SampleApp
             //            // Typically you would use a BeginChild()/EndChild() pair to benefit from a clipping region + own scrolling.
             //            // Here we demonstrate that this can be replaced by simple offsetting + custom drawing + PushClipRect/PopClipRect() calls.
             //            // To use a child window instead we could use, e.g:
-            //            //      Imgui.PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));      // Disable padding
-            //            //      Imgui.PushStyleColor(ImGuiCol_ChildBg, IM_COL32(50, 50, 50, 255));  // Set a background color
-            //            //      Imgui.BeginChild("canvas", ImVec2(0.0f, 0.0f), true, ImGuiWindowFlags_NoMove);
+            //            //      Imgui.PushStyleVariable(StyleVariable.WindowPadding, ImVec2(0, 0));      // Disable padding
+            //            //      Imgui.PushStyleColor(StyleColor.ChildBg, IM_COL32(50, 50, 50, 255));  // Set a background color
+            //            //      Imgui.BeginChild("canvas", ImVec2(0.0f, 0.0f), true, WindowOptions.NoMove);
             //            //      Imgui.PopStyleColor();
-            //            //      Imgui.PopStyleVar();
+            //            //      Imgui.PopStyleVariable();
             //            //      [...]
             //            //      Imgui.EndChild();
             //
             //            // Using InvisibleButton() as a convenience 1) it will advance the layout cursor and 2) allows us to use IsItemHovered()/IsItemActive()
             //            ImVec2 canvas_p0 = Imgui.GetCursorScreenPos();      // ImDrawList API uses screen coordinates!
-            //            ImVec2 canvas_sz = Imgui.GetContentRegionAvail();   // Resize canvas to what's available
-            //            if (canvas_sz.x < 50.0f) canvas_sz.x = 50.0f;
-            //            if (canvas_sz.y < 50.0f) canvas_sz.y = 50.0f;
-            //            ImVec2 canvas_p1 = ImVec2(canvas_p0.x + canvas_sz.x, canvas_p0.y + canvas_sz.y);
+            //            ImVec2 canvas_sz = Imgui.GetContentRegionAvailable();   // Resize canvas to what's available
+            //            if (canvas_sz.X < 50.0f) canvas_sz.X = 50.0f;
+            //            if (canvas_sz.Y < 50.0f) canvas_sz.Y = 50.0f;
+            //            ImVec2 canvas_p1 = ImVec2(canvas_p0.X + canvas_sz.X, canvas_p0.Y + canvas_sz.Y);
             //
             //            // Draw border and background color
-            //            ImGuiIO& io = Imgui.GetIO();
+            //            ImGuiIO& io = Imgui.GetIo();
             //            ImDrawList* draw_list = Imgui.GetWindowDrawList();
             //            draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(50, 50, 50, 255));
             //            draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
@@ -7359,8 +7417,8 @@ namespace SampleApp
             //            Imgui.InvisibleButton("canvas", canvas_sz, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
             //            const bool is_hovered = Imgui.IsItemHovered(); // Hovered
             //            const bool is_active = Imgui.IsItemActive();   // Held
-            //            const ImVec2 origin(canvas_p0.x + scrolling.x, canvas_p0.y + scrolling.y); // Lock scrolled origin
-            //            const ImVec2 mouse_pos_in_canvas(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
+            //            const ImVec2 origin(canvas_p0.X + scrolling.X, canvas_p0.Y + scrolling.Y); // Lock scrolled origin
+            //            const ImVec2 mouse_pos_in_canvas(io.MousePos.X - origin.X, io.MousePos.Y - origin.Y);
             //
             //            // Add first and second point
             //            if (is_hovered && !adding_line && Imgui.IsMouseClicked(ImGuiMouseButton_Left))
@@ -7381,13 +7439,13 @@ namespace SampleApp
             //            const float mouse_threshold_for_pan = opt_enable_context_menu ? -1.0f : 0.0f;
             //            if (is_active && Imgui.IsMouseDragging(ImGuiMouseButton_Right, mouse_threshold_for_pan))
             //            {
-            //                scrolling.x += io.MouseDelta.x;
-            //                scrolling.y += io.MouseDelta.y;
+            //                scrolling.X += io.MouseDelta.X;
+            //                scrolling.Y += io.MouseDelta.Y;
             //            }
             //
             //            // Context menu (under default mouse threshold)
             //            ImVec2 drag_delta = Imgui.GetMouseDragDelta(ImGuiMouseButton_Right);
-            //            if (opt_enable_context_menu && drag_delta.x == 0.0f && drag_delta.y == 0.0f)
+            //            if (opt_enable_context_menu && drag_delta.X == 0.0f && drag_delta.Y == 0.0f)
             //                Imgui.OpenPopupOnItemClick("context", ImGuiPopupFlags_MouseButtonRight);
             //            if (Imgui.BeginPopup("context"))
             //            {
@@ -7404,13 +7462,13 @@ namespace SampleApp
             //            if (opt_enable_grid)
             //            {
             //                const float GRID_STEP = 64.0f;
-            //                for (float x = fmodf(scrolling.x, GRID_STEP); x < canvas_sz.x; x += GRID_STEP)
-            //                    draw_list->AddLine(ImVec2(canvas_p0.x + x, canvas_p0.y), ImVec2(canvas_p0.x + x, canvas_p1.y), IM_COL32(200, 200, 200, 40));
-            //                for (float y = fmodf(scrolling.y, GRID_STEP); y < canvas_sz.y; y += GRID_STEP)
-            //                    draw_list->AddLine(ImVec2(canvas_p0.x, canvas_p0.y + y), ImVec2(canvas_p1.x, canvas_p0.y + y), IM_COL32(200, 200, 200, 40));
+            //                for (float x = fmodf(scrolling.X, GRID_STEP); x < canvas_sz.X; x += GRID_STEP)
+            //                    draw_list->AddLine(ImVec2(canvas_p0.X + x, canvas_p0.Y), ImVec2(canvas_p0.X + x, canvas_p1.Y), IM_COL32(200, 200, 200, 40));
+            //                for (float y = fmodf(scrolling.Y, GRID_STEP); y < canvas_sz.Y; y += GRID_STEP)
+            //                    draw_list->AddLine(ImVec2(canvas_p0.X, canvas_p0.Y + y), ImVec2(canvas_p1.X, canvas_p0.Y + y), IM_COL32(200, 200, 200, 40));
             //            }
             //            for (int n = 0; n < points.Size; n += 2)
-            //                draw_list->AddLine(ImVec2(origin.x + points[n].x, origin.y + points[n].y), ImVec2(origin.x + points[n + 1].x, origin.y + points[n + 1].y), IM_COL32(255, 255, 0, 255), 2.0f);
+            //                draw_list->AddLine(ImVec2(origin.X + points[n].X, origin.Y + points[n].Y), ImVec2(origin.X + points[n + 1].X, origin.Y + points[n + 1].Y), IM_COL32(255, 255, 0, 255), 2.0f);
             //            draw_list->PopClipRect();
             //
             //            Imgui.EndTabItem();
@@ -7424,13 +7482,13 @@ namespace SampleApp
             //            Imgui.SameLine(); HelpMarker("The Background draw list will be rendered below every Dear ImGui windows.");
             //            Imgui.Checkbox("Draw in Foreground draw list", &draw_fg);
             //            Imgui.SameLine(); HelpMarker("The Foreground draw list will be rendered over every Dear ImGui windows.");
-            //            ImVec2 window_pos = Imgui.GetWindowPos();
+            //            ImVec2 window_pos = Imgui.GetWindowPosition();
             //            ImVec2 window_size = Imgui.GetWindowSize();
-            //            ImVec2 window_center = ImVec2(window_pos.x + window_size.x * 0.5f, window_pos.y + window_size.y * 0.5f);
+            //            ImVec2 window_center = ImVec2(window_pos.X + window_size.X * 0.5f, window_pos.Y + window_size.Y * 0.5f);
             //            if (draw_bg)
-            //                Imgui.GetBackgroundDrawList()->AddCircle(window_center, window_size.x * 0.6f, IM_COL32(255, 0, 0, 200), 0, 10 + 4);
+            //                Imgui.GetBackgroundDrawList()->AddCircle(window_center, window_size.X * 0.6f, IM_COL32(255, 0, 0, 200), 0, 10 + 4);
             //            if (draw_fg)
-            //                Imgui.GetForegroundDrawList()->AddCircle(window_center, window_size.y * 0.6f, IM_COL32(0, 255, 0, 200), 0, 10);
+            //                Imgui.GetForegroundDrawList()->AddCircle(window_center, window_size.Y * 0.6f, IM_COL32(0, 255, 0, 200), 0, 10);
             //            Imgui.EndTabItem();
             //        }
             //
@@ -7466,9 +7524,9 @@ namespace SampleApp
         //    // Display placeholder contents for the Document
         //    static void DisplayContents(MyDocument* doc)
         //    {
-        //        Imgui.PushID(doc);
+        //        Imgui.PushId(doc);
         //        Imgui.Text("Document \"%s\"", doc->Name);
-        //        Imgui.PushStyleColor(ImGuiCol_Text, doc->Color);
+        //        Imgui.PushStyleColor(StyleColor.Text, doc->Color);
         //        Imgui.TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
         //        Imgui.PopStyleColor();
         //        if (Imgui.Button("Modify", ImVec2(100, 0)))
@@ -7476,8 +7534,8 @@ namespace SampleApp
         //        Imgui.SameLine();
         //        if (Imgui.Button("Save", ImVec2(100, 0)))
         //            doc->DoSave();
-        //        Imgui.ColorEdit3("color", &doc->Color.x);  // Useful to test drag and drop and hold-dragged-to-open-tab behavior.
-        //        Imgui.PopID();
+        //        Imgui.ColorEdit3("color", &doc->Color.X);  // Useful to test drag and drop and hold-dragged-to-open-tab behavior.
+        //        Imgui.PopId();
         //    }
         //
         //    // Display context menu for the Document
@@ -7538,7 +7596,7 @@ namespace SampleApp
             //    static bool opt_reorderable = true;
             //    static ImGuiTabBarFlags opt_fitting_flags = ImGuiTabBarFlags_FittingPolicyDefault_;
             //
-            //    bool window_contents_visible = Imgui.Begin("Example: Documents", p_open, ImGuiWindowFlags_MenuBar);
+            //    bool window_contents_visible = Imgui.Begin("Example: Documents", p_open, WindowOptions.MenuBar);
             //    if (!window_contents_visible)
             //    {
             //        Imgui.End();
@@ -7581,16 +7639,16 @@ namespace SampleApp
             //        MyDocument* doc = &app.Documents[doc_n];
             //        if (doc_n > 0)
             //            Imgui.SameLine();
-            //        Imgui.PushID(doc);
+            //        Imgui.PushId(doc);
             //        if (Imgui.Checkbox(doc->Name, &doc->Open))
             //            if (!doc->Open)
             //                doc->DoForceClose();
-            //        Imgui.PopID();
+            //        Imgui.PopId();
             //    }
             //
             //    Imgui.Separator();
             //
-            //    // About the ImGuiWindowFlags_UnsavedDocument / ImGuiTabItemFlags_UnsavedDocument flags.
+            //    // About the WindowOptions.UnsavedDocument / ImGuiTabItemFlags_UnsavedDocument flags.
             //    // They have multiple effects:
             //    // - Display a dot next to the title.
             //    // - Tab is selected when clicking the X close button.
@@ -7610,7 +7668,7 @@ namespace SampleApp
             //
             //            // [DEBUG] Stress tests
             //            //if ((Imgui.GetFrameCount() % 30) == 0) docs[1].Open ^= 1;            // [DEBUG] Automatically show/hide a tab. Test various interactions e.g. dragging with this on.
-            //            //if (Imgui.GetIO().KeyCtrl) Imgui.SetTabItemSelected(docs[1].Name);  // [DEBUG] Test SetTabItemSelected(), probably not very useful as-is anyway..
+            //            //if (Imgui.GetIo().KeyCtrl) Imgui.SetTabItemSelected(docs[1].Name);  // [DEBUG] Test SetTabItemSelected(), probably not very useful as-is anyway..
             //
             //            // Submit Tabs
             //            for (int doc_n = 0; doc_n < app.Documents.Size; doc_n++)
@@ -7676,11 +7734,11 @@ namespace SampleApp
             //        {
             //            if (!Imgui.IsPopupOpen("Save?"))
             //                Imgui.OpenPopup("Save?");
-            //            if (Imgui.BeginPopupModal("Save?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            //            if (Imgui.BeginPopupModal("Save?", NULL, WindowOptions.AlwaysAutoResize))
             //            {
             //                Imgui.Text("Save change to the following items?");
             //                float item_height = Imgui.GetTextLineHeightWithSpacing();
-            //                if (Imgui.BeginChildFrame(Imgui.GetID("frame"), ImVec2(-FLT_MIN, 6.25f * item_height)))
+            //                if (Imgui.BeginChildFrame(Imgui.GetId("frame"), ImVec2(-FLT_MIN, 6.25f * item_height)))
             //                {
             //                    for (int n = 0; n < close_queue.Size; n++)
             //                        if (close_queue[n]->Dirty)
