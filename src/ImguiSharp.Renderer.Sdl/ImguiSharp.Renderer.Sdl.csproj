@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\sdl-sharp\src\SdlSharp\SdlSharp.csproj" />
+    <PackageReference Include="SdlSharp" Version="0.12.64-alpha" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ImguiSharp\ImguiSharp.csproj" />
   </ItemGroup>
 

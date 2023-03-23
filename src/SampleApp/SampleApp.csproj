@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\sdl-sharp\src\SdlSharp\SdlSharp.csproj" />
     <ProjectReference Include="..\ImguiSharp.Native\ImguiSharp.Native.vcxproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Content</OutputItemType>
@@ -23,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SdlSharp.Redist" Version="0.11.8-alpha" />
+    <PackageReference Include="SdlSharp.Redist" Version="0.12.64-alpha" />
   </ItemGroup>
 
 </Project>
