@@ -3655,7 +3655,15 @@ namespace SampleApp
             _ = Imgui.CheckboxFlags(".IsHovered", flags, TableColumnOptions.IsHovered);
         }
 
-        private static readonly State<bool> disable_indent = new(false);
+        private static readonly State<bool> s_disableIndent = new(false);
+        private enum ContentsType
+        {
+            CT_Text,
+            CT_FillButton
+        };
+        private static readonly StateOption<TableOptions> s_flags4 = new(TableOptions.Borders | TableOptions.RowBg);
+        private static readonly State<bool> s_displayHeaders = new(false);
+        private static readonly State<int> s_contentsType = new((int)ContentsType.CT_Text);
 
         private static void ShowDemoWindowTables()
         {
@@ -3683,11 +3691,11 @@ namespace SampleApp
 
             Imgui.SameLine();
 
-            _ = Imgui.Checkbox("Disable tree indentation", disable_indent);
+            _ = Imgui.Checkbox("Disable tree indentation", s_disableIndent);
             Imgui.SameLine();
             HelpMarker("Disable the indenting of tree nodes so demo tables can use the full window width.");
             Imgui.Separator();
-            if (disable_indent)
+            if (s_disableIndent)
             {
                 Imgui.PushStyleVariable(StyleVariable.IndentSpacing, 0.0f);
             }
@@ -3746,77 +3754,78 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Borders, background");
-            //    if (Imgui.TreeNode("Borders, background"))
-            //    {
-            //        // Expose a few Borders related flags interactively
-            //        enum ContentsType { CT_Text, CT_FillButton };
-            //        static ImGuiTableFlags flags = TableOptions.Borders | TableOptions.RowBg;
-            //        static bool display_headers = false;
-            //        static int contents_type = CT_Text;
-            //
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.RowBg", &flags, TableOptions.RowBg);
-            //        Imgui.CheckboxFlags("TableOptions.Borders", &flags, TableOptions.Borders);
-            //        Imgui.SameLine(); HelpMarker("TableOptions.Borders\n = TableOptions.BordersInnerV\n | TableOptions.BordersOuterV\n | TableOptions.BordersInnerV\n | TableOptions.BordersOuterH");
-            //        Imgui.Indent();
-            //
-            //        Imgui.CheckboxFlags("TableOptions.BordersH", &flags, TableOptions.BordersH);
-            //        Imgui.Indent();
-            //        Imgui.CheckboxFlags("TableOptions.BordersOuterH", &flags, TableOptions.BordersOuterH);
-            //        Imgui.CheckboxFlags("TableOptions.BordersInnerH", &flags, TableOptions.BordersInnerH);
-            //        Imgui.Unindent();
-            //
-            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags, TableOptions.BordersV);
-            //        Imgui.Indent();
-            //        Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags, TableOptions.BordersOuterV);
-            //        Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags, TableOptions.BordersInnerV);
-            //        Imgui.Unindent();
-            //
-            //        Imgui.CheckboxFlags("TableOptions.BordersOuter", &flags, TableOptions.BordersOuter);
-            //        Imgui.CheckboxFlags("TableOptions.BordersInner", &flags, TableOptions.BordersInner);
-            //        Imgui.Unindent();
-            //
-            //        Imgui.AlignTextToFramePadding(); Imgui.Text("Cell contents:");
-            //        Imgui.SameLine(); Imgui.RadioButton("Text", &contents_type, CT_Text);
-            //        Imgui.SameLine(); Imgui.RadioButton("FillButton", &contents_type, CT_FillButton);
-            //        Imgui.Checkbox("Display headers", &display_headers);
-            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBody", &flags, TableOptions.NoBordersInBody); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table1", 3, flags))
-            //        {
-            //            // Display headers so we can inspect their interaction with borders.
-            //            // (Headers are not the main purpose of this section of the demo, so we are not elaborating on them too much. See other sections for details)
-            //            if (display_headers)
-            //            {
-            //                Imgui.TableSetupColumn("One");
-            //                Imgui.TableSetupColumn("Two");
-            //                Imgui.TableSetupColumn("Three");
-            //                Imgui.TableHeadersRow();
-            //            }
-            //
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    char buf[32];
-            //                    sprintf(buf, "Hello %d,%d", column, row);
-            //                    if (contents_type == CT_Text)
-            //                        Imgui.TextUnformatted(buf);
-            //                    else if (contents_type == CT_FillButton)
-            //                        Imgui.Button(buf, ImVec2(-FLT_MIN, 0.0f));
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Borders, background"))
+            {
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.RowBg", s_flags4, TableOptions.RowBg);
+                _ = Imgui.CheckboxFlags("TableOptions.Borders", s_flags4, TableOptions.Borders);
+                Imgui.SameLine();
+                HelpMarker("TableOptions.Borders\n = TableOptions.BordersInnerV\n | TableOptions.BordersOuterV\n | TableOptions.BordersInnerV\n | TableOptions.BordersOuterH");
+                Imgui.Indent();
+
+                _ = Imgui.CheckboxFlags("TableOptions.BordersH", s_flags4, TableOptions.BordersH);
+                Imgui.Indent();
+                _ = Imgui.CheckboxFlags("TableOptions.BordersOuterH", s_flags4, TableOptions.BordersOuterH);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersInnerH", s_flags4, TableOptions.BordersInnerH);
+                Imgui.Unindent();
+
+                _ = Imgui.CheckboxFlags("TableOptions.BordersV", s_flags4, TableOptions.BordersV);
+                Imgui.Indent();
+                _ = Imgui.CheckboxFlags("TableOptions.BordersOuterV", s_flags4, TableOptions.BordersOuterV);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersInnerV", s_flags4, TableOptions.BordersInnerV);
+                Imgui.Unindent();
+
+                _ = Imgui.CheckboxFlags("TableOptions.BordersOuter", s_flags4, TableOptions.BordersOuter);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersInner", s_flags4, TableOptions.BordersInner);
+                Imgui.Unindent();
+
+                Imgui.AlignTextToFramePadding(); Imgui.Text("Cell contents:");
+                Imgui.SameLine();
+                _ = Imgui.RadioButton("Text", s_contentsType, (int)ContentsType.CT_Text);
+                Imgui.SameLine();
+                _ = Imgui.RadioButton("FillButton", s_contentsType, (int)ContentsType.CT_FillButton);
+                _ = Imgui.Checkbox("Display headers", s_displayHeaders);
+                _ = Imgui.CheckboxFlags("TableOptions.NoBordersInBody", s_flags4, TableOptions.NoBordersInBody);
+                Imgui.SameLine();
+                HelpMarker("Disable vertical borders in columns Body (borders will always appear in Headers");
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table1", 3, s_flags4))
+                {
+                    if (s_displayHeaders)
+                    {
+                        Imgui.TableSetupColumn("One");
+                        Imgui.TableSetupColumn("Two");
+                        Imgui.TableSetupColumn("Three");
+                        Imgui.TableHeadersRow();
+                    }
+
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            if (s_contentsType == (int)ContentsType.CT_Text)
+                            {
+                                Imgui.TextUnformatted($"Hello {column},{row}");
+                            }
+                            else if (s_contentsType == (int)ContentsType.CT_FillButton)
+                            {
+                                _ = Imgui.Button($"Hello {column}, {row}", new(-SizeF.MinNormalizedValue, 0.0f));
+                            }
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
             //    if (open_action != -1)
             //        Imgui.SetNextItemOpen(open_action != 0);
             //    IMGUI_DEMO_MARKER("Tables/Resizable, stretch");
@@ -5370,7 +5379,7 @@ namespace SampleApp
 
             ShowDemoWindowColumns();
 
-            if (disable_indent)
+            if (s_disableIndent)
             {
                 Imgui.PopStyleVariable();
             }

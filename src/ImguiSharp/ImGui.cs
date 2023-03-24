@@ -1320,8 +1320,6 @@ namespace ImguiSharp
 
         #region Tables: Headers & Columns declaration
 
-        public static void TableSetupColumn(string label, TableColumnOptions options = default) => Native.StringToUtf8Action(label, labelPtr => Native.ImGui_TableSetupColumn(labelPtr, (Native.ImGuiTableColumnFlags)options));
-
         public static void TableSetupColumn(string label, TableColumnOptions options = default, float initWidthOrWeight = default, Id userId = default) => Native.StringToUtf8Action(label, labelPtr => Native.ImGui_TableSetupColumnEx(labelPtr, (Native.ImGuiTableColumnFlags)options, initWidthOrWeight, userId.ToNative()));
 
         public static void TableSetupScrollFreeze(int cols, int rows) => Native.ImGui_TableSetupScrollFreeze(cols, rows);
