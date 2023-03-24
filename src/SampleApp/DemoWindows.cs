@@ -2338,35 +2338,35 @@ namespace SampleApp
             }
         }
 
-        private static readonly State<bool> disable_mouse_wheel = new(false);
-        private static readonly State<bool> disable_menu = new(false);
-        private static readonly State<int> offset_x = new(0);
-        private static readonly State<float> f = new(0.0f);
-        private static readonly State<bool> show_indented_items = new(true);
-        private static readonly State<bool> c1 = new(false), c2 = new(false), c3 = new(false), c4 = new(false);
-        private static readonly State<float> f0 = new(1.0f), f1 = new(2.0f), f2 = new(3.0f);
-        private static readonly State<int> item = new(-1);
-        private static readonly StateVector<int> selection = new(4, new[] { 0, 1, 2, 3 });
-        private static readonly State<int> track_item = new(50);
-        private static readonly State<bool> enable_track = new(true);
-        private static readonly State<bool> enable_extra_decorations = new(false);
-        private static readonly State<float> scroll_to_off_px = new(0.0f);
-        private static readonly State<float> scroll_to_pos_px = new(200.0f);
-        private static readonly State<int> lines = new(7);
-        private static readonly State<bool> show_horizontal_contents_size_demo_window = new(false);
-        private static readonly State<bool> show_h_scrollbar = new(true);
-        private static readonly State<bool> show_button = new(true);
-        private static readonly State<bool> show_tree_nodes = new(true);
-        private static readonly State<bool> show_text_wrapped = new(false);
-        private static readonly State<bool> show_columns = new(true);
-        private static readonly State<bool> show_tab_bar = new(true);
-        private static readonly State<bool> show_child = new(false);
-        private static readonly State<bool> explicit_content_size = new(false);
-        private static readonly State<float> contents_size_x = new(300.0f);
-        private static readonly State<bool> open = new(true);
-        private static readonly StateVector<float> size = new(2, new[] { 100.0f, 100.0f });
-        private static readonly State<float> offsetX = new(30.0f);
-        private static readonly State<float> offsetY = new(30.0f);
+        private static readonly State<bool> s_disableMouseWheel = new(false);
+        private static readonly State<bool> s_disableMenu = new(false);
+        private static readonly State<int> s_offsetX = new(0);
+        private static readonly State<float> s_f6 = new(0.0f);
+        private static readonly State<bool> s_showIndentedItems = new(true);
+        private static readonly State<bool> s_c1 = new(false), s_c2 = new(false), s_c3 = new(false), s_c4 = new(false);
+        private static readonly State<float> s_f7 = new(1.0f), s_f8 = new(2.0f), s_f9 = new(3.0f);
+        private static readonly State<int> s_item = new(-1);
+        private static readonly StateVector<int> s_selection = new(4, new[] { 0, 1, 2, 3 });
+        private static readonly State<int> s_trackItem = new(50);
+        private static readonly State<bool> s_enableTrack = new(true);
+        private static readonly State<bool> s_enableExtraDecorations = new(false);
+        private static readonly State<float> s_scrollToOffPx = new(0.0f);
+        private static readonly State<float> s_scrollToPosPx = new(200.0f);
+        private static readonly State<int> s_lines = new(7);
+        private static readonly State<bool> s_showHorizontalContentsSizeDemoWindow = new(false);
+        private static readonly State<bool> s_showHScrollbar = new(true);
+        private static readonly State<bool> s_showButton = new(true);
+        private static readonly State<bool> s_showTreeNodes = new(true);
+        private static readonly State<bool> s_showTextWrapped = new(false);
+        private static readonly State<bool> s_showColumns = new(true);
+        private static readonly State<bool> s_showTabBar = new(true);
+        private static readonly State<bool> s_showChild = new(false);
+        private static readonly State<bool> s_explicitContentSize = new(false);
+        private static readonly State<float> s_contentsSizeX = new(300.0f);
+        private static readonly State<bool> s_open = new(true);
+        private static readonly StateVector<float> s_size = new(2, new[] { 100.0f, 100.0f });
+        private static readonly State<float> s_offsetX2 = new(30.0f);
+        private static readonly State<float> s_offsetY2 = new(30.0f);
 
         private static void ShowDemoWindowLayout()
         {
@@ -2378,12 +2378,12 @@ namespace SampleApp
             if (Imgui.TreeNode("Child windows"))
             {
                 HelpMarker("Use child windows to begin into a self-contained independent scrolling/clipping regions within a host window.");
-                _ = Imgui.Checkbox("Disable Mouse Wheel", disable_mouse_wheel);
-                _ = Imgui.Checkbox("Disable Menu", disable_menu);
+                _ = Imgui.Checkbox("Disable Mouse Wheel", s_disableMouseWheel);
+                _ = Imgui.Checkbox("Disable Menu", s_disableMenu);
 
                 {
                     var window_flags = WindowOptions.HorizontalScrollbar;
-                    if (disable_mouse_wheel)
+                    if (s_disableMouseWheel)
                     {
                         window_flags |= WindowOptions.NoScrollWithMouse;
                     }
@@ -2401,19 +2401,19 @@ namespace SampleApp
 
                 {
                     var window_flags = WindowOptions.None;
-                    if (disable_mouse_wheel)
+                    if (s_disableMouseWheel)
                     {
                         window_flags |= WindowOptions.NoScrollWithMouse;
                     }
 
-                    if (!disable_menu)
+                    if (!s_disableMenu)
                     {
                         window_flags |= WindowOptions.MenuBar;
                     }
 
                     Imgui.PushStyleVariable(StyleVariable.ChildRounding, 5.0f);
                     _ = Imgui.BeginChild("ChildR", new(0, 260), true, window_flags);
-                    if (!disable_menu && Imgui.BeginMenuBar())
+                    if (!s_disableMenu && Imgui.BeginMenuBar())
                     {
                         if (Imgui.BeginMenu("Menu"))
                         {
@@ -2439,9 +2439,9 @@ namespace SampleApp
 
                 {
                     Imgui.SetNextItemWidth(Imgui.GetFontSize() * 8);
-                    _ = Imgui.Drag("Offset X", offset_x, 1.0f, -1000, 1000);
+                    _ = Imgui.Drag("Offset X", s_offsetX, 1.0f, -1000, 1000);
 
-                    Imgui.SetCursorPosX(Imgui.GetCursorPosX() + (float)offset_x);
+                    Imgui.SetCursorPosX(Imgui.GetCursorPosX() + (float)s_offsetX);
                     Imgui.PushStyleColor(StyleColor.ChildBackground, new Color(255, 0, 0, 100));
                     _ = Imgui.BeginChild("Red", new(200, 100), true, WindowOptions.None);
                     for (var n = 0; n < 50; n++)
@@ -2463,17 +2463,17 @@ namespace SampleApp
 
             if (Imgui.TreeNode("Widgets Width"))
             {
-                _ = Imgui.Checkbox("Show indented items", show_indented_items);
+                _ = Imgui.Checkbox("Show indented items", s_showIndentedItems);
 
                 Imgui.Text("SetNextItemWidth/PushItemWidth(100)");
                 Imgui.SameLine();
                 HelpMarker("Fixed width.");
                 Imgui.PushItemWidth(100);
-                _ = Imgui.Drag("float##1b", f);
-                if (show_indented_items)
+                _ = Imgui.Drag("float##1b", s_f6);
+                if (s_showIndentedItems)
                 {
                     Imgui.Indent();
-                    _ = Imgui.Drag("float (indented)##1b", f);
+                    _ = Imgui.Drag("float (indented)##1b", s_f6);
                     Imgui.Unindent();
                 }
                 Imgui.PopItemWidth();
@@ -2482,11 +2482,11 @@ namespace SampleApp
                 Imgui.SameLine();
                 HelpMarker("Align to right edge minus 100");
                 Imgui.PushItemWidth(-100);
-                _ = Imgui.Drag("float##2a", f);
-                if (show_indented_items)
+                _ = Imgui.Drag("float##2a", s_f6);
+                if (s_showIndentedItems)
                 {
                     Imgui.Indent();
-                    _ = Imgui.Drag("float (indented)##2b", f);
+                    _ = Imgui.Drag("float (indented)##2b", s_f6);
                     Imgui.Unindent();
                 }
                 Imgui.PopItemWidth();
@@ -2495,11 +2495,11 @@ namespace SampleApp
                 Imgui.SameLine()
                     ; HelpMarker("Half of available width.\n(~ right-cursor_pos)\n(works within a column set)");
                 Imgui.PushItemWidth(Imgui.GetContentRegionAvailable().Width * 0.5f);
-                _ = Imgui.Drag("float##3a", f);
-                if (show_indented_items)
+                _ = Imgui.Drag("float##3a", s_f6);
+                if (s_showIndentedItems)
                 {
                     Imgui.Indent();
-                    _ = Imgui.Drag("float (indented)##3b", f);
+                    _ = Imgui.Drag("float (indented)##3b", s_f6);
                     Imgui.Unindent();
                 }
                 Imgui.PopItemWidth();
@@ -2508,11 +2508,11 @@ namespace SampleApp
                 Imgui.SameLine();
                 HelpMarker("Align to right edge minus half");
                 Imgui.PushItemWidth(-Imgui.GetContentRegionAvailable().Width * 0.5f);
-                _ = Imgui.Drag("float##4a", f);
-                if (show_indented_items)
+                _ = Imgui.Drag("float##4a", s_f6);
+                if (s_showIndentedItems)
                 {
                     Imgui.Indent();
-                    _ = Imgui.Drag("float (indented)##4b", f);
+                    _ = Imgui.Drag("float (indented)##4b", s_f6);
                     Imgui.Unindent();
                 }
                 Imgui.PopItemWidth();
@@ -2521,11 +2521,11 @@ namespace SampleApp
                 Imgui.SameLine();
                 HelpMarker("Align to right edge");
                 Imgui.PushItemWidth(-SizeF.MinNormalizedValue);
-                _ = Imgui.Drag("##float5a", f);
-                if (show_indented_items)
+                _ = Imgui.Drag("##float5a", s_f6);
+                if (s_showIndentedItems)
                 {
                     Imgui.Indent();
-                    _ = Imgui.Drag("float (indented)##5b", f);
+                    _ = Imgui.Drag("float (indented)##5b", s_f6);
                     Imgui.Unindent();
                 }
                 Imgui.PopItemWidth();
@@ -2571,23 +2571,23 @@ namespace SampleApp
                 Imgui.SameLine(300);
                 _ = Imgui.SmallButton("x=300");
 
-                _ = Imgui.Checkbox("My", c1);
+                _ = Imgui.Checkbox("My", s_c1);
                 Imgui.SameLine();
-                _ = Imgui.Checkbox("Tailor", c2);
+                _ = Imgui.Checkbox("Tailor", s_c2);
                 Imgui.SameLine();
-                _ = Imgui.Checkbox("Is", c3);
+                _ = Imgui.Checkbox("Is", s_c3);
                 Imgui.SameLine();
-                _ = Imgui.Checkbox("Rich", c4);
+                _ = Imgui.Checkbox("Rich", s_c4);
 
                 Imgui.PushItemWidth(80);
                 var items = new[] { "AAAA", "BBBB", "CCCC", "DDDD" };
-                _ = Imgui.Combo("Combo", item, items);
+                _ = Imgui.Combo("Combo", s_item, items);
                 Imgui.SameLine();
-                _ = Imgui.Slider("X", f0, 0.0f, 5.0f);
+                _ = Imgui.Slider("X", s_f7, 0.0f, 5.0f);
                 Imgui.SameLine();
-                _ = Imgui.Slider("Y", f1, 0.0f, 5.0f);
+                _ = Imgui.Slider("Y", s_f8, 0.0f, 5.0f);
                 Imgui.SameLine();
-                _ = Imgui.Slider("Z", f2, 0.0f, 5.0f);
+                _ = Imgui.Slider("Z", s_f9, 0.0f, 5.0f);
                 Imgui.PopItemWidth();
 
                 Imgui.PushItemWidth(80);
@@ -2600,7 +2600,7 @@ namespace SampleApp
                     }
 
                     Imgui.PushId(i);
-                    _ = Imgui.ListBox("", selection.GetStateOfElement(i), items, items.Length);
+                    _ = Imgui.ListBox("", s_selection.GetStateOfElement(i), items, items.Length);
                     Imgui.PopId();
                 }
                 Imgui.PopItemWidth();
@@ -2815,22 +2815,22 @@ namespace SampleApp
             {
                 HelpMarker("Use SetScrollHereY() or SetScrollFromPosY() to scroll to a given vertical position.");
 
-                _ = Imgui.Checkbox("Decoration", enable_extra_decorations);
+                _ = Imgui.Checkbox("Decoration", s_enableExtraDecorations);
 
-                _ = Imgui.Checkbox("Track", enable_track);
+                _ = Imgui.Checkbox("Track", s_enableTrack);
                 Imgui.PushItemWidth(100);
-                Imgui.SameLine(140); enable_track.Value |= Imgui.Drag("##item", track_item, 0.25f, 0, 99, "Item = %d");
+                Imgui.SameLine(140); s_enableTrack.Value |= Imgui.Drag("##item", s_trackItem, 0.25f, 0, 99, "Item = %d");
 
                 var scroll_to_off = Imgui.Button("Scroll Offset");
-                Imgui.SameLine(140); scroll_to_off |= Imgui.Drag("##off", scroll_to_off_px, 1.00f, 0, float.MaxValue, "+%.0f px");
+                Imgui.SameLine(140); scroll_to_off |= Imgui.Drag("##off", s_scrollToOffPx, 1.00f, 0, float.MaxValue, "+%.0f px");
 
                 var scroll_to_pos = Imgui.Button("Scroll To Pos");
-                Imgui.SameLine(140); scroll_to_pos |= Imgui.Drag("##pos", scroll_to_pos_px, 1.00f, -10, float.MaxValue, "X/Y = %.0f px");
+                Imgui.SameLine(140); scroll_to_pos |= Imgui.Drag("##pos", s_scrollToPosPx, 1.00f, -10, float.MaxValue, "X/Y = %.0f px");
                 Imgui.PopItemWidth();
 
                 if (scroll_to_off || scroll_to_pos)
                 {
-                    enable_track.Value = false;
+                    s_enableTrack.Value = false;
                 }
 
                 var style = Imgui.GetStyle();
@@ -2852,7 +2852,7 @@ namespace SampleApp
                     var names = new[] { "Top", "25%", "Center", "75%", "Bottom" };
                     Imgui.TextUnformatted(names[i]);
 
-                    var child_flags = enable_extra_decorations ? WindowOptions.MenuBar : 0;
+                    var child_flags = s_enableExtraDecorations ? WindowOptions.MenuBar : 0;
                     var child_id = Imgui.GetId((nuint)i);
                     var child_is_visible = Imgui.BeginChild(child_id, new(child_w, 200.0f), true, child_flags);
                     if (Imgui.BeginMenuBar())
@@ -2862,19 +2862,19 @@ namespace SampleApp
                     }
                     if (scroll_to_off)
                     {
-                        Imgui.SetScrollY(scroll_to_off_px);
+                        Imgui.SetScrollY(s_scrollToOffPx);
                     }
 
                     if (scroll_to_pos)
                     {
-                        Imgui.SetScrollFromPositionY(Imgui.GetCursorStartPosition().Y + scroll_to_pos_px, i * 0.25f);
+                        Imgui.SetScrollFromPositionY(Imgui.GetCursorStartPosition().Y + s_scrollToPosPx, i * 0.25f);
                     }
 
                     if (child_is_visible) // Avoid calling SetScrollHereY when running with culled items
                     {
                         for (var item = 0; item < 100; item++)
                         {
-                            if (enable_track && item == track_item)
+                            if (s_enableTrack && item == s_trackItem)
                             {
                                 Imgui.TextColored(new(1, 1, 0, 1), $"Item {item}");
                                 Imgui.SetScrollHereY(i * 0.25f);
@@ -2903,17 +2903,17 @@ namespace SampleApp
                 for (var i = 0; i < 5; i++)
                 {
                     var child_height = Imgui.GetTextLineHeight() + style.ScrollbarSize + (style.WindowPadding.Width * 2.0f);
-                    var child_flags = WindowOptions.HorizontalScrollbar | (enable_extra_decorations ? WindowOptions.AlwaysVerticalScrollbar : 0);
+                    var child_flags = WindowOptions.HorizontalScrollbar | (s_enableExtraDecorations ? WindowOptions.AlwaysVerticalScrollbar : 0);
                     var child_id = Imgui.GetId((nuint)i);
                     var child_is_visible = Imgui.BeginChild(child_id, new(-100, child_height), true, child_flags);
                     if (scroll_to_off)
                     {
-                        Imgui.SetScrollX(scroll_to_off_px);
+                        Imgui.SetScrollX(s_scrollToOffPx);
                     }
 
                     if (scroll_to_pos)
                     {
-                        Imgui.SetScrollFromPositionX(Imgui.GetCursorStartPosition().X + scroll_to_pos_px, i * 0.25f);
+                        Imgui.SetScrollFromPositionX(Imgui.GetCursorStartPosition().X + s_scrollToPosPx, i * 0.25f);
                     }
 
                     if (child_is_visible)
@@ -2925,7 +2925,7 @@ namespace SampleApp
                                 Imgui.SameLine();
                             }
 
-                            if (enable_track && item == track_item)
+                            if (s_enableTrack && item == s_trackItem)
                             {
                                 Imgui.TextColored(new(1, 1, 0, 1), $"Item {item}");
                                 Imgui.SetScrollHereX(i * 0.25f);
@@ -2947,12 +2947,12 @@ namespace SampleApp
                 HelpMarker(
                     "Horizontal scrolling for a window is enabled via the WindowOptions.HorizontalScrollbar flag.\n\n" +
                     "You may want to also explicitly specify content width by using SetNextWindowContentWidth() before Begin().");
-                _ = Imgui.Slider("Lines", lines, 1, 15);
+                _ = Imgui.Slider("Lines", s_lines, 1, 15);
                 Imgui.PushStyleVariable(StyleVariable.FrameRounding, 3.0f);
                 Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(2.0f, 1.0f));
                 SizeF scrolling_child_size = new(0, (Imgui.GetFrameHeightWithSpacing() * 7) + 30);
                 _ = Imgui.BeginChild("scrolling", scrolling_child_size, true, WindowOptions.HorizontalScrollbar);
-                for (var line = 0; line < lines; line++)
+                for (var line = 0; line < s_lines; line++)
                 {
                     var num_buttons = 10 + ((line & 1) == 1 ? line * 9 : line * 3);
                     for (var n = 0; n < num_buttons; n++)
@@ -3003,45 +3003,45 @@ namespace SampleApp
                 }
                 Imgui.Spacing();
 
-                _ = Imgui.Checkbox("Show Horizontal contents size demo window", show_horizontal_contents_size_demo_window);
+                _ = Imgui.Checkbox("Show Horizontal contents size demo window", s_showHorizontalContentsSizeDemoWindow);
 
-                if (show_horizontal_contents_size_demo_window)
+                if (s_showHorizontalContentsSizeDemoWindow)
                 {
-                    if (explicit_content_size)
+                    if (s_explicitContentSize)
                     {
-                        Imgui.SetNextWindowContentSize(new(contents_size_x, 0.0f));
+                        Imgui.SetNextWindowContentSize(new(s_contentsSizeX, 0.0f));
                     }
 
-                    _ = Imgui.Begin("Horizontal contents size demo window", show_horizontal_contents_size_demo_window, show_h_scrollbar ? WindowOptions.HorizontalScrollbar : 0);
+                    _ = Imgui.Begin("Horizontal contents size demo window", s_showHorizontalContentsSizeDemoWindow, s_showHScrollbar ? WindowOptions.HorizontalScrollbar : 0);
                     Imgui.PushStyleVariable(StyleVariable.ItemSpacing, new SizeF(2, 0));
                     Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(2, 0));
                     HelpMarker("Test of different widgets react and impact the work rectangle growing when horizontal scrolling is enabled.\n\nUse 'Metrics->Tools->Show windows rectangles' to visualize rectangles.");
-                    _ = Imgui.Checkbox("H-scrollbar", show_h_scrollbar);
-                    _ = Imgui.Checkbox("Button", show_button);
-                    _ = Imgui.Checkbox("Tree nodes", show_tree_nodes);
-                    _ = Imgui.Checkbox("Text wrapped", show_text_wrapped);
-                    _ = Imgui.Checkbox("Columns", show_columns);
-                    _ = Imgui.Checkbox("Tab bar", show_tab_bar);
-                    _ = Imgui.Checkbox("Child", show_child);
-                    _ = Imgui.Checkbox("Explicit content size", explicit_content_size);
+                    _ = Imgui.Checkbox("H-scrollbar", s_showHScrollbar);
+                    _ = Imgui.Checkbox("Button", s_showButton);
+                    _ = Imgui.Checkbox("Tree nodes", s_showTreeNodes);
+                    _ = Imgui.Checkbox("Text wrapped", s_showTextWrapped);
+                    _ = Imgui.Checkbox("Columns", s_showColumns);
+                    _ = Imgui.Checkbox("Tab bar", s_showTabBar);
+                    _ = Imgui.Checkbox("Child", s_showChild);
+                    _ = Imgui.Checkbox("Explicit content size", s_explicitContentSize);
                     Imgui.Text($"Scroll {Imgui.GetScrollX():F1}/{Imgui.GetScrollMaxX():F1} {Imgui.GetScrollY():F1}/{Imgui.GetScrollMaxY():F1}");
-                    if (explicit_content_size)
+                    if (s_explicitContentSize)
                     {
                         Imgui.SameLine();
                         Imgui.SetNextItemWidth(100);
-                        _ = Imgui.Drag("##csx", contents_size_x);
+                        _ = Imgui.Drag("##csx", s_contentsSizeX);
                         var p = Imgui.GetCursorScreenPosition();
                         Imgui.GetWindowDrawList()!.Value.AddRectangleFilled(new RectangleF(p, new PositionF(p.X + 10, p.Y + 10)), Color.White);
-                        Imgui.GetWindowDrawList()!.Value.AddRectangleFilled(new RectangleF(new PositionF(p.X + contents_size_x - 10, p.Y), new PositionF(p.X + contents_size_x, p.Y + 10)), Color.White);
+                        Imgui.GetWindowDrawList()!.Value.AddRectangleFilled(new RectangleF(new PositionF(p.X + s_contentsSizeX - 10, p.Y), new PositionF(p.X + s_contentsSizeX, p.Y + 10)), Color.White);
                         Imgui.Dummy(new(0, 10));
                     }
                     Imgui.PopStyleVariable(2);
                     Imgui.Separator();
-                    if (show_button)
+                    if (s_showButton)
                     {
                         _ = Imgui.Button("this is a 300-wide button", new(300, 0));
                     }
-                    if (show_tree_nodes)
+                    if (s_showTreeNodes)
                     {
                         if (Imgui.TreeNode("this is a tree node"))
                         {
@@ -3052,13 +3052,13 @@ namespace SampleApp
                             }
                             Imgui.TreePop();
                         }
-                        _ = Imgui.CollapsingHeader("CollapsingHeader", open);
+                        _ = Imgui.CollapsingHeader("CollapsingHeader", s_open);
                     }
-                    if (show_text_wrapped)
+                    if (s_showTextWrapped)
                     {
                         Imgui.TextWrapped("This text should automatically wrap on the edge of the work rectangle.");
                     }
-                    if (show_columns)
+                    if (s_showColumns)
                     {
                         Imgui.Text("Tables:");
                         if (Imgui.BeginTable("table", 4, TableOptions.Borders))
@@ -3079,7 +3079,7 @@ namespace SampleApp
                         }
                         Imgui.Columns(1);
                     }
-                    if (show_tab_bar && Imgui.BeginTabBar("Hello"))
+                    if (s_showTabBar && Imgui.BeginTabBar("Hello"))
                     {
                         if (Imgui.BeginTabItem("OneOneOne"))
                         {
@@ -3099,7 +3099,7 @@ namespace SampleApp
                         }
                         Imgui.EndTabBar();
                     }
-                    if (show_child)
+                    if (s_showChild)
                     {
                         _ = Imgui.BeginChild("child", new(0, 0), true);
                         Imgui.EndChild();
@@ -3112,7 +3112,7 @@ namespace SampleApp
 
             if (Imgui.TreeNode("Clipping"))
             {
-                _ = Imgui.Drag("size", size, 0.5f, 1.0f, 200.0f, "%.0f");
+                _ = Imgui.Drag("size", s_size, 0.5f, 1.0f, 200.0f, "%.0f");
                 Imgui.TextWrapped("(Click and drag to scroll)");
 
                 HelpMarker(
@@ -3134,11 +3134,11 @@ namespace SampleApp
                     }
 
                     Imgui.PushId(n);
-                    _ = Imgui.InvisibleButton("##canvas", new(size[0], size[1]));
+                    _ = Imgui.InvisibleButton("##canvas", new(s_size[0], s_size[1]));
                     if (Imgui.IsItemActive() && Imgui.IsMouseDragging(MouseButton.Left))
                     {
-                        offsetX.Value += Imgui.GetIo().MouseDelta.Width;
-                        offsetY.Value += Imgui.GetIo().MouseDelta.Height;
+                        s_offsetX2.Value += Imgui.GetIo().MouseDelta.Width;
+                        s_offsetY2.Value += Imgui.GetIo().MouseDelta.Height;
                     }
                     Imgui.PopId();
                     if (!Imgui.IsItemVisible()) // Skip rendering as ImDrawList elements are not clipped.
@@ -3149,7 +3149,7 @@ namespace SampleApp
                     var p0 = Imgui.GetItemRectangle().Min;
                     var p1 = Imgui.GetItemRectangle().Max;
                     var text_str = "Line 1 hello\nLine 2 clip me!";
-                    var text_pos = new PositionF(p0.X + offsetX, p0.Y + offsetY);
+                    var text_pos = new PositionF(p0.X + s_offsetX2, p0.Y + s_offsetY2);
                     var draw_list = Imgui.GetWindowDrawList()!.Value;
                     switch (n)
                     {
@@ -3177,304 +3177,316 @@ namespace SampleApp
             }
         }
 
+        private static int s_selectedFish = -1;
+        private static readonly StateVector<bool> s_toggles = new(5, new[] { true, false, false, false, false });
+        private static int s_selected8 = -1;
+        private static readonly State<float> s_value = new(0.5f);
+        private static readonly StateText s_name = new(32, "Label1");
+        private static readonly State<bool> s_dontAskMeNextTime = new(false);
+        private static readonly State<int> s_item2 = new(1);
+        private static readonly State<ColorF> s_color2 = new(new(0.4f, 0.7f, 0.0f, 0.5f));
+        private static readonly State<bool> s_unusedOpen = new(true);
+
         private static void ShowDemoWindowPopups()
         {
-            //    IMGUI_DEMO_MARKER("Popups");
-            //    if (!Imgui.CollapsingHeader("Popups & Modal windows"))
-            //        return;
-            //
-            //    // The properties of popups windows are:
-            //    // - They block normal mouse hovering detection outside them. (*)
-            //    // - Unless modal, they can be closed by clicking anywhere outside them, or by pressing ESCAPE.
-            //    // - Their visibility state (~bool) is held internally by Dear ImGui instead of being held by the programmer as
-            //    //   we are used to with regular Begin() calls. User can manipulate the visibility state by calling OpenPopup().
-            //    // (*) One can use IsItemHovered(HoveredOptions.AllowWhenBlockedByPopup) to bypass it and detect hovering even
-            //    //     when normally blocked by a popup.
-            //    // Those three properties are connected. The library needs to hold their visibility state BECAUSE it can close
-            //    // popups at any time.
-            //
-            //    // Typical use for regular windows:
-            //    //   bool my_tool_is_active = false; if (Imgui.Button("Open")) my_tool_is_active = true; [...] if (my_tool_is_active) Begin("My Tool", &my_tool_is_active) { [...] } End();
-            //    // Typical use for popups:
-            //    //   if (Imgui.Button("Open")) Imgui.OpenPopup("MyPopup"); if (Imgui.BeginPopup("MyPopup") { [...] EndPopup(); }
-            //
-            //    // With popups we have to go through a library call (here OpenPopup) to manipulate the visibility state.
-            //    // This may be a bit confusing at first but it should quickly make sense. Follow on the examples below.
-            //
-            //    IMGUI_DEMO_MARKER("Popups/Popups");
-            //    if (Imgui.TreeNode("Popups"))
-            //    {
-            //        Imgui.TextWrapped(
-            //            "When a popup is active, it inhibits interacting with windows that are behind the popup. "
-            //            "Clicking outside the popup closes it.");
-            //
-            //        static int selected_fish = -1;
-            //        const char* names[] = { "Bream", "Haddock", "Mackerel", "Pollock", "Tilefish" };
-            //        static bool toggles[] = { true, false, false, false, false };
-            //
-            //        // Simple selection popup (if you want to show the current selection inside the Button itself,
-            //        // you may want to build a string using the "###" operator to preserve a constant ID with a variable label)
-            //        if (Imgui.Button("Select.."))
-            //            Imgui.OpenPopup("my_select_popup");
-            //        Imgui.SameLine();
-            //        Imgui.TextUnformatted(selected_fish == -1 ? "<None>" : names[selected_fish]);
-            //        if (Imgui.BeginPopup("my_select_popup"))
-            //        {
-            //            Imgui.Text("Aquarium");
-            //            Imgui.Separator();
-            //            for (int i = 0; i < names.Length; i++)
-            //                if (Imgui.Selectable(names[i]))
-            //                    selected_fish = i;
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        // Showing a menu with toggles
-            //        if (Imgui.Button("Toggle.."))
-            //            Imgui.OpenPopup("my_toggle_popup");
-            //        if (Imgui.BeginPopup("my_toggle_popup"))
-            //        {
-            //            for (int i = 0; i < names.Length; i++)
-            //                Imgui.MenuItem(names[i], "", &toggles[i]);
-            //            if (Imgui.BeginMenu("Sub-menu"))
-            //            {
-            //                Imgui.MenuItem("Click me");
-            //                Imgui.EndMenu();
-            //            }
-            //
-            //            Imgui.Separator();
-            //            Imgui.Text("Tooltip here");
-            //            if (Imgui.IsItemHovered())
-            //                Imgui.SetTooltip("I am a tooltip over a popup");
-            //
-            //            if (Imgui.Button("Stacked Popup"))
-            //                Imgui.OpenPopup("another popup");
-            //            if (Imgui.BeginPopup("another popup"))
-            //            {
-            //                for (int i = 0; i < names.Length; i++)
-            //                    Imgui.MenuItem(names[i], "", &toggles[i]);
-            //                if (Imgui.BeginMenu("Sub-menu"))
-            //                {
-            //                    Imgui.MenuItem("Click me");
-            //                    if (Imgui.Button("Stacked Popup"))
-            //                        Imgui.OpenPopup("another popup");
-            //                    if (Imgui.BeginPopup("another popup"))
-            //                    {
-            //                        Imgui.Text("I am the last one here.");
-            //                        Imgui.EndPopup();
-            //                    }
-            //                    Imgui.EndMenu();
-            //                }
-            //                Imgui.EndPopup();
-            //            }
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        // Call the more complete ShowExampleMenuFile which we use in various places of this demo
-            //        if (Imgui.Button("With a menu.."))
-            //            Imgui.OpenPopup("my_file_popup");
-            //        if (Imgui.BeginPopup("my_file_popup", WindowOptions.MenuBar))
-            //        {
-            //            if (Imgui.BeginMenuBar())
-            //            {
-            //                if (Imgui.BeginMenu("File"))
-            //                {
-            //                    ShowExampleMenuFile();
-            //                    Imgui.EndMenu();
-            //                }
-            //                if (Imgui.BeginMenu("Edit"))
-            //                {
-            //                    Imgui.MenuItem("Dummy");
-            //                    Imgui.EndMenu();
-            //                }
-            //                Imgui.EndMenuBar();
-            //            }
-            //            Imgui.Text("Hello from popup!");
-            //            Imgui.Button("This is a dummy button..");
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Popups/Context menus");
-            //    if (Imgui.TreeNode("Context menus"))
-            //    {
-            //        HelpMarker("\"Context\" functions are simple helpers to associate a Popup to a given Item or Window identifier.");
-            //
-            //        // BeginPopupContextItem() is a helper to provide common/simple popup behavior of essentially doing:
-            //        //     if (id == 0)
-            //        //         id = GetItemID(); // Use last item id
-            //        //     if (IsItemHovered() && IsMouseReleased(ImGuiMouseButton_Right))
-            //        //         OpenPopup(id);
-            //        //     return BeginPopup(id);
-            //        // For advanced uses you may want to replicate and customize this code.
-            //        // See more details in BeginPopupContextItem().
-            //
-            //        // Example 1
-            //        // When used after an item that has an ID (e.g. Button), we can skip providing an ID to BeginPopupContextItem(),
-            //        // and BeginPopupContextItem() will use the last item ID as the popup ID.
-            //        {
-            //            const char* names[5] = { "Label1", "Label2", "Label3", "Label4", "Label5" };
-            //            static int selected = -1;
-            //            for (int n = 0; n < 5; n++)
-            //            {
-            //                if (Imgui.Selectable(names[n], selected == n))
-            //                    selected = n;
-            //                if (Imgui.BeginPopupContextItem()) // <-- use last item id as popup id
-            //                {
-            //                    selected = n;
-            //                    Imgui.Text("This a popup for \"%s\"!", names[n]);
-            //                    if (Imgui.Button("Close"))
-            //                        Imgui.CloseCurrentPopup();
-            //                    Imgui.EndPopup();
-            //                }
-            //                if (Imgui.IsItemHovered())
-            //                    Imgui.SetTooltip("Right-click to open popup");
-            //            }
-            //        }
-            //
-            //        // Example 2
-            //        // Popup on a Text() element which doesn't have an identifier: we need to provide an identifier to BeginPopupContextItem().
-            //        // Using an explicit identifier is also convenient if you want to activate the popups from different locations.
-            //        {
-            //            HelpMarker("Text() elements don't have stable identifiers so we need to provide one.");
-            //            static float value = 0.5f;
-            //            Imgui.Text("Value = %.3f <-- (1) right-click this text", value);
-            //            if (Imgui.BeginPopupContextItem("my popup"))
-            //            {
-            //                if (Imgui.Selectable("Set to zero")) value = 0.0f;
-            //                if (Imgui.Selectable("Set to PI")) value = 3.1415f;
-            //                Imgui.SetNextItemWidth(-FLT_MIN);
-            //                Imgui.Drag("##Value", &value, 0.1f, 0.0f, 0.0f);
-            //                Imgui.EndPopup();
-            //            }
-            //
-            //            // We can also use OpenPopupOnItemClick() to toggle the visibility of a given popup.
-            //            // Here we make it that right-clicking this other text element opens the same popup as above.
-            //            // The popup itself will be submitted by the code above.
-            //            Imgui.Text("(2) Or right-click this text");
-            //            Imgui.OpenPopupOnItemClick("my popup", ImGuiPopupFlags_MouseButtonRight);
-            //
-            //            // Back to square one: manually open the same popup.
-            //            if (Imgui.Button("(3) Or click this button"))
-            //                Imgui.OpenPopup("my popup");
-            //        }
-            //
-            //        // Example 3
-            //        // When using BeginPopupContextItem() with an implicit identifier (NULL == use last item ID),
-            //        // we need to make sure your item identifier is stable.
-            //        // In this example we showcase altering the item label while preserving its identifier, using the ### operator (see FAQ).
-            //        {
-            //            HelpMarker("Showcase using a popup ID linked to item ID, with the item having a changing label + stable ID using the ### operator.");
-            //            static char name[32] = "Label1";
-            //            char buf[64];
-            //            sprintf(buf, "Button: %s###Button", name); // ### operator override ID ignoring the preceding label
-            //            Imgui.Button(buf);
-            //            if (Imgui.BeginPopupContextItem())
-            //            {
-            //                Imgui.Text("Edit name:");
-            //                Imgui.InputText("##edit", name, name.Length);
-            //                if (Imgui.Button("Close"))
-            //                    Imgui.CloseCurrentPopup();
-            //                Imgui.EndPopup();
-            //            }
-            //            Imgui.SameLine(); Imgui.Text("(<-- right-click here)");
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Popups/Modals");
-            //    if (Imgui.TreeNode("Modals"))
-            //    {
-            //        Imgui.TextWrapped("Modal windows are like popups but the user cannot close them by clicking outside.");
-            //
-            //        if (Imgui.Button("Delete.."))
-            //            Imgui.OpenPopup("Delete?");
-            //
-            //        // Always center this window when appearing
-            //        ImVec2 center = Imgui.GetMainViewport()->GetCenter();
-            //        Imgui.SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-            //
-            //        if (Imgui.BeginPopupModal("Delete?", NULL, WindowOptions.AlwaysAutoResize))
-            //        {
-            //            Imgui.Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
-            //            Imgui.Separator();
-            //
-            //            //static int unused_i = 0;
-            //            //Imgui.Combo("Combo", &unused_i, "Delete\0Delete harder\0");
-            //
-            //            static bool dont_ask_me_next_time = false;
-            //            Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(0, 0));
-            //            Imgui.Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-            //            Imgui.PopStyleVariable();
-            //
-            //            if (Imgui.Button("OK", ImVec2(120, 0))) { Imgui.CloseCurrentPopup(); }
-            //            Imgui.SetItemDefaultFocus();
-            //            Imgui.SameLine();
-            //            if (Imgui.Button("Cancel", ImVec2(120, 0))) { Imgui.CloseCurrentPopup(); }
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        if (Imgui.Button("Stacked modals.."))
-            //            Imgui.OpenPopup("Stacked 1");
-            //        if (Imgui.BeginPopupModal("Stacked 1", NULL, WindowOptions.MenuBar))
-            //        {
-            //            if (Imgui.BeginMenuBar())
-            //            {
-            //                if (Imgui.BeginMenu("File"))
-            //                {
-            //                    if (Imgui.MenuItem("Some menu item")) {}
-            //                    Imgui.EndMenu();
-            //                }
-            //                Imgui.EndMenuBar();
-            //            }
-            //            Imgui.Text("Hello from Stacked The First\nUsing style.Colors[StyleColor.ModalWindowDimBg] behind it.");
-            //
-            //            // Testing behavior of widgets stacking their own regular popups over the modal.
-            //            static int item = 1;
-            //            static float color[4] = { 0.4f, 0.7f, 0.0f, 0.5f };
-            //            Imgui.Combo("Combo", &item, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
-            //            Imgui.ColorEdit4("color", color);
-            //
-            //            if (Imgui.Button("Add another modal.."))
-            //                Imgui.OpenPopup("Stacked 2");
-            //
-            //            // Also demonstrate passing a bool* to BeginPopupModal(), this will create a regular close button which
-            //            // will close the popup. Note that the visibility state of popups is owned by imgui, so the input value
-            //            // of the bool actually doesn't matter here.
-            //            bool unused_open = true;
-            //            if (Imgui.BeginPopupModal("Stacked 2", &unused_open))
-            //            {
-            //                Imgui.Text("Hello from Stacked The Second!");
-            //                if (Imgui.Button("Close"))
-            //                    Imgui.CloseCurrentPopup();
-            //                Imgui.EndPopup();
-            //            }
-            //
-            //            if (Imgui.Button("Close"))
-            //                Imgui.CloseCurrentPopup();
-            //            Imgui.EndPopup();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    IMGUI_DEMO_MARKER("Popups/Menus inside a regular window");
-            //    if (Imgui.TreeNode("Menus inside a regular window"))
-            //    {
-            //        Imgui.TextWrapped("Below we are testing adding menu items to a regular window. It's rather unusual but should work!");
-            //        Imgui.Separator();
-            //
-            //        Imgui.MenuItem("Menu item", "CTRL+M");
-            //        if (Imgui.BeginMenu("Menu inside a regular window"))
-            //        {
-            //            ShowExampleMenuFile();
-            //            Imgui.EndMenu();
-            //        }
-            //        Imgui.Separator();
-            //        Imgui.TreePop();
-            //    }
+            if (!Imgui.CollapsingHeader("Popups & Modal windows"))
+            {
+                return;
+            }
+
+            if (Imgui.TreeNode("Popups"))
+            {
+                Imgui.TextWrapped(
+                    "When a popup is active, it inhibits interacting with windows that are behind the popup. " +
+                    "Clicking outside the popup closes it.");
+
+                var names = new[] { "Bream", "Haddock", "Mackerel", "Pollock", "Tilefish" };
+
+                if (Imgui.Button("Select.."))
+                {
+                    Imgui.OpenPopup("my_select_popup");
+                }
+
+                Imgui.SameLine();
+                Imgui.TextUnformatted(s_selectedFish == -1 ? "<None>" : names[s_selectedFish]);
+                if (Imgui.BeginPopup("my_select_popup"))
+                {
+                    Imgui.Text("Aquarium");
+                    Imgui.Separator();
+                    for (var i = 0; i < names.Length; i++)
+                    {
+                        if (Imgui.Selectable(names[i]))
+                        {
+                            s_selectedFish = i;
+                        }
+                    }
+
+                    Imgui.EndPopup();
+                }
+
+                if (Imgui.Button("Toggle.."))
+                {
+                    Imgui.OpenPopup("my_toggle_popup");
+                }
+
+                if (Imgui.BeginPopup("my_toggle_popup"))
+                {
+                    for (var i = 0; i < names.Length; i++)
+                    {
+                        _ = Imgui.MenuItem(names[i], "", s_toggles.GetStateOfElement(i));
+                    }
+
+                    if (Imgui.BeginMenu("Sub-menu"))
+                    {
+                        _ = Imgui.MenuItem("Click me");
+                        Imgui.EndMenu();
+                    }
+
+                    Imgui.Separator();
+                    Imgui.Text("Tooltip here");
+                    if (Imgui.IsItemHovered())
+                    {
+                        Imgui.SetTooltip("I am a tooltip over a popup");
+                    }
+
+                    if (Imgui.Button("Stacked Popup"))
+                    {
+                        Imgui.OpenPopup("another popup");
+                    }
+
+                    if (Imgui.BeginPopup("another popup"))
+                    {
+                        for (var i = 0; i < names.Length; i++)
+                        {
+                            _ = Imgui.MenuItem(names[i], "", s_toggles.GetStateOfElement(i));
+                        }
+
+                        if (Imgui.BeginMenu("Sub-menu"))
+                        {
+                            _ = Imgui.MenuItem("Click me");
+                            if (Imgui.Button("Stacked Popup"))
+                            {
+                                Imgui.OpenPopup("another popup");
+                            }
+
+                            if (Imgui.BeginPopup("another popup"))
+                            {
+                                Imgui.Text("I am the last one here.");
+                                Imgui.EndPopup();
+                            }
+                            Imgui.EndMenu();
+                        }
+                        Imgui.EndPopup();
+                    }
+                    Imgui.EndPopup();
+                }
+
+                if (Imgui.Button("With a menu.."))
+                {
+                    Imgui.OpenPopup("my_file_popup");
+                }
+
+                if (Imgui.BeginPopup("my_file_popup", WindowOptions.MenuBar))
+                {
+                    if (Imgui.BeginMenuBar())
+                    {
+                        if (Imgui.BeginMenu("File"))
+                        {
+                            ShowExampleMenuFile();
+                            Imgui.EndMenu();
+                        }
+                        if (Imgui.BeginMenu("Edit"))
+                        {
+                            _ = Imgui.MenuItem("Dummy");
+                            Imgui.EndMenu();
+                        }
+                        Imgui.EndMenuBar();
+                    }
+                    Imgui.Text("Hello from popup!");
+                    _ = Imgui.Button("This is a dummy button..");
+                    Imgui.EndPopup();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Context menus"))
+            {
+                HelpMarker("\"Context\" functions are simple helpers to associate a Popup to a given Item or Window identifier.");
+
+                {
+                    var names = new[] { "Label1", "Label2", "Label3", "Label4", "Label5" };
+                    for (var n = 0; n < 5; n++)
+                    {
+                        if (Imgui.Selectable(names[n], s_selected8 == n))
+                        {
+                            s_selected8 = n;
+                        }
+
+                        if (Imgui.BeginPopupContextItem())
+                        {
+                            s_selected8 = n;
+                            Imgui.Text($"This a popup for \"{names[n]}\"!");
+                            if (Imgui.Button("Close"))
+                            {
+                                Imgui.CloseCurrentPopup();
+                            }
+
+                            Imgui.EndPopup();
+                        }
+                        if (Imgui.IsItemHovered())
+                        {
+                            Imgui.SetTooltip("Right-click to open popup");
+                        }
+                    }
+                }
+
+                {
+                    HelpMarker("Text() elements don't have stable identifiers so we need to provide one.");
+                    Imgui.Text($"Value = {s_value.Value:F3} <-- (1) right-click this text");
+                    if (Imgui.BeginPopupContextItem("my popup"))
+                    {
+                        if (Imgui.Selectable("Set to zero"))
+                        {
+                            s_value.Value = 0.0f;
+                        }
+
+                        if (Imgui.Selectable("Set to PI"))
+                        {
+                            s_value.Value = 3.1415f;
+                        }
+
+                        Imgui.SetNextItemWidth(-SizeF.MinNormalizedValue);
+                        _ = Imgui.Drag("##Value", s_value, 0.1f, 0.0f, 0.0f);
+                        Imgui.EndPopup();
+                    }
+
+                    Imgui.Text("(2) Or right-click this text");
+                    Imgui.OpenPopupOnItemClick("my popup", PopupOptions.MouseButtonRight);
+
+                    if (Imgui.Button("(3) Or click this button"))
+                    {
+                        Imgui.OpenPopup("my popup");
+                    }
+                }
+
+                {
+                    HelpMarker("Showcase using a popup ID linked to item ID, with the item having a changing label + stable ID using the ### operator.");
+                    _ = Imgui.Button($"Button: {s_name}###Button");
+                    if (Imgui.BeginPopupContextItem())
+                    {
+                        Imgui.Text("Edit name:");
+                        _ = Imgui.InputText("##edit", s_name);
+                        if (Imgui.Button("Close"))
+                        {
+                            Imgui.CloseCurrentPopup();
+                        }
+
+                        Imgui.EndPopup();
+                    }
+                    Imgui.SameLine();
+                    Imgui.Text("(<-- right-click here)");
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Modals"))
+            {
+                Imgui.TextWrapped("Modal windows are like popups but the user cannot close them by clicking outside.");
+
+                if (Imgui.Button("Delete.."))
+                {
+                    Imgui.OpenPopup("Delete?");
+                }
+
+                var center = Imgui.GetMainViewport().Center;
+                Imgui.SetNextWindowPosition(center, Condition.Appearing, new(0.5f, 0.5f));
+
+                if (Imgui.BeginPopupModal("Delete?", null, WindowOptions.AlwaysAutoResize))
+                {
+                    Imgui.Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
+                    Imgui.Separator();
+
+                    Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(0, 0));
+                    _ = Imgui.Checkbox("Don't ask me next time", s_dontAskMeNextTime);
+                    Imgui.PopStyleVariable();
+
+                    if (Imgui.Button("OK", new(120, 0)))
+                    {
+                        Imgui.CloseCurrentPopup();
+                    }
+                    Imgui.SetItemDefaultFocus();
+                    Imgui.SameLine();
+                    if (Imgui.Button("Cancel", new(120, 0)))
+                    {
+                        Imgui.CloseCurrentPopup();
+                    }
+                    Imgui.EndPopup();
+                }
+
+                if (Imgui.Button("Stacked modals.."))
+                {
+                    Imgui.OpenPopup("Stacked 1");
+                }
+
+                if (Imgui.BeginPopupModal("Stacked 1", null, WindowOptions.MenuBar))
+                {
+                    if (Imgui.BeginMenuBar())
+                    {
+                        if (Imgui.BeginMenu("File"))
+                        {
+                            if (Imgui.MenuItem("Some menu item")) { }
+                            Imgui.EndMenu();
+                        }
+                        Imgui.EndMenuBar();
+                    }
+                    Imgui.Text("Hello from Stacked The First\nUsing style.Colors[StyleColor.ModalWindowDimBg] behind it.");
+
+                    _ = Imgui.Combo("Combo", s_item2, "aaaa\0bbbb\0cccc\0dddd\0eeee\0\0");
+                    _ = Imgui.ColorEdit("color", s_color2);
+
+                    if (Imgui.Button("Add another modal.."))
+                    {
+                        Imgui.OpenPopup("Stacked 2");
+                    }
+
+                    if (Imgui.BeginPopupModal("Stacked 2", s_unusedOpen))
+                    {
+                        Imgui.Text("Hello from Stacked The Second!");
+                        if (Imgui.Button("Close"))
+                        {
+                            Imgui.CloseCurrentPopup();
+                        }
+
+                        Imgui.EndPopup();
+                    }
+
+                    if (Imgui.Button("Close"))
+                    {
+                        Imgui.CloseCurrentPopup();
+                    }
+
+                    Imgui.EndPopup();
+                }
+
+                Imgui.TreePop();
+            }
+
+            if (Imgui.TreeNode("Menus inside a regular window"))
+            {
+                Imgui.TextWrapped("Below we are testing adding menu items to a regular window. It's rather unusual but should work!");
+                Imgui.Separator();
+
+                _ = Imgui.MenuItem("Menu item", "CTRL+M");
+                if (Imgui.BeginMenu("Menu inside a regular window"))
+                {
+                    ShowExampleMenuFile();
+                    Imgui.EndMenu();
+                }
+                Imgui.Separator();
+                Imgui.TreePop();
+            }
         }
 
         //// Dummy data structure that we use for the Table demo.
@@ -4887,7 +4899,7 @@ namespace SampleApp
             //            }
             //
             //            // [2.3] Right-click anywhere in columns to open another custom popup
-            //            // (instead of testing for !IsAnyItemHovered() we could also call OpenPopup() with ImGuiPopupFlags_NoOpenOverExistingPopup
+            //            // (instead of testing for !IsAnyItemHovered() we could also call OpenPopup() with PopupOptions.NoOpenOverExistingPopup
             //            // to manage popup priority as the popups triggers, here "are we hovering a column" are overlapping)
             //            int hovered_column = -1;
             //            for (int column = 0; column < COLUMNS_COUNT + 1; column++)
@@ -7446,7 +7458,7 @@ namespace SampleApp
             //            // Context menu (under default mouse threshold)
             //            ImVec2 drag_delta = Imgui.GetMouseDragDelta(ImGuiMouseButton_Right);
             //            if (opt_enable_context_menu && drag_delta.X == 0.0f && drag_delta.Y == 0.0f)
-            //                Imgui.OpenPopupOnItemClick("context", ImGuiPopupFlags_MouseButtonRight);
+            //                Imgui.OpenPopupOnItemClick("context", PopupOptions.MouseButtonRight);
             //            if (Imgui.BeginPopup("context"))
             //            {
             //                if (adding_line)
