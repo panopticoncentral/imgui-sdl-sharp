@@ -3553,198 +3553,199 @@ namespace SampleApp
         //};
         //const ImGuiTableSortSpecs* MyItem::s_current_sort_specs = NULL;
         //}
-        //
-        //// Make the UI compact because there are so many fields
-        //static void PushStyleCompact()
-        //{
-        //    ImGuiStyle& style = Imgui.GetStyle();
-        //    Imgui.PushStyleVariable(StyleVariable.FramePadding, ImVec2(style.FramePadding.X, (float)(int)(style.FramePadding.Y * 0.60f)));
-        //    Imgui.PushStyleVariable(StyleVariable.ItemSpacing, ImVec2(style.ItemSpacing.X, (float)(int)(style.ItemSpacing.Y * 0.60f)));
-        //}
-        //
-        //static void PopStyleCompact()
-        //{
-        //    Imgui.PopStyleVariable(2);
-        //}
-        //
-        //// Show a combo box with a choice of sizing policies
-        //static void EditTableSizingFlags(ImGuiTableFlags* p_flags)
-        //{
-        //    struct EnumDesc { ImGuiTableFlags Value; const char* Name; const char* Tooltip; };
-        //    static const EnumDesc policies[] =
-        //    {
-        //        { TableOptions.None,               "Default",                            "Use default sizing policy:\n- TableOptions.SizingFixedFit if ScrollX is on or if host window has WindowOptions.AlwaysAutoResize.\n- TableOptions.SizingStretchSame otherwise." },
-        //        { TableOptions.SizingFixedFit,     "TableOptions.SizingFixedFit",     "Columns default to _WidthFixed (if resizable) or _WidthAuto (if not resizable), matching contents width." },
-        //        { TableOptions.SizingFixedSame,    "TableOptions.SizingFixedSame",    "Columns are all the same width, matching the maximum contents width.\nImplicitly disable TableOptions.Resizable and enable TableOptions.NoKeepColumnsVisible." },
-        //        { TableOptions.SizingStretchProp,  "TableOptions.SizingStretchProp",  "Columns default to _WidthStretch with weights proportional to their widths." },
-        //        { TableOptions.SizingStretchSame,  "TableOptions.SizingStretchSame",  "Columns default to _WidthStretch with same weights." }
-        //    };
-        //    int idx;
-        //    for (idx = 0; idx < policies.Length; idx++)
-        //        if (policies[idx].Value == (*p_flags & TableOptions.SizingMask_))
-        //            break;
-        //    const char* preview_text = (idx < policies.Length) ? policies[idx].Name + (idx > 0 ? strlen("ImGuiTableFlags") : 0) : "";
-        //    if (Imgui.BeginCombo("Sizing Policy", preview_text))
-        //    {
-        //        for (int n = 0; n < policies.Length; n++)
-        //            if (Imgui.Selectable(policies[n].Name, idx == n))
-        //                *p_flags = (*p_flags & ~TableOptions.SizingMask_) | policies[n].Value;
-        //        Imgui.EndCombo();
-        //    }
-        //    Imgui.SameLine();
-        //    Imgui.TextDisabled("(?)");
-        //    if (Imgui.IsItemHovered())
-        //    {
-        //        Imgui.BeginTooltip();
-        //        Imgui.PushTextWrapPos(Imgui.GetFontSize() * 50.0f);
-        //        for (int m = 0; m < policies.Length; m++)
-        //        {
-        //            Imgui.Separator();
-        //            Imgui.Text("%s:", policies[m].Name);
-        //            Imgui.Separator();
-        //            Imgui.SetCursorPosX(Imgui.GetCursorPosX() + Imgui.GetStyle().IndentSpacing * 0.5f);
-        //            Imgui.TextUnformatted(policies[m].Tooltip);
-        //        }
-        //        Imgui.PopTextWrapPos();
-        //        Imgui.EndTooltip();
-        //    }
-        //}
-        //
-        //static void EditTableColumnsFlags(ImGuiTableColumnFlags* p_flags)
-        //{
-        //    Imgui.CheckboxFlags("_Disabled", p_flags, ImGuiTableColumnFlags_Disabled); Imgui.SameLine(); HelpMarker("Master disable flag (also hide from context menu)");
-        //    Imgui.CheckboxFlags("_DefaultHide", p_flags, ImGuiTableColumnFlags_DefaultHide);
-        //    Imgui.CheckboxFlags("_DefaultSort", p_flags, ImGuiTableColumnFlags_DefaultSort);
-        //    if (Imgui.CheckboxFlags("_WidthStretch", p_flags, ImGuiTableColumnFlags_WidthStretch))
-        //        *p_flags &= ~(ImGuiTableColumnFlags_WidthMask_ ^ ImGuiTableColumnFlags_WidthStretch);
-        //    if (Imgui.CheckboxFlags("_WidthFixed", p_flags, ImGuiTableColumnFlags_WidthFixed))
-        //        *p_flags &= ~(ImGuiTableColumnFlags_WidthMask_ ^ ImGuiTableColumnFlags_WidthFixed);
-        //    Imgui.CheckboxFlags("_NoResize", p_flags, ImGuiTableColumnFlags_NoResize);
-        //    Imgui.CheckboxFlags("_NoReorder", p_flags, ImGuiTableColumnFlags_NoReorder);
-        //    Imgui.CheckboxFlags("_NoHide", p_flags, ImGuiTableColumnFlags_NoHide);
-        //    Imgui.CheckboxFlags("_NoClip", p_flags, ImGuiTableColumnFlags_NoClip);
-        //    Imgui.CheckboxFlags("_NoSort", p_flags, ImGuiTableColumnFlags_NoSort);
-        //    Imgui.CheckboxFlags("_NoSortAscending", p_flags, ImGuiTableColumnFlags_NoSortAscending);
-        //    Imgui.CheckboxFlags("_NoSortDescending", p_flags, ImGuiTableColumnFlags_NoSortDescending);
-        //    Imgui.CheckboxFlags("_NoHeaderLabel", p_flags, ImGuiTableColumnFlags_NoHeaderLabel);
-        //    Imgui.CheckboxFlags("_NoHeaderWidth", p_flags, ImGuiTableColumnFlags_NoHeaderWidth);
-        //    Imgui.CheckboxFlags("_PreferSortAscending", p_flags, ImGuiTableColumnFlags_PreferSortAscending);
-        //    Imgui.CheckboxFlags("_PreferSortDescending", p_flags, ImGuiTableColumnFlags_PreferSortDescending);
-        //    Imgui.CheckboxFlags("_IndentEnable", p_flags, ImGuiTableColumnFlags_IndentEnable); Imgui.SameLine(); HelpMarker("Default for column 0");
-        //    Imgui.CheckboxFlags("_IndentDisable", p_flags, ImGuiTableColumnFlags_IndentDisable); Imgui.SameLine(); HelpMarker("Default for column >0");
-        //}
-        //
-        //static void ShowTableColumnsStatusFlags(ImGuiTableColumnFlags flags)
-        //{
-        //    Imgui.CheckboxFlags("_IsEnabled", &flags, ImGuiTableColumnFlags_IsEnabled);
-        //    Imgui.CheckboxFlags("_IsVisible", &flags, ImGuiTableColumnFlags_IsVisible);
-        //    Imgui.CheckboxFlags("_IsSorted", &flags, ImGuiTableColumnFlags_IsSorted);
-        //    Imgui.CheckboxFlags("_IsHovered", &flags, ImGuiTableColumnFlags_IsHovered);
-        //}
+
+        private static void PushStyleCompact()
+        {
+            var style = Imgui.GetStyle();
+            Imgui.PushStyleVariable(StyleVariable.FramePadding, new SizeF(style.FramePadding.Width, (int)(style.FramePadding.Height * 0.60f)));
+            Imgui.PushStyleVariable(StyleVariable.ItemSpacing, new SizeF(style.ItemSpacing.Width, (int)(style.ItemSpacing.Height * 0.60f)));
+        }
+
+        private static void PopStyleCompact() => Imgui.PopStyleVariable(2);
+
+        private static void EditTableSizingFlags(StateOption<TableOptions> p_flags)
+        {
+            var policies = new (TableOptions Value, string Name, string Tooltip)[]
+            {
+                new(TableOptions.None,               "Default",                         "Use default sizing policy:\n- TableOptions.SizingFixedFit if ScrollX is on or if host window has WindowOptions.AlwaysAutoResize.\n- TableOptions.SizingStretchSame otherwise."),
+                new(TableOptions.SizingFixedFit,     "TableOptions.SizingFixedFit",     "Columns default to _WidthFixed (if resizable) or _WidthAuto (if not resizable), matching contents width."),
+                new(TableOptions.SizingFixedSame,    "TableOptions.SizingFixedSame",    "Columns are all the same width, matching the maximum contents width.\nImplicitly disable TableOptions.Resizable and enable TableOptions.NoKeepColumnsVisible."),
+                new(TableOptions.SizingStretchProp,  "TableOptions.SizingStretchProp",  "Columns default to _WidthStretch with weights proportional to their widths."),
+                new(TableOptions.SizingStretchSame,  "TableOptions.SizingStretchSame",  "Columns default to _WidthStretch with same weights.")
+            };
+
+            int idx;
+            for (idx = 0; idx < policies.Length; idx++)
+            {
+                if (policies[idx].Value == (p_flags & TableOptions.SizingMask))
+                {
+                    break;
+                }
+            }
+
+            var preview_text = (idx < policies.Length) ? policies[idx].Name[(idx > 0 ? "TableOptions".Length : 0)..] : "";
+            if (Imgui.BeginCombo("Sizing Policy", preview_text))
+            {
+                for (var n = 0; n < policies.Length; n++)
+                {
+                    if (Imgui.Selectable(policies[n].Name, idx == n))
+                    {
+                        p_flags.Value = (p_flags & ~TableOptions.SizingMask) | policies[n].Value;
+                    }
+                }
+
+                Imgui.EndCombo();
+            }
+            Imgui.SameLine();
+            Imgui.TextDisabled("(?)");
+            if (Imgui.IsItemHovered())
+            {
+                Imgui.BeginTooltip();
+                Imgui.PushTextWrapPosition(Imgui.GetFontSize() * 50.0f);
+                for (var m = 0; m < policies.Length; m++)
+                {
+                    Imgui.Separator();
+                    Imgui.Text($"{policies[m].Name}:");
+                    Imgui.Separator();
+                    Imgui.SetCursorPosX(Imgui.GetCursorPosX() + Imgui.GetStyle().IndentSpacing * 0.5f);
+                    Imgui.TextUnformatted(policies[m].Tooltip);
+                }
+                Imgui.PopTextWrapPosition();
+                Imgui.EndTooltip();
+            }
+        }
+
+        private static void EditTableColumnsFlags(StateOption<TableColumnOptions> p_flags)
+        {
+            _ = Imgui.CheckboxFlags(".Disabled", p_flags, TableColumnOptions.Disabled);
+            Imgui.SameLine();
+            HelpMarker("Master disable flag (also hide from context menu)");
+            _ = Imgui.CheckboxFlags(".DefaultHide", p_flags, TableColumnOptions.DefaultHide);
+            _ = Imgui.CheckboxFlags(".DefaultSort", p_flags, TableColumnOptions.DefaultSort);
+            if (Imgui.CheckboxFlags(".WidthStretch", p_flags, TableColumnOptions.WidthStretch))
+            {
+                p_flags.Value &= ~(TableColumnOptions.WidthMask ^ TableColumnOptions.WidthStretch);
+            }
+
+            if (Imgui.CheckboxFlags(".WidthFixed", p_flags, TableColumnOptions.WidthFixed))
+            {
+                p_flags.Value &= ~(TableColumnOptions.WidthMask ^ TableColumnOptions.WidthFixed);
+            }
+
+            _ = Imgui.CheckboxFlags(".NoResize", p_flags, TableColumnOptions.NoResize);
+            _ = Imgui.CheckboxFlags(".NoReorder", p_flags, TableColumnOptions.NoReorder);
+            _ = Imgui.CheckboxFlags(".NoHide", p_flags, TableColumnOptions.NoHide);
+            _ = Imgui.CheckboxFlags(".NoClip", p_flags, TableColumnOptions.NoClip);
+            _ = Imgui.CheckboxFlags(".NoSort", p_flags, TableColumnOptions.NoSort);
+            _ = Imgui.CheckboxFlags(".NoSortAscending", p_flags, TableColumnOptions.NoSortAscending);
+            _ = Imgui.CheckboxFlags(".NoSortDescending", p_flags, TableColumnOptions.NoSortDescending);
+            _ = Imgui.CheckboxFlags(".NoHeaderLabel", p_flags, TableColumnOptions.NoHeaderLabel);
+            _ = Imgui.CheckboxFlags(".NoHeaderWidth", p_flags, TableColumnOptions.NoHeaderWidth);
+            _ = Imgui.CheckboxFlags(".PreferSortAscending", p_flags, TableColumnOptions.PreferSortAscending);
+            _ = Imgui.CheckboxFlags(".PreferSortDescending", p_flags, TableColumnOptions.PreferSortDescending);
+            _ = Imgui.CheckboxFlags(".IndentEnable", p_flags, TableColumnOptions.IndentEnable); Imgui.SameLine(); HelpMarker("Default for column 0");
+            _ = Imgui.CheckboxFlags(".IndentDisable", p_flags, TableColumnOptions.IndentDisable); Imgui.SameLine(); HelpMarker("Default for column >0");
+        }
+
+        private static void ShowTableColumnsStatusFlags(StateOption<TableColumnOptions> flags)
+        {
+            _ = Imgui.CheckboxFlags(".IsEnabled", flags, TableColumnOptions.IsEnabled);
+            _ = Imgui.CheckboxFlags(".IsVisible", flags, TableColumnOptions.IsVisible);
+            _ = Imgui.CheckboxFlags(".IsSorted", flags, TableColumnOptions.IsSorted);
+            _ = Imgui.CheckboxFlags(".IsHovered", flags, TableColumnOptions.IsHovered);
+        }
+
+        private static readonly State<bool> disable_indent = new(false);
 
         private static void ShowDemoWindowTables()
         {
-            //    //Imgui.SetNextItemOpen(true, ImGuiCond_Once);
-            //    IMGUI_DEMO_MARKER("Tables");
-            //    if (!Imgui.CollapsingHeader("Tables & Columns"))
-            //        return;
-            //
-            //    // Using those as a base value to create width/height that are factor of the size of our font
-            //    const float TEXT_BASE_WIDTH = Imgui.CalcTextSize("A").X;
-            //    const float TEXT_BASE_HEIGHT = Imgui.GetTextLineHeightWithSpacing();
-            //
-            //    Imgui.PushId("Tables");
-            //
-            //    int open_action = -1;
-            //    if (Imgui.Button("Open all"))
-            //        open_action = 1;
-            //    Imgui.SameLine();
-            //    if (Imgui.Button("Close all"))
-            //        open_action = 0;
-            //    Imgui.SameLine();
-            //
-            //    // Options
-            //    static bool disable_indent = false;
-            //    Imgui.Checkbox("Disable tree indentation", &disable_indent);
-            //    Imgui.SameLine();
-            //    HelpMarker("Disable the indenting of tree nodes so demo tables can use the full window width.");
-            //    Imgui.Separator();
-            //    if (disable_indent)
-            //        Imgui.PushStyleVariable(StyleVariable.IndentSpacing, 0.0f);
-            //
-            //    // About Styling of tables
-            //    // Most settings are configured on a per-table basis via the flags passed to BeginTable() and TableSetupColumns APIs.
-            //    // There are however a few settings that a shared and part of the ImGuiStyle structure:
-            //    //   style.CellPadding                          // Padding within each cell
-            //    //   style.Colors[StyleColor.TableHeaderBg]       // Table header background
-            //    //   style.Colors[StyleColor.TableBorderStrong]   // Table outer and header borders
-            //    //   style.Colors[StyleColor.TableBorderLight]    // Table inner borders
-            //    //   style.Colors[StyleColor.TableRowBg]          // Table row background when TableOptions.RowBg is enabled (even rows)
-            //    //   style.Colors[StyleColor.TableRowBgAlt]       // Table row background when TableOptions.RowBg is enabled (odds rows)
-            //
-            //    // Demos
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Basic");
-            //    if (Imgui.TreeNode("Basic"))
-            //    {
-            //        // Here we will showcase three different ways to output a table.
-            //        // They are very simple variations of a same thing!
-            //
-            //        // [Method 1] Using TableNextRow() to create a new row, and TableSetColumnIndex() to select the column.
-            //        // In many situations, this is the most flexible and easy to use pattern.
-            //        HelpMarker("Using TableNextRow() + calling TableSetColumnIndex() _before_ each cell, in a loop.");
-            //        if (Imgui.BeginTable("table1", 3))
-            //        {
-            //            for (int row = 0; row < 4; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("Row %d Column %d", row, column);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        // [Method 2] Using TableNextColumn() called multiple times, instead of using a for loop + TableSetColumnIndex().
-            //        // This is generally more convenient when you have code manually submitting the contents of each column.
-            //        HelpMarker("Using TableNextRow() + calling TableNextColumn() _before_ each cell, manually.");
-            //        if (Imgui.BeginTable("table2", 3))
-            //        {
-            //            for (int row = 0; row < 4; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                Imgui.TableNextColumn();
-            //                Imgui.Text("Row %d", row);
-            //                Imgui.TableNextColumn();
-            //                Imgui.Text("Some contents");
-            //                Imgui.TableNextColumn();
-            //                Imgui.Text("123.456");
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        // [Method 3] We call TableNextColumn() _before_ each cell. We never call TableNextRow(),
-            //        // as TableNextColumn() will automatically wrap around and create new rows as needed.
-            //        // This is generally more convenient when your cells all contains the same type of data.
-            //        HelpMarker(
-            //            "Only using TableNextColumn(), which tends to be convenient for tables where every cell contains the same type of contents.\n" +
-            //            "This is also more similar to the old NextColumn() function of the Columns API, and provided to facilitate the Columns->Tables API transition.");
-            //        if (Imgui.BeginTable("table3", 3))
-            //        {
-            //            for (int item = 0; item < 14; item++)
-            //            {
-            //                Imgui.TableNextColumn();
-            //                Imgui.Text("Item %d", item);
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (!Imgui.CollapsingHeader("Tables & Columns"))
+            {
+                return;
+            }
+
+            var TEXT_BASE_WIDTH = Imgui.CalcTextSize("A").Width;
+            var TEXT_BASE_HEIGHT = Imgui.GetTextLineHeightWithSpacing();
+
+            Imgui.PushId("Tables");
+
+            var open_action = -1;
+            if (Imgui.Button("Open all"))
+            {
+                open_action = 1;
+            }
+
+            Imgui.SameLine();
+            if (Imgui.Button("Close all"))
+            {
+                open_action = 0;
+            }
+
+            Imgui.SameLine();
+
+            _ = Imgui.Checkbox("Disable tree indentation", disable_indent);
+            Imgui.SameLine();
+            HelpMarker("Disable the indenting of tree nodes so demo tables can use the full window width.");
+            Imgui.Separator();
+            if (disable_indent)
+            {
+                Imgui.PushStyleVariable(StyleVariable.IndentSpacing, 0.0f);
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Basic"))
+            {
+                HelpMarker("Using TableNextRow() + calling TableSetColumnIndex() _before_ each cell, in a loop.");
+                if (Imgui.BeginTable("table1", 3))
+                {
+                    for (var row = 0; row < 4; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"Row {row} Column {column}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+
+                HelpMarker("Using TableNextRow() + calling TableNextColumn() _before_ each cell, manually.");
+                if (Imgui.BeginTable("table2", 3))
+                {
+                    for (var row = 0; row < 4; row++)
+                    {
+                        Imgui.TableNextRow();
+                        _ = Imgui.TableNextColumn();
+                        Imgui.Text($"Row {row}");
+                        _ = Imgui.TableNextColumn();
+                        Imgui.Text("Some contents");
+                        _ = Imgui.TableNextColumn();
+                        Imgui.Text("123.456");
+                    }
+                    Imgui.EndTable();
+                }
+
+                HelpMarker(
+                    "Only using TableNextColumn(), which tends to be convenient for tables where every cell contains the same type of contents.\n" +
+                    "This is also more similar to the old NextColumn() function of the Columns API, and provided to facilitate the Columns->Tables API transition.");
+                if (Imgui.BeginTable("table3", 3))
+                {
+                    for (var item = 0; item < 14; item++)
+                    {
+                        _ = Imgui.TableNextColumn();
+                        Imgui.Text($"Item {item}");
+                    }
+                    Imgui.EndTable();
+                }
+
+                Imgui.TreePop();
+            }
+
             //    if (open_action != -1)
             //        Imgui.SetNextItemOpen(open_action != 0);
             //    IMGUI_DEMO_MARKER("Tables/Borders, background");
@@ -3892,9 +3893,9 @@ namespace SampleApp
             //
             //        if (Imgui.BeginTable("table1", 3, flags))
             //        {
-            //            Imgui.TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
-            //            Imgui.TableSetupColumn("BBB", ImGuiTableColumnFlags_WidthFixed);
-            //            Imgui.TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
+            //            Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
+            //            Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
+            //            Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthStretch);
             //            Imgui.TableHeadersRow();
             //            for (int row = 0; row < 5; row++)
             //            {
@@ -3909,12 +3910,12 @@ namespace SampleApp
             //        }
             //        if (Imgui.BeginTable("table2", 6, flags))
             //        {
-            //            Imgui.TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
-            //            Imgui.TableSetupColumn("BBB", ImGuiTableColumnFlags_WidthFixed);
-            //            Imgui.TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_DefaultHide);
-            //            Imgui.TableSetupColumn("DDD", ImGuiTableColumnFlags_WidthStretch);
-            //            Imgui.TableSetupColumn("EEE", ImGuiTableColumnFlags_WidthStretch);
-            //            Imgui.TableSetupColumn("FFF", ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_DefaultHide);
+            //            Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
+            //            Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
+            //            Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthFixed | TableColumnOptions.DefaultHide);
+            //            Imgui.TableSetupColumn("DDD", TableColumnOptions.WidthStretch);
+            //            Imgui.TableSetupColumn("EEE", TableColumnOptions.WidthStretch);
+            //            Imgui.TableSetupColumn("FFF", TableColumnOptions.WidthStretch | TableColumnOptions.DefaultHide);
             //            Imgui.TableHeadersRow();
             //            for (int row = 0; row < 5; row++)
             //            {
@@ -4044,7 +4045,7 @@ namespace SampleApp
             //                        sprintf(buf, "Hello %d,%d", column, row);
             //                        Imgui.Button(buf, ImVec2(-FLT_MIN, 0.0f));
             //                    }
-            //                    //if (Imgui.TableGetColumnFlags() & ImGuiTableColumnFlags_IsHovered)
+            //                    //if (Imgui.TableGetColumnFlags() & TableColumnOptions.IsHovered)
             //                    //    Imgui.TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(0, 100, 0, 255));
             //                }
             //            }
@@ -4219,9 +4220,9 @@ namespace SampleApp
             //        if (Imgui.BeginTable("table_scrolly", 3, flags, outer_size))
             //        {
             //            Imgui.TableSetupScrollFreeze(0, 1); // Make top row always visible
-            //            Imgui.TableSetupColumn("One", ImGuiTableColumnFlags_None);
-            //            Imgui.TableSetupColumn("Two", ImGuiTableColumnFlags_None);
-            //            Imgui.TableSetupColumn("Three", ImGuiTableColumnFlags_None);
+            //            Imgui.TableSetupColumn("One", TableColumnOptions.None);
+            //            Imgui.TableSetupColumn("Two", TableColumnOptions.None);
+            //            Imgui.TableSetupColumn("Three", TableColumnOptions.None);
             //            Imgui.TableHeadersRow();
             //
             //            // Demonstrate using clipper for large vertical lists
@@ -4274,7 +4275,7 @@ namespace SampleApp
             //        if (Imgui.BeginTable("table_scrollx", 7, flags, outer_size))
             //        {
             //            Imgui.TableSetupScrollFreeze(freeze_cols, freeze_rows);
-            //            Imgui.TableSetupColumn("Line #", ImGuiTableColumnFlags_NoHide); // Make the first column not hideable to match our use of TableSetupScrollFreeze()
+            //            Imgui.TableSetupColumn("Line #", TableColumnOptions.NoHide); // Make the first column not hideable to match our use of TableSetupScrollFreeze()
             //            Imgui.TableSetupColumn("One");
             //            Imgui.TableSetupColumn("Two");
             //            Imgui.TableSetupColumn("Three");
@@ -4341,7 +4342,7 @@ namespace SampleApp
             //        // Create a first table just to show all the options/flags we want to make visible in our example!
             //        const int column_count = 3;
             //        const char* column_names[column_count] = { "One", "Two", "Three" };
-            //        static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort, ImGuiTableColumnFlags_None, ImGuiTableColumnFlags_DefaultHide };
+            //        static ImGuiTableColumnFlags column_flags[column_count] = { TableColumnOptions.DefaultSort, TableColumnOptions.None, TableColumnOptions.DefaultHide };
             //        static ImGuiTableColumnFlags column_flags_out[column_count] = { 0, 0, 0 }; // Output from TableGetColumnFlags()
             //
             //        if (Imgui.BeginTable("table_columns_flags_checkboxes", column_count, TableOptions.None))
@@ -4414,10 +4415,10 @@ namespace SampleApp
             //        PopStyleCompact();
             //        if (Imgui.BeginTable("table1", 3, flags1))
             //        {
-            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
-            //            Imgui.TableSetupColumn("one", ImGuiTableColumnFlags_WidthFixed, 100.0f); // Default to 100.0f
-            //            Imgui.TableSetupColumn("two", ImGuiTableColumnFlags_WidthFixed, 200.0f); // Default to 200.0f
-            //            Imgui.TableSetupColumn("three", ImGuiTableColumnFlags_WidthFixed);       // Default to auto
+            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to TableColumnOptions.WidthFixed.
+            //            Imgui.TableSetupColumn("one", TableColumnOptions.WidthFixed, 100.0f); // Default to 100.0f
+            //            Imgui.TableSetupColumn("two", TableColumnOptions.WidthFixed, 200.0f); // Default to 200.0f
+            //            Imgui.TableSetupColumn("three", TableColumnOptions.WidthFixed);       // Default to auto
             //            Imgui.TableHeadersRow();
             //            for (int row = 0; row < 4; row++)
             //            {
@@ -4444,11 +4445,11 @@ namespace SampleApp
             //        PopStyleCompact();
             //        if (Imgui.BeginTable("table2", 4, flags2))
             //        {
-            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to ImGuiTableColumnFlags_WidthFixed.
-            //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 100.0f);
-            //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 15.0f);
-            //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 30.0f);
-            //            Imgui.TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 15.0f);
+            //            // We could also set TableOptions.SizingFixedFit on the table and all columns will default to TableColumnOptions.WidthFixed.
+            //            Imgui.TableSetupColumn("", TableColumnOptions.WidthFixed, 100.0f);
+            //            Imgui.TableSetupColumn("", TableColumnOptions.WidthFixed, TEXT_BASE_WIDTH * 15.0f);
+            //            Imgui.TableSetupColumn("", TableColumnOptions.WidthFixed, TEXT_BASE_WIDTH * 30.0f);
+            //            Imgui.TableSetupColumn("", TableColumnOptions.WidthFixed, TEXT_BASE_WIDTH * 15.0f);
             //            for (int row = 0; row < 5; row++)
             //            {
             //                Imgui.TableNextRow();
@@ -4666,9 +4667,9 @@ namespace SampleApp
             //        if (Imgui.BeginTable("3ways", 3, flags))
             //        {
             //            // The first column will use the default _WidthStretch when ScrollX is Off and _WidthFixed when ScrollX is On
-            //            Imgui.TableSetupColumn("Name", ImGuiTableColumnFlags_NoHide);
-            //            Imgui.TableSetupColumn("Size", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 12.0f);
-            //            Imgui.TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, TEXT_BASE_WIDTH * 18.0f);
+            //            Imgui.TableSetupColumn("Name", TableColumnOptions.NoHide);
+            //            Imgui.TableSetupColumn("Size", TableColumnOptions.WidthFixed, TEXT_BASE_WIDTH * 12.0f);
+            //            Imgui.TableSetupColumn("Type", TableColumnOptions.WidthFixed, TEXT_BASE_WIDTH * 18.0f);
             //            Imgui.TableHeadersRow();
             //
             //            // Simple storage to output a dummy file-system.
@@ -4905,7 +4906,7 @@ namespace SampleApp
             //            for (int column = 0; column < COLUMNS_COUNT + 1; column++)
             //            {
             //                Imgui.PushId(column);
-            //                if (Imgui.TableGetColumnFlags(column) & ImGuiTableColumnFlags_IsHovered)
+            //                if (Imgui.TableGetColumnFlags(column) & TableColumnOptions.IsHovered)
             //                    hovered_column = column;
             //                if (hovered_column == column && !Imgui.IsAnyItemHovered() && Imgui.IsMouseReleased(1))
             //                    Imgui.OpenPopup("MyPopup");
@@ -5008,13 +5009,13 @@ namespace SampleApp
             //            // We use the "user_id" parameter of TableSetupColumn() to specify a user id that will be stored in the sort specifications.
             //            // This is so our sort function can identify a column given our own identifier. We could also identify them based on their index!
             //            // Demonstrate using a mixture of flags among available sort-related flags:
-            //            // - ImGuiTableColumnFlags_DefaultSort
-            //            // - ImGuiTableColumnFlags_NoSort / ImGuiTableColumnFlags_NoSortAscending / ImGuiTableColumnFlags_NoSortDescending
-            //            // - ImGuiTableColumnFlags_PreferSortAscending / ImGuiTableColumnFlags_PreferSortDescending
-            //            Imgui.TableSetupColumn("ID",       ImGuiTableColumnFlags_DefaultSort          | ImGuiTableColumnFlags_WidthFixed,   0.0f, MyItemColumnID_ID);
-            //            Imgui.TableSetupColumn("Name",                                                  ImGuiTableColumnFlags_WidthFixed,   0.0f, MyItemColumnID_Name);
-            //            Imgui.TableSetupColumn("Action",   ImGuiTableColumnFlags_NoSort               | ImGuiTableColumnFlags_WidthFixed,   0.0f, MyItemColumnID_Action);
-            //            Imgui.TableSetupColumn("Quantity", ImGuiTableColumnFlags_PreferSortDescending | ImGuiTableColumnFlags_WidthStretch, 0.0f, MyItemColumnID_Quantity);
+            //            // - TableColumnOptions.DefaultSort
+            //            // - TableColumnOptions.NoSort / TableColumnOptions.NoSortAscending / TableColumnOptions.NoSortDescending
+            //            // - TableColumnOptions.PreferSortAscending / TableColumnOptions.PreferSortDescending
+            //            Imgui.TableSetupColumn("ID",       TableColumnOptions.DefaultSort          | TableColumnOptions.WidthFixed,   0.0f, MyItemColumnID_ID);
+            //            Imgui.TableSetupColumn("Name",                                                  TableColumnOptions.WidthFixed,   0.0f, MyItemColumnID_Name);
+            //            Imgui.TableSetupColumn("Action",   TableColumnOptions.NoSort               | TableColumnOptions.WidthFixed,   0.0f, MyItemColumnID_Action);
+            //            Imgui.TableSetupColumn("Quantity", TableColumnOptions.PreferSortDescending | TableColumnOptions.WidthStretch, 0.0f, MyItemColumnID_Quantity);
             //            Imgui.TableSetupScrollFreeze(0, 1); // Make row always visible
             //            Imgui.TableHeadersRow();
             //
@@ -5225,12 +5226,12 @@ namespace SampleApp
             //            // Declare columns
             //            // We use the "user_id" parameter of TableSetupColumn() to specify a user id that will be stored in the sort specifications.
             //            // This is so our sort function can identify a column given our own identifier. We could also identify them based on their index!
-            //            Imgui.TableSetupColumn("ID",           ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, 0.0f, MyItemColumnID_ID);
-            //            Imgui.TableSetupColumn("Name",         ImGuiTableColumnFlags_WidthFixed, 0.0f, MyItemColumnID_Name);
-            //            Imgui.TableSetupColumn("Action",       ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, 0.0f, MyItemColumnID_Action);
-            //            Imgui.TableSetupColumn("Quantity",     ImGuiTableColumnFlags_PreferSortDescending, 0.0f, MyItemColumnID_Quantity);
-            //            Imgui.TableSetupColumn("Description",  (flags & TableOptions.NoHostExtendX) ? 0 : ImGuiTableColumnFlags_WidthStretch, 0.0f, MyItemColumnID_Description);
-            //            Imgui.TableSetupColumn("Hidden",       ImGuiTableColumnFlags_DefaultHide | ImGuiTableColumnFlags_NoSort);
+            //            Imgui.TableSetupColumn("ID",           TableColumnOptions.DefaultSort | TableColumnOptions.WidthFixed | TableColumnOptions.NoHide, 0.0f, MyItemColumnID_ID);
+            //            Imgui.TableSetupColumn("Name",         TableColumnOptions.WidthFixed, 0.0f, MyItemColumnID_Name);
+            //            Imgui.TableSetupColumn("Action",       TableColumnOptions.NoSort | TableColumnOptions.WidthFixed, 0.0f, MyItemColumnID_Action);
+            //            Imgui.TableSetupColumn("Quantity",     TableColumnOptions.PreferSortDescending, 0.0f, MyItemColumnID_Quantity);
+            //            Imgui.TableSetupColumn("Description",  (flags & TableOptions.NoHostExtendX) ? 0 : TableColumnOptions.WidthStretch, 0.0f, MyItemColumnID_Description);
+            //            Imgui.TableSetupColumn("Hidden",       TableColumnOptions.DefaultHide | TableColumnOptions.NoSort);
             //            Imgui.TableSetupScrollFreeze(freeze_cols, freeze_rows);
             //
             //            // Sort our data if sort specs have been changed!
@@ -5248,7 +5249,7 @@ namespace SampleApp
             //
             //            // Take note of whether we are currently sorting based on the Quantity field,
             //            // we will use this to trigger sorting when we know the data of this column has been modified.
-            //            const bool sorts_specs_using_quantity = (Imgui.TableGetColumnFlags(3) & ImGuiTableColumnFlags_IsSorted) != 0;
+            //            const bool sorts_specs_using_quantity = (Imgui.TableGetColumnFlags(3) & TableColumnOptions.IsSorted) != 0;
             //
             //            // Show headers
             //            if (show_headers)
@@ -5364,13 +5365,15 @@ namespace SampleApp
             //        }
             //        Imgui.TreePop();
             //    }
-            //
-            //    Imgui.PopId();
-            //
-            //    ShowDemoWindowColumns();
-            //
-            //    if (disable_indent)
-            //        Imgui.PopStyleVariable();
+
+            Imgui.PopId();
+
+            ShowDemoWindowColumns();
+
+            if (disable_indent)
+            {
+                Imgui.PopStyleVariable();
+            }
         }
 
         // Demonstrate old/legacy Columns API!
