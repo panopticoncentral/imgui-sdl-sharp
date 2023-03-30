@@ -1,5 +1,7 @@
 ﻿using ImguiSharp;
 
+using static ImguiSharp.Native;
+
 namespace SampleApp
 {
     public static class DemoWindows
@@ -3658,12 +3660,39 @@ namespace SampleApp
         private static readonly State<bool> s_disableIndent = new(false);
         private enum ContentsType
         {
-            CT_Text,
-            CT_FillButton
+            Text,
+            FillButton
         };
         private static readonly StateOption<TableOptions> s_flags4 = new(TableOptions.Borders | TableOptions.RowBg);
         private static readonly State<bool> s_displayHeaders = new(false);
-        private static readonly State<int> s_contentsType = new((int)ContentsType.CT_Text);
+        private static readonly State<int> s_contentsType = new((int)ContentsType.Text);
+        private static readonly StateOption<TableOptions> s_flags5 = new(TableOptions.SizingStretchSame | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody);
+        private static readonly StateOption<TableOptions> s_flags6 = new(TableOptions.SizingFixedFit | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody);
+        private static readonly StateOption<TableOptions> s_flags7 = new(TableOptions.SizingFixedFit | TableOptions.RowBg | TableOptions.Borders | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable);
+        private static readonly StateOption<TableOptions> s_flags8 = new(TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.BordersOuter | TableOptions.BordersV);
+        private static readonly StateOption<TableOptions> s_flags9 = new(TableOptions.BordersV);
+        private static readonly State<bool> s_showHeaders = new(false);
+        private static readonly StateOption<TableOptions> s_flags10 = new(TableOptions.Borders | TableOptions.RowBg);
+        private static readonly StateVector<float> s_cellPadding = new(2, new[] { 0.0f, 0.0f });
+        private static readonly State<bool> s_showWidgetFrameBg = new(true);
+        private static readonly StateText[] s_textBufs = new StateText[3 * 5];
+        private static bool s_init = true;
+        private static readonly StateOption<TableOptions> s_flags11 = new(TableOptions.BordersV | TableOptions.BordersOuterH | TableOptions.RowBg | TableOptions.ContextMenuInBody);
+        private static readonly StateOptionVector<TableOptions> s_sizingPolicyFlags = new(4, new[] { TableOptions.SizingFixedFit, TableOptions.SizingFixedSame, TableOptions.SizingStretchProp, TableOptions.SizingStretchSame });
+
+        private enum ContentsType2
+        {
+            ShowWidth,
+            ShortText,
+            LongText,
+            Button,
+            FillButton,
+            InputText
+        };
+        private static readonly StateOption<TableOptions> s_flags12 = new(TableOptions.ScrollY | TableOptions.Borders | TableOptions.RowBg | TableOptions.Resizable);
+        private static readonly State<int> s_contentsType2 = new((int)ContentsType2.ShowWidth);
+        private static readonly State<int> s_columnCount = new(3);
+        private static readonly StateText s_textBuf = new(32);
 
         private static void ShowDemoWindowTables()
         {
@@ -3786,9 +3815,9 @@ namespace SampleApp
 
                 Imgui.AlignTextToFramePadding(); Imgui.Text("Cell contents:");
                 Imgui.SameLine();
-                _ = Imgui.RadioButton("Text", s_contentsType, (int)ContentsType.CT_Text);
+                _ = Imgui.RadioButton("Text", s_contentsType, (int)ContentsType.Text);
                 Imgui.SameLine();
-                _ = Imgui.RadioButton("FillButton", s_contentsType, (int)ContentsType.CT_FillButton);
+                _ = Imgui.RadioButton("FillButton", s_contentsType, (int)ContentsType.FillButton);
                 _ = Imgui.Checkbox("Display headers", s_displayHeaders);
                 _ = Imgui.CheckboxFlags("TableOptions.NoBordersInBody", s_flags4, TableOptions.NoBordersInBody);
                 Imgui.SameLine();
@@ -3811,11 +3840,11 @@ namespace SampleApp
                         for (var column = 0; column < 3; column++)
                         {
                             _ = Imgui.TableSetColumnIndex(column);
-                            if (s_contentsType == (int)ContentsType.CT_Text)
+                            if (s_contentsType == (int)ContentsType.Text)
                             {
                                 Imgui.TextUnformatted($"Hello {column},{row}");
                             }
-                            else if (s_contentsType == (int)ContentsType.CT_FillButton)
+                            else if (s_contentsType == (int)ContentsType.FillButton)
                             {
                                 _ = Imgui.Button($"Hello {column}, {row}", new(-SizeF.MinNormalizedValue, 0.0f));
                             }
@@ -3826,391 +3855,392 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Resizable, stretch");
-            //    if (Imgui.TreeNode("Resizable, stretch"))
-            //    {
-            //        // By default, if we don't enable ScrollX the sizing policy for each column is "Stretch"
-            //        // All columns maintain a sizing weight, and they will occupy all available width.
-            //        static ImGuiTableFlags flags = TableOptions.SizingStretchSame | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody;
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
-            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags, TableOptions.BordersV);
-            //        Imgui.SameLine(); HelpMarker("Using the _Resizable flag automatically enables the _BordersInnerV flag as well, this is why the resize borders are still showing when unchecking this.");
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table1", 3, flags))
-            //        {
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("Hello %d,%d", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Resizable, fixed");
-            //    if (Imgui.TreeNode("Resizable, fixed"))
-            //    {
-            //        // Here we use TableOptions.SizingFixedFit (even though _ScrollX is not set)
-            //        // So columns will adopt the "Fixed" policy and will maintain a fixed width regardless of the whole available width (unless table is small)
-            //        // If there is not enough available width to fit all columns, they will however be resized down.
-            //        // FIXME-TABLE: Providing a stretch-on-init would make sense especially for tables which don't have saved settings
-            //        HelpMarker(
-            //            "Using _Resizable + _SizingFixedFit flags.\n" +
-            //            "Fixed-width columns generally makes more sense if you want to use horizontal scrolling.\n\n" +
-            //            "Double-click a column border to auto-fit the column to its contents.");
-            //        PushStyleCompact();
-            //        static ImGuiTableFlags flags = TableOptions.SizingFixedFit | TableOptions.Resizable | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.ContextMenuInBody;
-            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags, TableOptions.NoHostExtendX);
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table1", 3, flags))
-            //        {
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("Hello %d,%d", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Resizable, mixed");
-            //    if (Imgui.TreeNode("Resizable, mixed"))
-            //    {
-            //        HelpMarker(
-            //            "Using TableSetupColumn() to alter resizing policy on a per-column basis.\n\n" +
-            //            "When combining Fixed and Stretch columns, generally you only want one, maybe two trailing columns to use _WidthStretch.");
-            //        static ImGuiTableFlags flags = TableOptions.SizingFixedFit | TableOptions.RowBg | TableOptions.Borders | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
-            //
-            //        if (Imgui.BeginTable("table1", 3, flags))
-            //        {
-            //            Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
-            //            Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
-            //            Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthStretch);
-            //            Imgui.TableHeadersRow();
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        if (Imgui.BeginTable("table2", 6, flags))
-            //        {
-            //            Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
-            //            Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
-            //            Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthFixed | TableColumnOptions.DefaultHide);
-            //            Imgui.TableSetupColumn("DDD", TableColumnOptions.WidthStretch);
-            //            Imgui.TableSetupColumn("EEE", TableColumnOptions.WidthStretch);
-            //            Imgui.TableSetupColumn("FFF", TableColumnOptions.WidthStretch | TableColumnOptions.DefaultHide);
-            //            Imgui.TableHeadersRow();
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 6; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("%s %d,%d", (column >= 3) ? "Stretch" : "Fixed", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Reorderable, hideable, with headers");
-            //    if (Imgui.TreeNode("Reorderable, hideable, with headers"))
-            //    {
-            //        HelpMarker(
-            //            "Click and drag column headers to reorder columns.\n\n" +
-            //            "Right-click on a header to open a context menu.");
-            //        static ImGuiTableFlags flags = TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.BordersOuter | TableOptions.BordersV;
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
-            //        Imgui.CheckboxFlags("TableOptions.Reorderable", &flags, TableOptions.Reorderable);
-            //        Imgui.CheckboxFlags("TableOptions.Hideable", &flags, TableOptions.Hideable);
-            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBody", &flags, TableOptions.NoBordersInBody);
-            //        Imgui.CheckboxFlags("TableOptions.NoBordersInBodyUntilResize", &flags, TableOptions.NoBordersInBodyUntilResize); Imgui.SameLine(); HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table1", 3, flags))
-            //        {
-            //            // Submit columns name with TableSetupColumn() and call TableHeadersRow() to create a row with a header in each column.
-            //            // (Later we will show how TableSetupColumn() has other uses, optional flags, sizing weight etc.)
-            //            Imgui.TableSetupColumn("One");
-            //            Imgui.TableSetupColumn("Two");
-            //            Imgui.TableSetupColumn("Three");
-            //            Imgui.TableHeadersRow();
-            //            for (int row = 0; row < 6; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("Hello %d,%d", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        // Use outer_size.X == 0.0f instead of default to make the table as tight as possible (only valid when no scrolling and no stretch column)
-            //        if (Imgui.BeginTable("table2", 3, flags | TableOptions.SizingFixedFit, ImVec2(0.0f, 0.0f)))
-            //        {
-            //            Imgui.TableSetupColumn("One");
-            //            Imgui.TableSetupColumn("Two");
-            //            Imgui.TableSetupColumn("Three");
-            //            Imgui.TableHeadersRow();
-            //            for (int row = 0; row < 6; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("Fixed %d,%d", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Padding");
-            //    if (Imgui.TreeNode("Padding"))
-            //    {
-            //        // First example: showcase use of padding flags and effect of BorderOuterV/BorderInnerV on X padding.
-            //        // We don't expose BorderOuterH/BorderInnerH here because they have no effect on X padding.
-            //        HelpMarker(
-            //            "We often want outer padding activated when any using features which makes the edges of a column visible:\n" +
-            //            "e.g.:\n" +
-            //            "- BorderOuterV\n" +
-            //            "- any form of row selection\n" +
-            //            "Because of this, activating BorderOuterV sets the default to PadOuterX. Using PadOuterX or NoPadOuterX you can override the default.\n\n" +
-            //            "Actual padding values are using style.CellPadding.\n\n" +
-            //            "In this demo we don't show horizontal borders to emphasize how they don't affect default horizontal padding.");
-            //
-            //        static ImGuiTableFlags flags1 = TableOptions.BordersV;
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.PadOuterX", &flags1, TableOptions.PadOuterX);
-            //        Imgui.SameLine(); HelpMarker("Enable outer-most padding (default if TableOptions.BordersOuterV is set)");
-            //        Imgui.CheckboxFlags("TableOptions.NoPadOuterX", &flags1, TableOptions.NoPadOuterX);
-            //        Imgui.SameLine(); HelpMarker("Disable outer-most padding (default if TableOptions.BordersOuterV is not set)");
-            //        Imgui.CheckboxFlags("TableOptions.NoPadInnerX", &flags1, TableOptions.NoPadInnerX);
-            //        Imgui.SameLine(); HelpMarker("Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off)");
-            //        Imgui.CheckboxFlags("TableOptions.BordersOuterV", &flags1, TableOptions.BordersOuterV);
-            //        Imgui.CheckboxFlags("TableOptions.BordersInnerV", &flags1, TableOptions.BordersInnerV);
-            //        static bool show_headers = false;
-            //        Imgui.Checkbox("show_headers", &show_headers);
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table_padding", 3, flags1))
-            //        {
-            //            if (show_headers)
-            //            {
-            //                Imgui.TableSetupColumn("One");
-            //                Imgui.TableSetupColumn("Two");
-            //                Imgui.TableSetupColumn("Three");
-            //                Imgui.TableHeadersRow();
-            //            }
-            //
-            //            for (int row = 0; row < 5; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 3; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    if (row == 0)
-            //                    {
-            //                        Imgui.Text("Avail %.2f", Imgui.GetContentRegionAvailable().Width);
-            //                    }
-            //                    else
-            //                    {
-            //                        char buf[32];
-            //                        sprintf(buf, "Hello %d,%d", column, row);
-            //                        Imgui.Button(buf, ImVec2(-FLT_MIN, 0.0f));
-            //                    }
-            //                    //if (Imgui.TableGetColumnFlags() & TableColumnOptions.IsHovered)
-            //                    //    Imgui.TableSetBgColor(ImGuiTableBgTarget_CellBg, IM_COL32(0, 100, 0, 255));
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        // Second example: set style.CellPadding to (0.0) or a custom value.
-            //        // FIXME-TABLE: Vertical border effectively not displayed the same way as horizontal one...
-            //        HelpMarker("Setting style.CellPadding to (0,0) or a custom value.");
-            //        static ImGuiTableFlags flags2 = TableOptions.Borders | TableOptions.RowBg;
-            //        static ImVec2 cell_padding(0.0f, 0.0f);
-            //        static bool show_widget_frame_bg = true;
-            //
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.Borders", &flags2, TableOptions.Borders);
-            //        Imgui.CheckboxFlags("TableOptions.BordersH", &flags2, TableOptions.BordersH);
-            //        Imgui.CheckboxFlags("TableOptions.BordersV", &flags2, TableOptions.BordersV);
-            //        Imgui.CheckboxFlags("TableOptions.BordersInner", &flags2, TableOptions.BordersInner);
-            //        Imgui.CheckboxFlags("TableOptions.BordersOuter", &flags2, TableOptions.BordersOuter);
-            //        Imgui.CheckboxFlags("TableOptions.RowBg", &flags2, TableOptions.RowBg);
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags2, TableOptions.Resizable);
-            //        Imgui.Checkbox("show_widget_frame_bg", &show_widget_frame_bg);
-            //        Imgui.Slider("CellPadding", &cell_padding.X, 0.0f, 10.0f, "%.0f");
-            //        PopStyleCompact();
-            //
-            //        Imgui.PushStyleVariable(StyleVariable.CellPadding, cell_padding);
-            //        if (Imgui.BeginTable("table_padding_2", 3, flags2))
-            //        {
-            //            static char text_bufs[3 * 5][16]; // Mini text storage for 3x5 cells
-            //            static bool init = true;
-            //            if (!show_widget_frame_bg)
-            //                Imgui.PushStyleColor(StyleColor.FrameBg, 0);
-            //            for (int cell = 0; cell < 3 * 5; cell++)
-            //            {
-            //                Imgui.TableNextColumn();
-            //                if (init)
-            //                    strcpy(text_bufs[cell], "edit me");
-            //                Imgui.SetNextItemWidth(-FLT_MIN);
-            //                Imgui.PushId(cell);
-            //                Imgui.InputText("##cell", text_bufs[cell], IM_ARRAYSIZE(text_bufs[cell]));
-            //                Imgui.PopId();
-            //            }
-            //            if (!show_widget_frame_bg)
-            //                Imgui.PopStyleColor();
-            //            init = false;
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.PopStyleVariable();
-            //
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Explicit widths");
-            //    if (Imgui.TreeNode("Sizing policies"))
-            //    {
-            //        static ImGuiTableFlags flags1 = TableOptions.BordersV | TableOptions.BordersOuterH | TableOptions.RowBg | TableOptions.ContextMenuInBody;
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags1, TableOptions.Resizable);
-            //        Imgui.CheckboxFlags("TableOptions.NoHostExtendX", &flags1, TableOptions.NoHostExtendX);
-            //        PopStyleCompact();
-            //
-            //        static ImGuiTableFlags sizing_policy_flags[4] = { TableOptions.SizingFixedFit, TableOptions.SizingFixedSame, TableOptions.SizingStretchProp, TableOptions.SizingStretchSame };
-            //        for (int table_n = 0; table_n < 4; table_n++)
-            //        {
-            //            Imgui.PushId(table_n);
-            //            Imgui.SetNextItemWidth(TEXT_BASE_WIDTH * 30);
-            //            EditTableSizingFlags(&sizing_policy_flags[table_n]);
-            //
-            //            // To make it easier to understand the different sizing policy,
-            //            // For each policy: we display one table where the columns have equal contents width, and one where the columns have different contents width.
-            //            if (Imgui.BeginTable("table1", 3, sizing_policy_flags[table_n] | flags1))
-            //            {
-            //                for (int row = 0; row < 3; row++)
-            //                {
-            //                    Imgui.TableNextRow();
-            //                    Imgui.TableNextColumn(); Imgui.Text("Oh dear");
-            //                    Imgui.TableNextColumn(); Imgui.Text("Oh dear");
-            //                    Imgui.TableNextColumn(); Imgui.Text("Oh dear");
-            //                }
-            //                Imgui.EndTable();
-            //            }
-            //            if (Imgui.BeginTable("table2", 3, sizing_policy_flags[table_n] | flags1))
-            //            {
-            //                for (int row = 0; row < 3; row++)
-            //                {
-            //                    Imgui.TableNextRow();
-            //                    Imgui.TableNextColumn(); Imgui.Text("AAAA");
-            //                    Imgui.TableNextColumn(); Imgui.Text("BBBBBBBB");
-            //                    Imgui.TableNextColumn(); Imgui.Text("CCCCCCCCCCCC");
-            //                }
-            //                Imgui.EndTable();
-            //            }
-            //            Imgui.PopId();
-            //        }
-            //
-            //        Imgui.Spacing();
-            //        Imgui.TextUnformatted("Advanced");
-            //        Imgui.SameLine();
-            //        HelpMarker("This section allows you to interact and see the effect of various sizing policies depending on whether Scroll is enabled and the contents of your columns.");
-            //
-            //        enum ContentsType { CT_ShowWidth, CT_ShortText, CT_LongText, CT_Button, CT_FillButton, CT_InputText };
-            //        static ImGuiTableFlags flags = TableOptions.ScrollY | TableOptions.Borders | TableOptions.RowBg | TableOptions.Resizable;
-            //        static int contents_type = CT_ShowWidth;
-            //        static int column_count = 3;
-            //
-            //        PushStyleCompact();
-            //        Imgui.PushId("Advanced");
-            //        Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
-            //        EditTableSizingFlags(&flags);
-            //        Imgui.Combo("Contents", &contents_type, "Show width\0Short Text\0Long Text\0Button\0Fill Button\0InputText\0");
-            //        if (contents_type == CT_FillButton)
-            //        {
-            //            Imgui.SameLine();
-            //            HelpMarker("Be mindful that using right-alignment (e.g. size.X = -FLT_MIN) creates a feedback loop where contents width can feed into auto-column width can feed into contents width.");
-            //        }
-            //        Imgui.Drag("Columns", &column_count, 0.1f, 1, 64, "%d", SliderOptions.AlwaysClamp);
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
-            //        Imgui.CheckboxFlags("TableOptions.PreciseWidths", &flags, TableOptions.PreciseWidths);
-            //        Imgui.SameLine(); HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
-            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags, TableOptions.ScrollX);
-            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
-            //        Imgui.CheckboxFlags("TableOptions.NoClip", &flags, TableOptions.NoClip);
-            //        Imgui.PopItemWidth();
-            //        Imgui.PopId();
-            //        PopStyleCompact();
-            //
-            //        if (Imgui.BeginTable("table2", column_count, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 7)))
-            //        {
-            //            for (int cell = 0; cell < 10 * column_count; cell++)
-            //            {
-            //                Imgui.TableNextColumn();
-            //                int column = Imgui.TableGetColumnIndex();
-            //                int row = Imgui.TableGetRowIndex();
-            //
-            //                Imgui.PushId(cell);
-            //                char label[32];
-            //                static char text_buf[32] = "";
-            //                sprintf(label, "Hello %d,%d", column, row);
-            //                switch (contents_type)
-            //                {
-            //                case CT_ShortText:  Imgui.TextUnformatted(label); break;
-            //                case CT_LongText:   Imgui.Text("Some %s text %d,%d\nOver two lines..", column == 0 ? "long" : "longeeer", column, row); break;
-            //                case CT_ShowWidth:  Imgui.Text("W: %.1f", Imgui.GetContentRegionAvailable().Width); break;
-            //                case CT_Button:     Imgui.Button(label); break;
-            //                case CT_FillButton: Imgui.Button(label, ImVec2(-FLT_MIN, 0.0f)); break;
-            //                case CT_InputText:  Imgui.SetNextItemWidth(-FLT_MIN); Imgui.InputText("##", text_buf, text_buf.Length); break;
-            //                }
-            //                Imgui.PopId();
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Resizable, stretch"))
+            {
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags5, TableOptions.Resizable);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersV", s_flags5, TableOptions.BordersV);
+                Imgui.SameLine();
+                HelpMarker("Using the _Resizable flag automatically enables the _BordersInnerV flag as well, this is why the resize borders are still showing when unchecking this.");
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table1", 3, s_flags5))
+                {
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"Hello {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Resizable, fixed"))
+            {
+                HelpMarker(
+                    "Using _Resizable + _SizingFixedFit flags.\n" +
+                    "Fixed-width columns generally makes more sense if you want to use horizontal scrolling.\n\n" +
+                    "Double-click a column border to auto-fit the column to its contents.");
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.NoHostExtendX", s_flags6, TableOptions.NoHostExtendX);
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table1", 3, s_flags6))
+                {
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"Hello {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Resizable, mixed"))
+            {
+                HelpMarker(
+                    "Using TableSetupColumn() to alter resizing policy on a per-column basis.\n\n" +
+                    "When combining Fixed and Stretch columns, generally you only want one, maybe two trailing columns to use _WidthStretch.");
+
+                if (Imgui.BeginTable("table1", 3, s_flags7))
+                {
+                    Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
+                    Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
+                    Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthStretch);
+                    Imgui.TableHeadersRow();
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"{((column == 2) ? "Stretch" : "Fixed")} {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                if (Imgui.BeginTable("table2", 6, s_flags7))
+                {
+                    Imgui.TableSetupColumn("AAA", TableColumnOptions.WidthFixed);
+                    Imgui.TableSetupColumn("BBB", TableColumnOptions.WidthFixed);
+                    Imgui.TableSetupColumn("CCC", TableColumnOptions.WidthFixed | TableColumnOptions.DefaultHide);
+                    Imgui.TableSetupColumn("DDD", TableColumnOptions.WidthStretch);
+                    Imgui.TableSetupColumn("EEE", TableColumnOptions.WidthStretch);
+                    Imgui.TableSetupColumn("FFF", TableColumnOptions.WidthStretch | TableColumnOptions.DefaultHide);
+                    Imgui.TableHeadersRow();
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 6; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"{((column >= 3) ? "Stretch" : "Fixed")} {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Reorderable, hideable, with headers"))
+            {
+                HelpMarker(
+                    "Click and drag column headers to reorder columns.\n\n" +
+                    "Right-click on a header to open a context menu.");
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags8, TableOptions.Resizable);
+                _ = Imgui.CheckboxFlags("TableOptions.Reorderable", s_flags8, TableOptions.Reorderable);
+                _ = Imgui.CheckboxFlags("TableOptions.Hideable", s_flags8, TableOptions.Hideable);
+                _ = Imgui.CheckboxFlags("TableOptions.NoBordersInBody", s_flags8, TableOptions.NoBordersInBody);
+                _ = Imgui.CheckboxFlags("TableOptions.NoBordersInBodyUntilResize", s_flags8, TableOptions.NoBordersInBodyUntilResize);
+                Imgui.SameLine();
+                HelpMarker("Disable vertical borders in columns Body until hovered for resize (borders will always appear in Headers)");
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table1", 3, s_flags8))
+                {
+                    Imgui.TableSetupColumn("One");
+                    Imgui.TableSetupColumn("Two");
+                    Imgui.TableSetupColumn("Three");
+                    Imgui.TableHeadersRow();
+                    for (var row = 0; row < 6; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"Hello {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+
+                if (Imgui.BeginTable("table2", 3, s_flags8 | TableOptions.SizingFixedFit, new(0.0f, 0.0f)))
+                {
+                    Imgui.TableSetupColumn("One");
+                    Imgui.TableSetupColumn("Two");
+                    Imgui.TableSetupColumn("Three");
+                    Imgui.TableHeadersRow();
+                    for (var row = 0; row < 6; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"Fixed {column},{row}");
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Padding"))
+            {
+                HelpMarker(
+                    "We often want outer padding activated when any using features which makes the edges of a column visible:\n" +
+                    "e.g.:\n" +
+                    "- BorderOuterV\n" +
+                    "- any form of row selection\n" +
+                    "Because of this, activating BorderOuterV sets the default to PadOuterX. Using PadOuterX or NoPadOuterX you can override the default.\n\n" +
+                    "Actual padding values are using style.CellPadding.\n\n" +
+                    "In this demo we don't show horizontal borders to emphasize how they don't affect default horizontal padding.");
+
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.PadOuterX", s_flags9, TableOptions.PadOuterX);
+                Imgui.SameLine();
+                HelpMarker("Enable outer-most padding (default if TableOptions.BordersOuterV is set)");
+                _ = Imgui.CheckboxFlags("TableOptions.NoPadOuterX", s_flags9, TableOptions.NoPadOuterX);
+                Imgui.SameLine();
+                HelpMarker("Disable outer-most padding (default if TableOptions.BordersOuterV is not set)");
+                _ = Imgui.CheckboxFlags("TableOptions.NoPadInnerX", s_flags9, TableOptions.NoPadInnerX);
+                Imgui.SameLine();
+                HelpMarker("Disable inner padding between columns (double inner padding if BordersOuterV is on, single inner padding if BordersOuterV is off)");
+                _ = Imgui.CheckboxFlags("TableOptions.BordersOuterV", s_flags9, TableOptions.BordersOuterV);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersInnerV", s_flags9, TableOptions.BordersInnerV);
+                _ = Imgui.Checkbox("show_headers", s_showHeaders);
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table_padding", 3, s_flags9))
+                {
+                    if (s_showHeaders)
+                    {
+                        Imgui.TableSetupColumn("One");
+                        Imgui.TableSetupColumn("Two");
+                        Imgui.TableSetupColumn("Three");
+                        Imgui.TableHeadersRow();
+                    }
+
+                    for (var row = 0; row < 5; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 3; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            if (row == 0)
+                            {
+                                Imgui.Text($"Avail {Imgui.GetContentRegionAvailable().Width:F2}");
+                            }
+                            else
+                            {
+                                _ = Imgui.Button($"Hello {column},{row}", new(-SizeF.MinNormalizedValue, 0.0f));
+                            }
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+
+                HelpMarker("Setting style.CellPadding to (0,0) or a custom value.");
+
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.Borders", s_flags10, TableOptions.Borders);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersH", s_flags10, TableOptions.BordersH);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersV", s_flags10, TableOptions.BordersV);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersInner", s_flags10, TableOptions.BordersInner);
+                _ = Imgui.CheckboxFlags("TableOptions.BordersOuter", s_flags10, TableOptions.BordersOuter);
+                _ = Imgui.CheckboxFlags("TableOptions.RowBg", s_flags10, TableOptions.RowBg);
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags10, TableOptions.Resizable);
+                _ = Imgui.Checkbox("show_widget_frame_bg", s_showWidgetFrameBg);
+                _ = Imgui.Slider("CellPadding", s_cellPadding, 0.0f, 10.0f, "%.0f");
+                PopStyleCompact();
+
+                Imgui.PushStyleVariable(StyleVariable.CellPadding, new SizeF(s_cellPadding[0], s_cellPadding[1]));
+                if (Imgui.BeginTable("table_padding_2", 3, s_flags10))
+                {
+                    if (!s_showWidgetFrameBg)
+                    {
+                        Imgui.PushStyleColor(StyleColor.FrameBackground, Color.Black);
+                    }
+
+                    for (var cell = 0; cell < 3 * 5; cell++)
+                    {
+                        _ = Imgui.TableNextColumn();
+                        if (s_init)
+                        {
+                            s_textBufs[cell] = new(16, "edit me");
+                        }
+
+                        Imgui.SetNextItemWidth(-SizeF.MinNormalizedValue);
+                        Imgui.PushId(cell);
+                        _ = Imgui.InputText("##cell", s_textBufs[cell]);
+                        Imgui.PopId();
+                    }
+                    if (!s_showWidgetFrameBg)
+                    {
+                        Imgui.PopStyleColor();
+                    }
+
+                    s_init = false;
+                    Imgui.EndTable();
+                }
+                Imgui.PopStyleVariable();
+
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Sizing policies"))
+            {
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags11, TableOptions.Resizable);
+                _ = Imgui.CheckboxFlags("TableOptions.NoHostExtendX", s_flags11, TableOptions.NoHostExtendX);
+                PopStyleCompact();
+
+                for (var table_n = 0; table_n < 4; table_n++)
+                {
+                    Imgui.PushId(table_n);
+                    Imgui.SetNextItemWidth(TEXT_BASE_WIDTH * 30);
+                    EditTableSizingFlags(s_sizingPolicyFlags.GetStateOptionOfElement(table_n));
+
+                    if (Imgui.BeginTable("table1", 3, s_sizingPolicyFlags[table_n] | s_flags11))
+                    {
+                        for (var row = 0; row < 3; row++)
+                        {
+                            Imgui.TableNextRow();
+                            _ = Imgui.TableNextColumn(); Imgui.Text("Oh dear");
+                            _ = Imgui.TableNextColumn(); Imgui.Text("Oh dear");
+                            _ = Imgui.TableNextColumn(); Imgui.Text("Oh dear");
+                        }
+                        Imgui.EndTable();
+                    }
+                    if (Imgui.BeginTable("table2", 3, s_sizingPolicyFlags[table_n] | s_flags11))
+                    {
+                        for (var row = 0; row < 3; row++)
+                        {
+                            Imgui.TableNextRow();
+                            _ = Imgui.TableNextColumn(); Imgui.Text("AAAA");
+                            _ = Imgui.TableNextColumn(); Imgui.Text("BBBBBBBB");
+                            _ = Imgui.TableNextColumn(); Imgui.Text("CCCCCCCCCCCC");
+                        }
+                        Imgui.EndTable();
+                    }
+                    Imgui.PopId();
+                }
+
+                Imgui.Spacing();
+                Imgui.TextUnformatted("Advanced");
+                Imgui.SameLine();
+                HelpMarker("This section allows you to interact and see the effect of various sizing policies depending on whether Scroll is enabled and the contents of your columns.");
+
+                PushStyleCompact();
+                Imgui.PushId("Advanced");
+                Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
+                EditTableSizingFlags(s_flags12);
+                _ = Imgui.Combo("Contents", s_contentsType2, "Show width\0Short Text\0Long Text\0Button\0Fill Button\0InputText\0");
+                if ((ContentsType2)(int)s_contentsType2 == ContentsType2.FillButton)
+                {
+                    Imgui.SameLine();
+                    HelpMarker("Be mindful that using right-alignment (e.g. size.X = -FLT_MIN) creates a feedback loop where contents width can feed into auto-column width can feed into contents width.");
+                }
+                _ = Imgui.Drag("Columns", s_columnCount, 0.1f, 1, 64, "%d", SliderOptions.AlwaysClamp);
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags12, TableOptions.Resizable);
+                _ = Imgui.CheckboxFlags("TableOptions.PreciseWidths", s_flags12, TableOptions.PreciseWidths);
+                Imgui.SameLine();
+                HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollX", s_flags12, TableOptions.ScrollX);
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollY", s_flags12, TableOptions.ScrollY);
+                _ = Imgui.CheckboxFlags("TableOptions.NoClip", s_flags12, TableOptions.NoClip);
+                Imgui.PopItemWidth();
+                Imgui.PopId();
+                PopStyleCompact();
+
+                if (Imgui.BeginTable("table2", s_columnCount, s_flags12, new(0.0f, TEXT_BASE_HEIGHT * 7)))
+                {
+                    for (var cell = 0; cell < 10 * s_columnCount; cell++)
+                    {
+                        _ = Imgui.TableNextColumn();
+                        var column = Imgui.TableGetColumnIndex();
+                        var row = Imgui.TableGetRowIndex();
+
+                        Imgui.PushId(cell);
+                        switch ((ContentsType2)(int)s_contentsType2)
+                        {
+                            case ContentsType2.ShortText:
+                                Imgui.TextUnformatted($"Hello {column},{row}");
+                                break;
+                            case ContentsType2.LongText:
+                                Imgui.Text($"Some {(column == 0 ? "long" : "longeeer")} text {column},{row}\nOver two lines..");
+                                break;
+                            case ContentsType2.ShowWidth:
+                                Imgui.Text($"W: {Imgui.GetContentRegionAvailable().Width:F1}");
+                                break;
+                            case ContentsType2.Button:
+                                _ = Imgui.Button($"Hello {column},{row}");
+                                break;
+                            case ContentsType2.FillButton:
+                                _ = Imgui.Button($"Hello {column},{row}", new(-SizeF.MinNormalizedValue, 0.0f));
+                                break;
+                            case ContentsType2.InputText:
+                                Imgui.SetNextItemWidth(-SizeF.MinNormalizedValue);
+                                _ = Imgui.InputText("##", s_textBuf);
+                                break;
+                        }
+                        Imgui.PopId();
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
             //    if (open_action != -1)
             //        Imgui.SetNextItemOpen(open_action != 0);
             //    IMGUI_DEMO_MARKER("Tables/Vertical scrolling, with clipping");
