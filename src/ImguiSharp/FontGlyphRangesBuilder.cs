@@ -1,6 +1,6 @@
 ﻿namespace ImguiSharp
 {
-    public unsafe struct FontGlyphRangesBuilder : IDisposable
+    public sealed unsafe class FontGlyphRangesBuilder : IDisposable
     {
         private Native.ImFontGlyphRangesBuilder* _builder;
 

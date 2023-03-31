@@ -3693,6 +3693,12 @@ namespace SampleApp
         private static readonly State<int> s_contentsType2 = new((int)ContentsType2.ShowWidth);
         private static readonly State<int> s_columnCount = new(3);
         private static readonly StateText s_textBuf = new(32);
+        private static readonly StateOption<TableOptions> s_flags13 = new(TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable);
+        private static readonly StateOption<TableOptions> s_flags14 = new(TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable);
+        private static readonly State<int> s_freezeCols = new(1);
+        private static readonly State<int> s_freezeRows = new(1);
+        private static readonly StateOption<TableOptions> s_flags15 = new(TableOptions.SizingStretchSame | TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.BordersOuter | TableOptions.RowBg | TableOptions.ContextMenuInBody);
+        private static readonly State<float> s_innerWidth = new(1000.0f);
 
         private static void ShowDemoWindowTables()
         {
@@ -4241,138 +4247,134 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Vertical scrolling, with clipping");
-            //    if (Imgui.TreeNode("Vertical scrolling, with clipping"))
-            //    {
-            //        HelpMarker("Here we activate ScrollY, which will create a child window container to allow hosting scrollable contents.\n\nWe also demonstrate using ImGuiListClipper to virtualize the submission of many items.");
-            //        static ImGuiTableFlags flags = TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
-            //
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
-            //        PopStyleCompact();
-            //
-            //        // When using ScrollX or ScrollY we need to specify a size for our table container!
-            //        // Otherwise by default the table will fit all available space, like a BeginChild() call.
-            //        ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 8);
-            //        if (Imgui.BeginTable("table_scrolly", 3, flags, outer_size))
-            //        {
-            //            Imgui.TableSetupScrollFreeze(0, 1); // Make top row always visible
-            //            Imgui.TableSetupColumn("One", TableColumnOptions.None);
-            //            Imgui.TableSetupColumn("Two", TableColumnOptions.None);
-            //            Imgui.TableSetupColumn("Three", TableColumnOptions.None);
-            //            Imgui.TableHeadersRow();
-            //
-            //            // Demonstrate using clipper for large vertical lists
-            //            ImGuiListClipper clipper;
-            //            clipper.Begin(1000);
-            //            while (clipper.Step())
-            //            {
-            //                for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
-            //                {
-            //                    Imgui.TableNextRow();
-            //                    for (int column = 0; column < 3; column++)
-            //                    {
-            //                        Imgui.TableSetColumnIndex(column);
-            //                        Imgui.Text("Hello %d,%d", column, row);
-            //                    }
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Horizontal scrolling");
-            //    if (Imgui.TreeNode("Horizontal scrolling"))
-            //    {
-            //        HelpMarker(
-            //            "When ScrollX is enabled, the default sizing policy becomes TableOptions.SizingFixedFit, "
-            //            "as automatically stretching columns doesn't make much sense with horizontal scrolling.\n\n" +
-            //            "Also note that as of the current version, you will almost always want to enable ScrollY along with ScrollX,"
-            //            "because the container window won't automatically extend vertically to fix contents (this may be improved in future versions).");
-            //        static ImGuiTableFlags flags = TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable;
-            //        static int freeze_cols = 1;
-            //        static int freeze_rows = 1;
-            //
-            //        PushStyleCompact();
-            //        Imgui.CheckboxFlags("TableOptions.Resizable", &flags, TableOptions.Resizable);
-            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags, TableOptions.ScrollX);
-            //        Imgui.CheckboxFlags("TableOptions.ScrollY", &flags, TableOptions.ScrollY);
-            //        Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //        Imgui.Drag("freeze_cols", &freeze_cols, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
-            //        Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
-            //        Imgui.Drag("freeze_rows", &freeze_rows, 0.2f, 0, 9, NULL, SliderOptions.NoInput);
-            //        PopStyleCompact();
-            //
-            //        // When using ScrollX or ScrollY we need to specify a size for our table container!
-            //        // Otherwise by default the table will fit all available space, like a BeginChild() call.
-            //        ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 8);
-            //        if (Imgui.BeginTable("table_scrollx", 7, flags, outer_size))
-            //        {
-            //            Imgui.TableSetupScrollFreeze(freeze_cols, freeze_rows);
-            //            Imgui.TableSetupColumn("Line #", TableColumnOptions.NoHide); // Make the first column not hideable to match our use of TableSetupScrollFreeze()
-            //            Imgui.TableSetupColumn("One");
-            //            Imgui.TableSetupColumn("Two");
-            //            Imgui.TableSetupColumn("Three");
-            //            Imgui.TableSetupColumn("Four");
-            //            Imgui.TableSetupColumn("Five");
-            //            Imgui.TableSetupColumn("Six");
-            //            Imgui.TableHeadersRow();
-            //            for (int row = 0; row < 20; row++)
-            //            {
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < 7; column++)
-            //                {
-            //                    // Both TableNextColumn() and TableSetColumnIndex() return true when a column is visible or performing width measurement.
-            //                    // Because here we know that:
-            //                    // - A) all our columns are contributing the same to row height
-            //                    // - B) column 0 is always visible,
-            //                    // We only always submit this one column and can skip others.
-            //                    // More advanced per-column clipping behaviors may benefit from polling the status flags via TableGetColumnFlags().
-            //                    if (!Imgui.TableSetColumnIndex(column) && column > 0)
-            //                        continue;
-            //                    if (column == 0)
-            //                        Imgui.Text("Line %d", row);
-            //                    else
-            //                        Imgui.Text("Hello world %d,%d", column, row);
-            //                }
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        Imgui.Spacing();
-            //        Imgui.TextUnformatted("Stretch + ScrollX");
-            //        Imgui.SameLine();
-            //        HelpMarker(
-            //            "Showcase using Stretch columns + ScrollX together: "
-            //            "this is rather unusual and only makes sense when specifying an 'inner_width' for the table!\n" +
-            //            "Without an explicit value, inner_width is == outer_size.X and therefore using Stretch columns + ScrollX together doesn't make sense.");
-            //        static ImGuiTableFlags flags2 = TableOptions.SizingStretchSame | TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.BordersOuter | TableOptions.RowBg | TableOptions.ContextMenuInBody;
-            //        static float inner_width = 1000.0f;
-            //        PushStyleCompact();
-            //        Imgui.PushId("flags3");
-            //        Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
-            //        Imgui.CheckboxFlags("TableOptions.ScrollX", &flags2, TableOptions.ScrollX);
-            //        Imgui.Drag("inner_width", &inner_width, 1.0f, 0.0f, FLT_MAX, "%.1f");
-            //        Imgui.PopItemWidth();
-            //        Imgui.PopId();
-            //        PopStyleCompact();
-            //        if (Imgui.BeginTable("table2", 7, flags2, outer_size, inner_width))
-            //        {
-            //            for (int cell = 0; cell < 20 * 7; cell++)
-            //            {
-            //                Imgui.TableNextColumn();
-            //                Imgui.Text("Hello world %d,%d", Imgui.TableGetColumnIndex(), Imgui.TableGetRowIndex());
-            //            }
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Vertical scrolling, with clipping"))
+            {
+                HelpMarker("Here we activate ScrollY, which will create a child window container to allow hosting scrollable contents.\n\nWe also demonstrate using ListClipper to virtualize the submission of many items.");
+
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollY", s_flags13, TableOptions.ScrollY);
+                PopStyleCompact();
+
+                var outer_size = new SizeF(0.0f, TEXT_BASE_HEIGHT * 8);
+                if (Imgui.BeginTable("table_scrolly", 3, s_flags13, outer_size))
+                {
+                    Imgui.TableSetupScrollFreeze(0, 1); // Make top row always visible
+                    Imgui.TableSetupColumn("One", TableColumnOptions.None);
+                    Imgui.TableSetupColumn("Two", TableColumnOptions.None);
+                    Imgui.TableSetupColumn("Three", TableColumnOptions.None);
+                    Imgui.TableHeadersRow();
+
+                    using (var clipper = new ListClipper())
+                    {
+                        clipper.Begin(1000);
+                        while (clipper.Step())
+                        {
+                            for (var row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
+                            {
+                                Imgui.TableNextRow();
+                                for (var column = 0; column < 3; column++)
+                                {
+                                    _ = Imgui.TableSetColumnIndex(column);
+                                    Imgui.Text($"Hello {column},{row}");
+                                }
+                            }
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Horizontal scrolling"))
+            {
+                HelpMarker(
+                    "When ScrollX is enabled, the default sizing policy becomes TableOptions.SizingFixedFit, " +
+                    "as automatically stretching columns doesn't make much sense with horizontal scrolling.\n\n" +
+                    "Also note that as of the current version, you will almost always want to enable ScrollY along with ScrollX," +
+                    "because the container window won't automatically extend vertically to fix contents (this may be improved in future versions).");
+
+                PushStyleCompact();
+                _ = Imgui.CheckboxFlags("TableOptions.Resizable", s_flags14, TableOptions.Resizable);
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollX", s_flags14, TableOptions.ScrollX);
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollY", s_flags14, TableOptions.ScrollY);
+                Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
+                _ = Imgui.Drag("freeze_cols", s_freezeCols, 0.2f, 0, 9, null, SliderOptions.NoInput);
+                Imgui.SetNextItemWidth(Imgui.GetFrameHeight());
+                _ = Imgui.Drag("freeze_rows", s_freezeRows, 0.2f, 0, 9, null, SliderOptions.NoInput);
+                PopStyleCompact();
+
+                var outer_size = new SizeF(0.0f, TEXT_BASE_HEIGHT * 8);
+                if (Imgui.BeginTable("table_scrollx", 7, s_flags14, outer_size))
+                {
+                    Imgui.TableSetupScrollFreeze(s_freezeCols, s_freezeRows);
+                    Imgui.TableSetupColumn("Line #", TableColumnOptions.NoHide);
+                    Imgui.TableSetupColumn("One");
+                    Imgui.TableSetupColumn("Two");
+                    Imgui.TableSetupColumn("Three");
+                    Imgui.TableSetupColumn("Four");
+                    Imgui.TableSetupColumn("Five");
+                    Imgui.TableSetupColumn("Six");
+                    Imgui.TableHeadersRow();
+                    for (var row = 0; row < 20; row++)
+                    {
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < 7; column++)
+                        {
+                            if (!Imgui.TableSetColumnIndex(column) && column > 0)
+                            {
+                                continue;
+                            }
+
+                            if (column == 0)
+                            {
+                                Imgui.Text($"Line {row}");
+                            }
+                            else
+                            {
+                                Imgui.Text($"Hello world {column},{row}");
+                            }
+                        }
+                    }
+                    Imgui.EndTable();
+                }
+
+                Imgui.Spacing();
+                Imgui.TextUnformatted("Stretch + ScrollX");
+                Imgui.SameLine();
+                HelpMarker(
+                    "Showcase using Stretch columns + ScrollX together: " +
+                    "this is rather unusual and only makes sense when specifying an 'inner_width' for the table!\n" +
+                    "Without an explicit value, inner_width is == outer_size.X and therefore using Stretch columns + ScrollX together doesn't make sense.");
+                PushStyleCompact();
+                Imgui.PushId("flags3");
+                Imgui.PushItemWidth(TEXT_BASE_WIDTH * 30);
+                _ = Imgui.CheckboxFlags("TableOptions.ScrollX", s_flags15, TableOptions.ScrollX);
+                _ = Imgui.Drag("inner_width", s_innerWidth, 1.0f, 0.0f, float.MaxValue, "%.1f");
+                Imgui.PopItemWidth();
+                Imgui.PopId();
+                PopStyleCompact();
+                if (Imgui.BeginTable("table2", 7, s_flags15, outer_size, s_innerWidth))
+                {
+                    for (var cell = 0; cell < 20 * 7; cell++)
+                    {
+                        _ = Imgui.TableNextColumn();
+                        Imgui.Text($"Hello world {Imgui.TableGetColumnIndex()},{Imgui.TableGetRowIndex()}");
+                    }
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
             //    if (open_action != -1)
             //        Imgui.SetNextItemOpen(open_action != 0);
             //    IMGUI_DEMO_MARKER("Tables/Columns flags");
