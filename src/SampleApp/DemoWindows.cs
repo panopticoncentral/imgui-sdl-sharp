@@ -3699,6 +3699,9 @@ namespace SampleApp
         private static readonly State<int> s_freezeRows = new(1);
         private static readonly StateOption<TableOptions> s_flags15 = new(TableOptions.SizingStretchSame | TableOptions.ScrollX | TableOptions.ScrollY | TableOptions.BordersOuter | TableOptions.RowBg | TableOptions.ContextMenuInBody);
         private static readonly State<float> s_innerWidth = new(1000.0f);
+        private static readonly string[] s_columnNames = new[] { "One", "Two", "Three" };
+        private static readonly StateOptionVector<TableColumnOptions> s_columnFlags = new(s_columnNames.Length, new[] { TableColumnOptions.DefaultSort, TableColumnOptions.None, TableColumnOptions.DefaultHide });
+        private static readonly StateOptionVector<TableColumnOptions> s_columnFlagsOut = new(s_columnNames.Length);
 
         private static void ShowDemoWindowTables()
         {
@@ -4375,73 +4378,72 @@ namespace SampleApp
                 Imgui.TreePop();
             }
 
-            //    if (open_action != -1)
-            //        Imgui.SetNextItemOpen(open_action != 0);
-            //    IMGUI_DEMO_MARKER("Tables/Columns flags");
-            //    if (Imgui.TreeNode("Columns flags"))
-            //    {
-            //        // Create a first table just to show all the options/flags we want to make visible in our example!
-            //        const int column_count = 3;
-            //        const char* column_names[column_count] = { "One", "Two", "Three" };
-            //        static ImGuiTableColumnFlags column_flags[column_count] = { TableColumnOptions.DefaultSort, TableColumnOptions.None, TableColumnOptions.DefaultHide };
-            //        static ImGuiTableColumnFlags column_flags_out[column_count] = { 0, 0, 0 }; // Output from TableGetColumnFlags()
-            //
-            //        if (Imgui.BeginTable("table_columns_flags_checkboxes", column_count, TableOptions.None))
-            //        {
-            //            PushStyleCompact();
-            //            for (int column = 0; column < column_count; column++)
-            //            {
-            //                Imgui.TableNextColumn();
-            //                Imgui.PushId(column);
-            //                Imgui.AlignTextToFramePadding(); // FIXME-TABLE: Workaround for wrong text baseline propagation across columns
-            //                Imgui.Text("'%s'", column_names[column]);
-            //                Imgui.Spacing();
-            //                Imgui.Text("Input flags:");
-            //                EditTableColumnsFlags(&column_flags[column]);
-            //                Imgui.Spacing();
-            //                Imgui.Text("Output flags:");
-            //                Imgui.BeginDisabled();
-            //                ShowTableColumnsStatusFlags(column_flags_out[column]);
-            //                Imgui.EndDisabled();
-            //                Imgui.PopId();
-            //            }
-            //            PopStyleCompact();
-            //            Imgui.EndTable();
-            //        }
-            //
-            //        // Create the real table we care about for the example!
-            //        // We use a scrolling table to be able to showcase the difference between the _IsEnabled and _IsVisible flags above, otherwise in
-            //        // a non-scrolling table columns are always visible (unless using TableOptions.NoKeepColumnsVisible + resizing the parent window down)
-            //        const ImGuiTableFlags flags
-            //            = TableOptions.SizingFixedFit | TableOptions.ScrollX | TableOptions.ScrollY
-            //            | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV
-            //            | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Sortable;
-            //        ImVec2 outer_size = ImVec2(0.0f, TEXT_BASE_HEIGHT * 9);
-            //        if (Imgui.BeginTable("table_columns_flags", column_count, flags, outer_size))
-            //        {
-            //            for (int column = 0; column < column_count; column++)
-            //                Imgui.TableSetupColumn(column_names[column], column_flags[column]);
-            //            Imgui.TableHeadersRow();
-            //            for (int column = 0; column < column_count; column++)
-            //                column_flags_out[column] = Imgui.TableGetColumnFlags(column);
-            //            float indent_step = (float)((int)TEXT_BASE_WIDTH / 2);
-            //            for (int row = 0; row < 8; row++)
-            //            {
-            //                Imgui.Indent(indent_step); // Add some indentation to demonstrate usage of per-column IndentEnable/IndentDisable flags.
-            //                Imgui.TableNextRow();
-            //                for (int column = 0; column < column_count; column++)
-            //                {
-            //                    Imgui.TableSetColumnIndex(column);
-            //                    Imgui.Text("%s %s", (column == 0) ? "Indented" : "Hello", Imgui.TableGetColumnName(column));
-            //                }
-            //            }
-            //            Imgui.Unindent(indent_step * 8.0f);
-            //
-            //            Imgui.EndTable();
-            //        }
-            //        Imgui.TreePop();
-            //    }
-            //
+            if (open_action != -1)
+            {
+                Imgui.SetNextItemOpen(open_action != 0);
+            }
+
+            if (Imgui.TreeNode("Columns flags"))
+            {
+                if (Imgui.BeginTable("table_columns_flags_checkboxes", s_columnNames.Length, TableOptions.None))
+                {
+                    PushStyleCompact();
+                    for (var column = 0; column < s_columnNames.Length; column++)
+                    {
+                        _ = Imgui.TableNextColumn();
+                        Imgui.PushId(column);
+                        Imgui.AlignTextToFramePadding();
+                        Imgui.Text($"'{s_columnNames[column]}'");
+                        Imgui.Spacing();
+                        Imgui.Text("Input flags:");
+                        EditTableColumnsFlags(s_columnFlags.GetStateOptionOfElement(column));
+                        Imgui.Spacing();
+                        Imgui.Text("Output flags:");
+                        Imgui.BeginDisabled();
+                        ShowTableColumnsStatusFlags(s_columnFlagsOut.GetStateOptionOfElement(column));
+                        Imgui.EndDisabled();
+                        Imgui.PopId();
+                    }
+                    PopStyleCompact();
+                    Imgui.EndTable();
+                }
+
+                const TableOptions Options
+                    = TableOptions.SizingFixedFit | TableOptions.ScrollX | TableOptions.ScrollY
+                    | TableOptions.RowBg | TableOptions.BordersOuter | TableOptions.BordersV
+                    | TableOptions.Resizable | TableOptions.Reorderable | TableOptions.Hideable | TableOptions.Sortable;
+                SizeF outer_size = new(0.0f, TEXT_BASE_HEIGHT * 9);
+                if (Imgui.BeginTable("table_columns_flags", s_columnNames.Length, Options, outer_size))
+                {
+                    for (var column = 0; column < s_columnNames.Length; column++)
+                    {
+                        Imgui.TableSetupColumn(s_columnNames[column], s_columnFlags[column]);
+                    }
+
+                    Imgui.TableHeadersRow();
+                    for (var column = 0; column < s_columnNames.Length; column++)
+                    {
+                        s_columnFlagsOut[column] = Imgui.TableGetColumnOptions(column);
+                    }
+
+                    float indent_step = (int)TEXT_BASE_WIDTH / 2;
+                    for (var row = 0; row < 8; row++)
+                    {
+                        Imgui.Indent(indent_step);
+                        Imgui.TableNextRow();
+                        for (var column = 0; column < s_columnNames.Length; column++)
+                        {
+                            _ = Imgui.TableSetColumnIndex(column);
+                            Imgui.Text($"{((column == 0) ? "Indented" : "Hello")} {Imgui.TableGetColumnName(column)}");
+                        }
+                    }
+                    Imgui.Unindent(indent_step * 8.0f);
+
+                    Imgui.EndTable();
+                }
+                Imgui.TreePop();
+            }
+
             //    if (open_action != -1)
             //        Imgui.SetNextItemOpen(open_action != 0);
             //    IMGUI_DEMO_MARKER("Tables/Columns widths");
